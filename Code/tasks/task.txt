@@ -1,0 +1,5 @@
+explicar multiplicação com raciocínio equacional
+
+gerar A + A = 2A somente com either
+
+álgebra dos tipos tipo soma e tipo produto

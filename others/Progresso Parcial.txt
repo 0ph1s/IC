@@ -1,0 +1,7 @@
+Progresso da pesquisa até o momento:
+
+- Busca por novos referenciais teóricos relevantes.
+- Estudo de métodos formais.
+- Estudo das bases teóricas para estudo dos conceitos ligados a linguagem haskell.
+- Implementação pratica de uma FSM determinística básica na linguagem Haskell (Interruptor).
+- Duas implementações de uma FSM (Máquina de Estados Finitos) clássica de catraca (turnstile) em Haskell: uma simples, de caráter pedagógico, e uma formalmente verificada utilizando a biblioteca CREM (Compositional Representable Executable Machines).

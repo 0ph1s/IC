@@ -1,0 +1,17 @@
+%% gerado por avionics-sim (Avionics.Sim.Mermaid)
+%% cenário: nominal
+sequenceDiagram
+  participant Op as Operador
+  participant Amb as Ambiente
+  participant Av as Avionica
+  participant Pw as Energia
+  Note over Op,Pw: estado inicial Av=Grounded Pw=Charged
+  Note over Op,Pw: tick 0
+  Op->>Av: TakeoffSignal
+  Av-->>Amb: MsgTakeoff, Av=InFlight
+  Note over Op,Pw: tick 1
+  Note over Op,Pw: tick 2
+  Op->>Pw: Drain
+  Pw-->>Amb: ReportLow, Pw=Low
+  Note over Op,Pw: tick 3
+  Note over Op,Pw: tick 4

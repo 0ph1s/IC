@@ -1,0 +1,61 @@
+================================================================================
+RESUMO: O QUE É O CREM E O QUE ELE FAZ
+================================================================================
+
+O QUE É?
+--------------------------------------------------------------------------------
+
+CREM é a abreviação de Compositional Representable Executable Machines
+(Máquinas Executáveis, Representáveis e Composicionais). É uma biblioteca
+Haskell, desenvolvida por Marco Perone e Georgios Karachalias, para definir,
+compor, executar e renderizar Máquinas de Estados Finitos (mais
+especificamente, Máquinas de Mealy) de forma puramente funcional.
+
+Foi projetada com base nos princípios do Domain-Driven Design (DDD), onde
+Aggregates, Policies e Projections são modelados como máquinas de estados que
+podem ser compostas para formar sistemas maiores.
+
+
+O QUE ELE FAZ?
+--------------------------------------------------------------------------------
+
+O CREM oferece quatro capacidades principais:
+
+1. IMPÕE INVARIANTES NAS TRANSIÇÕES PERMITIDAS (EM TEMPO DE COMPILAÇÃO)
+
+   - Usa uma Topology que lista todas as transições válidas entre estados.
+   - Essa topologia é promovida ao nível de tipos via singletons.
+   - Se o programador tentar implementar uma transição que não está na
+     topologia, o compilador GHC rejeita o código.
+   - As regras de negócio da FSM tornam-se propriedades do próprio sistema
+     de tipos.
+
+2. COMPÕE MÁQUINAS DE ESTADOS DE MÚLTIPLAS FORMAS
+
+   - Fornece construtores como Sequential, Parallel, Alternative, Feedback
+     e Kleisli.
+   - Isso permite construir sistemas complexos a partir de máquinas menores,
+     formando uma árvore onde as folhas são BaseMachine e os nós internos
+     descrevem a composição.
+
+3. GERA REPRESENTAÇÃO GRÁFICA AUTOMATICAMENTE
+
+   - Como a topologia é armazenada no nível de tipos, o CREM pode gerar
+     diagramas visuais do fluxo e do espaço de estados.
+   - Isso mantém a documentação visual sempre sincronizada com a
+     implementação, eliminando o problema de documentação desatualizada.
+
+4. EXECUTA MÁQUINAS DE FORMA PURAMENTE FUNCIONAL
+
+   - Permite executar uma máquina, fornecendo entradas e recebendo as saídas
+     emitidas, respeitando os princípios da programação funcional pura.
+
+
+EM UMA FRASE
+--------------------------------------------------------------------------------
+
+O CREM é uma biblioteca Haskell que permite construir arquiteturas de software
+como composição de máquinas de estados, onde as regras de negócio (quais
+transições são permitidas) são verificadas pelo compilador antes da execução,
+e onde a representação gráfica do sistema é gerada automaticamente a partir
+do código.

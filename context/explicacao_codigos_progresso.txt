@@ -1,0 +1,711 @@
+========================================================================
+EXPLICAÇÃO DE TODOS OS CÓDIGOS DO PROGRESSO PARCIAL
+COM SIGNIFICADOS DOS SÍMBOLOS UTILIZADOS
+========================================================================
+
+========================================================================
+GLOSSÁRIO DE SÍMBOLOS
+========================================================================
+
+Antes de percorrer os códigos, segue a legenda dos símbolos usados tanto
+no texto teórico quanto nos blocos de código Haskell.
+
+------------------------------------------------------------------------
+SÍMBOLOS DA TEORIA DAS CATEGORIAS E DA MATEMÁTICA
+------------------------------------------------------------------------
+
+  Q                Conjunto finito de ESTADOS da FSM.
+                   Ex.: Q = {Locked, Unlocked}.
+
+  Σ (Sigma)        Alfabeto finito de EVENTOS/ENTRADAS da FSM.
+                   Ex.: Σ = {Coin, Push}.
+
+  δ (Delta)        FUNÇÃO DE TRANSIÇÃO da FSM.
+                   Tipo: δ : Q × Σ → Q.
+                   Significado: dado um estado atual e um evento,
+                   devolve o próximo estado.
+
+  ×                PRODUTO CATEGORIAL (produto cartesiano de conjuntos).
+                   Ex.: Q × Σ é o conjunto de todos os pares
+                   (estado, evento).
+
+  →                MORFISMO (função/seta entre dois objetos).
+                   Ex.: A → B é uma função que vai de A para B.
+
+  ∘                COMPOSIÇÃO DE MORFISMOS (ou de funções).
+                   Ex.: (g ∘ f)(x) = g(f(x)).
+                   Em Haskell é o operador "." (ponto).
+
+  I                FUNCTOR IDENTIDADE (ou objeto identidade).
+                   Em Haskell corresponde ao "id".
+
+  T                ENDOFUNCTOR de uma mônada.
+                   Em Haskell, é o próprio construtor de tipo (ex.: ST, Maybe).
+
+  μ (Mu)           MULTIPLICAÇÃO DA MÔNADA (natural transformation T∘T → T).
+                   Em Haskell corresponde a "join :: m (m a) -> m a".
+
+  η (Eta)          UNIDADE DA MÔNADA (natural transformation I → T).
+                   Em Haskell corresponde a "return :: a -> m a".
+
+  T ∘ T            COMPOSIÇÃO DO ENDOFUNCTOR T COM ELE MESMO.
+                   Em Haskell: m (m a).
+
+  M                FUNCTOR MONÁDICO genérico (usado em "A → M B").
+                   Representa o contexto/efeito da mônada.
+
+  Q × Σ → Q        Assinatura completa da função de transição.
+                   Lê-se: "Q produto cartesiano com Σ resulta em Q".
+
+------------------------------------------------------------------------
+SÍMBOLOS DA LINGUAGEM HASKELL
+------------------------------------------------------------------------
+
+  ::               "TEM O TIPO" (type annotation).
+                   Ex.: x :: Int  ->  "x tem o tipo Int".
+
+  ->               SETA DE FUNÇÃO (função de um tipo para outro).
+                   Ex.: Int -> Int  ->  função que recebe Int e devolve Int.
+                   Também é associativa à direita: a -> b -> c  equivale a
+                   a -> (b -> c).
+
+  |                "OU" (separador de construtores em tipos soma).
+                   Ex.: data State = Locked | Unlocked.
+
+  =                DEFINIÇÃO (não é atribuição!).
+                   Ex.: transition Locked Coin = Unlocked.
+
+  _                WILDCARD (padrão que ignora o valor).
+                   Ex.: f _ = 0  ->  ignora o argumento.
+
+  \                LAMBDA (função anônima).
+                   Ex.: \x -> x + 1  ->  função que soma 1 a x.
+
+  <-               GERADOR em list comprehensions e notação do.
+                   Ex.: [x | x <- [1..10]]  ->  x percorre a lista.
+                   Ex.: y <- f x  ->  y recebe o resultado de f x.
+
+  $                OPERADOR DE APLICAÇÃO (baixa precedência).
+                   Ex.: f $ x + y  ->  f (x + y).
+                   Evita parênteses desnecessários.
+
+  .                COMPOSIÇÃO DE FUNÇÕES (em Haskell).
+                   Ex.: (f . g) x = f (g x).
+
+  >>=              BIND (operador de ligação monádica).
+                   Tipo: m a -> (a -> m b) -> m b.
+                   Encadeia computações monádicas.
+
+  >=>              FISH (composição de Kleisli).
+                   Tipo: (a -> m b) -> (b -> m c) -> (a -> m c).
+                   Compõe duas funções embelezadas.
+
+  <=<              FISH invertido (mesma ideia, argumentos trocados).
+
+  return           INJEÇÃO na mônada (identidade da Kleisli).
+                   Tipo: a -> m a.
+
+  do               NOTAÇÃO DO (açúcar sintático para >>=).
+                   Permite escrever código monádico em estilo imperativo.
+
+  pure             Equivalente a "return" no contexto Applicative.
+                   Tipo: a -> f a.
+
+  <$>              FMAP INFIXO.
+                   Tipo: (a -> b) -> f a -> f b.
+                   Ex.: (+1) <$> Just 2  ==  Just 3.
+
+  <*>              APLICAÇÃO APLICATIVA.
+                   Tipo: f (a -> b) -> f a -> f b.
+                   Aplica uma função dentro do contexto a um valor dentro
+                   do contexto.
+
+  fmap             FUNÇÃO DE MAPEAMENTO DE FUNCTOR.
+                   Tipo: (a -> b) -> f a -> f b.
+
+  newtype          DECLARAÇÃO DE TIPO NOVO (com um único construtor/campo).
+                   Ex.: newtype ST a = S (State -> (a, State)).
+
+  data             DECLARAÇÃO DE TIPO ALGÉBRICO (com um ou mais construtores).
+                   Ex.: data State = Locked | Unlocked.
+
+  deriving         DERIVAÇÃO AUTOMÁTICA DE INSTÂNCIAS.
+                   Ex.: deriving (Show, Eq)  ->  gera automaticamente as
+                   funções de impressão e comparação.
+
+  instance         DECLARAÇÃO DE INSTÂNCIA DE UMA CLASSE.
+                   Ex.: instance Functor ST where ...
+
+  type             SINÔNIMO DE TIPO.
+                   Ex.: type Stack = [Int].
+
+  app              FUNÇÃO AUXILIAR (definida pelo programador) para
+                   "desempacotar" o construtor S de ST.
+                   app (S st) x = st x.
+
+  foldl            FOLD LEFT (redução à esquerda).
+                   Tipo: (b -> a -> b) -> b -> [a] -> b.
+
+  mapM             MAP MONÁDICO.
+                   Tipo: Monad m => (a -> m b) -> [a] -> m [b].
+
+  singletons       BIBLIOTECA que promove valores ao nível de tipos.
+                   $(singletons [d| ... |]) gera tipos singleton.
+
+  $( ... )         QUASI-QUOTATION (Template Haskell).
+                   Permite gerar código em tempo de compilação.
+
+  [d| ... |]       QUASI-QUOTER para declarações (declarations).
+                   Usado dentro de $(singletons [d| ... |]).
+
+  _                (em nomes de tipos) parâmetro de tipo ignorado.
+
+  a, b, c, m, f, g Letras minúsculas: VARIÁVEIS DE TIPO (polimórficas).
+  t, xs, ys, ns    Letras minúsculas: VARIÁVEIS DE VALOR (argumentos).
+
+  A, B, C, M, T    Letras maiúsculas: TIPOS CONCRETOS ou FUNCTORES.
+
+------------------------------------------------------------------------
+SÍMBOLOS DO FRAMEWORK CREM
+------------------------------------------------------------------------
+
+  Topology         TIPO que representa a topologia de transições permitidas.
+                   É uma lista de pares (vértice, [vértices_destino]).
+
+  TurnstileVertex  TIPO que representa os vértices da catraca.
+                   Promovido ao nível de tipos via singletons.
+
+  STurnstileVertex TIPO SINGLETON gerado automaticamente.
+                   Permite usar valores (SLocked, SUnlocked) como tipos.
+
+  SLocked,         VALORES SINGLETON (prefixo "S" de "singleton").
+  SUnlocked        Representam Locked e Unlocked no nível de tipos.
+
+  ActionResult     TIPO que encapsula o resultado de uma ação.
+                   Exige uma prova AllowedTransition em tempo de compilação.
+
+  AllowedTransition RESTRIÇÃO DE TIPO que prova que uma transição
+                   pertence à topologia.
+
+  pureResult       FUNÇÃO AUXILIAR que constrói um ActionResult
+                   (usada no exemplo do CREM).
+
+  Applicative m    CONTEXTO genérico (m é qualquer functor aplicativo).
+                   Permite que a ação seja usada com diferentes efeitos.
+
+========================================================================
+1. DEFINIÇÃO DOS CONJUNTOS Q E Σ COMO TIPOS SOMA (Seção 5.1)
+========================================================================
+
+CÓDIGO:
+    data State = Locked | Unlocked deriving (Show, Eq)
+    data Input = Coin | Push deriving (Show, Eq)
+
+SIGNIFICADO DOS SÍMBOLOS USADOS:
+- data         -> declaração de tipo algébrico.
+- State, Input -> nomes dos tipos (conjuntos Q e Σ).
+- =            -> define os construtores do tipo.
+- |            -> "OU": um State é Locked OU Unlocked.
+- Locked,      -> construtores (valores possíveis do tipo).
+  Unlocked,
+  Coin, Push
+- deriving     -> geração automática de instâncias.
+- Show         -> permite imprimir o valor na tela.
+- Eq           -> permite comparar valores com == e /=.
+
+O QUE FAZ:
+- Define dois tipos algébricos que representam, respectivamente, o conjunto
+  finito de estados Q = {Locked, Unlocked} e o alfabeto de eventos
+  Σ = {Coin, Push}.
+- Cada "|" (barra vertical) é lido como "ou": um State é Locked OU Unlocked.
+- deriving (Show, Eq) instrui o compilador a gerar automaticamente:
+    * Show: permite imprimir valores desses tipos no terminal.
+    * Eq: permite compará-los com == e /=.
+
+FUNDAMENTAÇÃO CATEGORIAL (Milewski, 2020):
+- Esses tipos são COPRODUTOS de duas cópias do objeto terminal.
+  Como Bool = True | False corresponde ao número 2 (isto é, 2 = 1 + 1),
+  tanto State quanto Input são ISOMORFOS A Bool — estruturalmente, são
+  coprodutos de dois objetos terminais na categoria Hask.
+- Isso garante que a FINITUDE exigida pela definição matemática de Q e Σ
+  é preservada com fidelidade pelo sistema de tipos.
+
+========================================================================
+2. FUNÇÃO DE TRANSIÇÃO δ COMO MORFISMO EM HASK (Seção 5.2)
+========================================================================
+
+CÓDIGO:
+    transition :: State -> Input -> State
+    transition Locked   Coin  = Unlocked
+    transition Locked   Push  = Locked
+    transition Unlocked Coin  = Unlocked
+    transition Unlocked Push  = Locked
+
+SIGNIFICADO DOS SÍMBOLOS USADOS:
+- ::           -> "tem o tipo".
+- ->           -> seta de função (associativa à direita).
+- State ->     -> lê-se: "recebe um State e devolve uma função que
+  Input -> State   recebe um Input e devolve um State".
+- =            -> definição (equação da função).
+- Locked,      -> padrões (patterns) para pattern matching.
+  Coin, etc.
+
+O QUE FAZ:
+- Implementa a função de transição δ : Q × Σ → Q por meio de pattern
+  matching exaustivo.
+- Cada linha cobre um par (estado atual, evento) e devolve o próximo estado.
+- A assinatura State -> Input -> State é a versão CURRIED de uma função
+  cujo domínio real é o produto State × Input.
+
+FUNDAMENTAÇÃO (Milewski, 2020; Hutton, 2016):
+- O CURRYING estabelece que (a, b) -> c é equivalente a a -> b -> c.
+  Portanto, a assinatura em Haskell corresponde exatamente ao morfismo
+  δ : Q × Σ → Q, onde o domínio é o PRODUTO CATEGORIAL Q × Σ.
+- O PATTERN MATCHING EXAUSTIVO é o que garante a COMPLETUDE FUNCIONAL:
+  como todos os construtores de State e Input são cobertos, o compilador
+  GHC emite aviso (ou erro, com -Werror) se algum caso for omitido.
+- A propriedade de TYPE SAFETY de Hutton: como a inferência de tipos precede
+  a avaliação, ERROS DE TIPO NUNCA OCORREM EM TEMPO DE EXECUÇÃO — o
+  compilador detecta uma classe ampla de erros antes de o programa rodar.
+
+========================================================================
+3. SEQUENCIAÇÃO COM FOLDL (Seção 5.3)
+========================================================================
+
+CÓDIGO:
+    run :: State -> [Input] -> State
+    run = foldl transition
+
+SIGNIFICADO DOS SÍMBOLOS USADOS:
+- [Input]      -> LISTA de Inputs (colchetes = lista).
+- foldl        -> FOLD LEFT (redução à esquerda).
+                  Tipo: (b -> a -> b) -> b -> [a] -> b.
+- =            -> definição por aplicação parcial (point-free).
+
+O QUE FAZ:
+- run recebe um estado inicial e uma lista de eventos, e aplica transition
+  sucessivamente, acumulando o estado resultante.
+- foldl (fold left) é uma função de alta ordem que processa a lista da
+  esquerda para a direita, passando o acumulador (o estado atual) como
+  primeiro argumento para cada aplicação.
+
+FUNDAMENTAÇÃO (Milewski, 2020):
+- A função transition utilizada aqui é PURA: sempre produz o mesmo resultado
+  para o mesmo argumento, sem efeitos colaterais.
+- Essa pureza é o que viabiliza a VERIFICAÇÃO DE TIPOS e a EXAUSTIVIDADE
+  DO PATTERN MATCHING como mecanismos de corretude — algo inacessível ao
+  modelo imperativo tradicional (onde há estado mutável global).
+
+EXEMPLO DE EXECUÇÃO:
+    run Locked [Coin, Push, Push, Coin, Coin, Push]  ->  Locked
+
+========================================================================
+4. MOTIVAÇÃO PARA A ABSTRAÇÃO MONÁDICA (Seção 5.4)
+========================================================================
+
+CÓDIGO:
+    (<=<) :: (a -> Writer b) -> (b -> Writer c) -> (a -> Writer c)
+    m1 >=> m2 = \x -> let (v, s1) = m1 x
+                          (z, s2) = m2 y
+                      in (z, s1 ++ s2)
+
+    return :: a -> Writer a
+    return x = (x, "")
+
+SIGNIFICADO DOS SÍMBOLOS USADOS:
+- >=>          -> FISH (composição de Kleisli).
+- <=<          -> FISH invertido (mesma composição, argumentos trocados).
+- Writer       -> FUNCTOR que carrega um par (valor, log).
+- a, b, c      -> variáveis de tipo.
+- \x -> ...    -> LAMBDA (função anônima).
+- let ... in   -> DEFINIÇÕES LOCAIS dentro de uma expressão.
+- ++           -> CONCATENAÇÃO de listas/strings.
+- ""           -> STRING VAZIA (log vazio).
+- return       -> INJEÇÃO na mônada (identidade da Kleisli).
+
+O QUE FAZ:
+- Define o operador "FISH" (>=>), que compõe duas funções "embelezadas"
+  do tipo a -> Writer b e b -> Writer c, produzindo uma função a -> Writer c.
+- Writer aqui é um par (valor, log): a função retorna o valor calculado E
+  acumula um log textual.
+- return (chamado aqui de identidade da categoria de Kleisli) injeta um
+  valor puro em Writer, sem produzir log.
+
+FUNDAMENTAÇÃO (Milewski, 2020 — Categoria de Kleisli):
+- A CATEGORIA DE KLEISLI tem os mesmos objetos da categoria subjacente, mas
+  os morfismos são funções A → M B (onde M é um functor monádico).
+- A composição é dada por >=>, e a identidade é return.
+- Isso formaliza a solução para o caso em que a FSM precisa acumular NÃO SÓ
+  O NOVO ESTADO, mas também uma SAÍDA (output) ou LOG associado a cada
+  transição.
+- A analogia é direta: assim como Writer acumula uma trilha textual, a FSM
+  precisa acumular o novo estado E uma eventual saída, sem usar variável
+  mutável externa.
+
+========================================================================
+5. STATE MONAD E A FSM MONÁDICA (Seção 5.5)
+========================================================================
+
+CÓDIGO:
+    newtype ST a = S (State -> (a, State))
+
+    app :: ST a -> State -> (a, State)
+    app (S st) x = st x
+
+    instance Functor ST where
+      fmap g st = S (\s -> let (x, s') = app st s in (g x, s'))
+
+    instance Applicative ST where
+      pure x = S (\s -> (x, s))
+      stf <*> stx = S (\s -> let (f, s') = app stf s
+                                 (x, s'') = app stx s'
+                             in (f x, s''))
+
+    instance Monad ST where
+      st >>= f = S (\s -> let (x, s') = app st s
+                           in app (f x) s')
+
+SIGNIFICADO DOS SÍMBOLOS USADOS:
+- newtype      -> declaração de tipo novo (um construtor, um campo).
+- ST a         -> nome do tipo (State Transformer parametrizado por a).
+- S            -> CONSTRUTOR do tipo ST.
+- State        -> tipo do estado (aqui, sinônimo de Int ou similar).
+- (a, State)   -> PAR ORDENADO (valor, novo_estado).
+- app          -> função auxiliar para "desempacotar" o construtor S.
+- instance     -> declaração de instância de uma classe.
+- Functor,     -> CLASSES DE TIPO (typeclasses) que ST implementa.
+  Applicative,
+  Monad
+- fmap         -> função de mapeamento de functor.
+- pure         -> injeção no contexto aplicativo.
+- <*>          -> aplicação aplicativa.
+- >>=          -> BIND (ligação monádica).
+- \s -> ...    -> LAMBDA que recebe o estado s.
+- let ... in   -> DEFINIÇÕES LOCAIS.
+- (x, s')      -> par ordenado (valor, estado).
+- g            -> função a ser aplicada ao valor.
+- f            -> função que devolve uma nova computação monádica.
+
+O QUE FAZ:
+- ST a encapsula uma FUNÇÃO PURA DE TRANSFORMAÇÃO DE ESTADO: recebe um
+  estado s, devolve um par (valor, novo_estado).
+- app remove o construtor S para aplicar a função encapsulada.
+- Functor ST: aplica g ao VALOR produzido, sem tocar no estado.
+- Applicative ST: pure x devolve x sem modificar o estado; <*> aplica uma
+  função f (extraída de stf) ao valor x (extraído de stx), ENCADEANDO O
+  ESTADO de stf para stx.
+- Monad ST: >>= executa st a partir de um estado s, obtém (x, s'), e então
+  aplica f x a s' — ENCADEANDO O ESTADO através das computações.
+
+FUNDAMENTAÇÃO (Hutton, 2016):
+- Esse é exatamente o padrão do exemplo canônico de Hutton para GERAÇÃO DE
+  VALORES FRESCOS (fresh :: ST Int; fresh = S (\n -> (n, n+1))).
+- Um contador interno é encapsulado e "ROSQUEADO" (threaded) de forma pura
+  através de sucessivas aplicações — exatamente o comportamento requerido
+  para propagar, transformar e extrair o estado do autômato a cada evento.
+
+DERIVAÇÃO DA TRANSIÇÃO MONÁDICA:
+    transicaoM :: Input -> ST Output
+    transicaoM evt = S (\q -> let q' = transition q evt
+                               in (mensagem q evt, q'))
+
+SIGNIFICADO DOS SÍMBOLOS USADOS:
+- Output       -> tipo da saída produzida pela transição.
+- evt          -> variável que representa o evento (Input).
+- q            -> variável que representa o estado atual.
+- q'           -> variável que representa o novo estado.
+- mensagem     -> função auxiliar que produz a saída associada à transição.
+
+O QUE FAZ:
+- Instancia o "estado" da State Monad como o ESTADO DO AUTÔMATO Q.
+- O VALOR PRODUZIDO a cada passo é a SAÍDA ASSOCIADA À TRANSIÇÃO
+  (mensagem q evt).
+- O NOVO ESTADO é q' = transition q evt.
+- Retorna o par (saída, novo_estado) — exatamente o que a State Monad espera.
+
+========================================================================
+6. SEQUENCIAÇÃO COM MAPM E NOTAÇÃO DO (Seção 5.6)
+========================================================================
+
+CÓDIGO:
+    mapM :: Monad m => (a -> m b) -> [a] -> m [b]
+    mapM f []     = return []
+    mapM f (x:xs) = do y  <- f x
+                       ys <- mapM f xs
+                       return (y:ys)
+
+SIGNIFICADO DOS SÍMBOLOS USADOS:
+- Monad m =>   -> RESTRIÇÃO DE TIPO: m deve ser uma mônada.
+- mapM         -> MAP MONÁDICO.
+- f            -> função que devolve uma ação monádica.
+- m b          -> tipo do resultado dentro da mônada.
+- []           -> lista vazia (caso base).
+- (x:xs)       -> padrão que separa o primeiro elemento (x) do resto (xs).
+- do           -> NOTAÇÃO DO (açúcar sintático para >>=).
+- <-           -> GERADOR: recebe o resultado de uma ação monádica.
+- return       -> INJEÇÃO na mônada.
+- (y:ys)       -> CONSTRUÇÃO de lista (cons).
+
+O QUE FAZ:
+- Generaliza a composição de foldl para o contexto monádico.
+- Para cada elemento x da lista, aplica f x (que produz uma ação monádica),
+  ENCADEIA os resultados com do (que é açúcar sintático para >>=), e devolve
+  uma lista de resultados DENTRO DA MÔNADA.
+- mapM transicaoM eventos :: ST [Output] — executa a sequência de transições
+  monádicas, produzindo a lista de saídas e o estado final.
+
+FUNDAMENTAÇÃO (Oliveira, 2017):
+- A NOTAÇÃO DO é uma forma de reescrever expressões baseadas em >>= "de uma
+  maneira parecida com as linguagens de programação imperativas",
+  preservando a PUREZA REFERENCIAL.
+- Generaliza rigorosamente o resultado obtido apenas com foldl, mas agora
+  carregando efeitos (saída + estado).
+
+EXEMPLO DE USO:
+    app (mapM transicaoM eventos) Locked
+    -- produz: ([saída1, saída2, ...], estado_final)
+
+========================================================================
+7. MONAD COMO MONOIDE NA CATEGORIA DOS ENDOFUNCTORES (Seção 5.7)
+========================================================================
+
+CÓDIGO:
+    μ : T ∘ T → T
+    η : I → T
+
+SIGNIFICADO DOS SÍMBOLOS USADOS:
+- μ (Mu)       -> MULTIPLICAÇÃO DA MÔNADA (natural transformation).
+                  Em Haskell: join :: m (m a) -> m a.
+- η (Eta)      -> UNIDADE DA MÔNADA (natural transformation).
+                  Em Haskell: return :: a -> m a.
+- T            -> ENDOFUNCTOR (a própria mônada).
+- ∘            -> COMPOSIÇÃO DE FUNCTORES (T ∘ T = T composto com T).
+- I            -> FUNCTOR IDENTIDADE.
+- →            -> MORFISMO entre functores (transformação natural).
+- T ∘ T → T    -> assinatura de μ (achata dois níveis em um).
+- I → T        -> assinatura de η (injeta identidade em T).
+
+O QUE FAZ:
+- Definição formal de MONAD como um endofunctor T equipado com duas
+  transformações naturais:
+    * μ (multiplicação): achata T ∘ T em T (é o join em Haskell).
+    * η (unidade): injeta a identidade I em T (é o return em Haskell).
+- Satisfazem leis de associatividade e unidade ESTRUTURALMENTE IDÊNTICAS
+  ÀS LEIS DE UM MONOIDE.
+
+FUNDAMENTAÇÃO (Milewski, 2020; Mac Lane):
+- "Monad is just a monoid in the category of endofunctors."
+- Esse resultado garante que a composição de transições via >=> (fish) é
+  ASSOCIATIVA e possui ELEMENTO NEUTRO (return).
+- Consequência prática: a sequenciação de eventos da FSM produz o MESMO
+  RESULTADO INDEPENDENTEMENTE DE COMO A LISTA DE EVENTOS FOR PARTICIONADA
+  OU AGRUPADA — generalizando formalmente a associatividade implicitamente
+  exigida pelo foldl.
+
+========================================================================
+8. TOPOLOGIA PROMOVIDA AO NÍVEL DE TIPOS (CREM — Seção 5.8)
+========================================================================
+
+CÓDIGO:
+    $(singletons [d|
+      data TurnstileVertex = Locked | Unlocked
+        deriving (Show, Eq)
+
+      turnstileTopology :: Topology TurnstileVertex
+      turnstileTopology = Topology
+        [ (Locked,   [Unlocked])
+        , (Unlocked, [Locked])
+        ]
+      |])
+
+SIGNIFICADO DOS SÍMBOLOS USADOS:
+- $( ... )     -> QUASI-QUOTATION (Template Haskell).
+                  Permite gerar código em tempo de compilação.
+- singletons   -> BIBLIOTECA que promove valores ao nível de tipos.
+- [d| ... |]   -> QUASI-QUOTER para declarações.
+- data         -> declaração de tipo.
+- TurnstileVertex -> tipo dos vértices (estados) da catraca.
+- ::           -> "tem o tipo".
+- Topology     -> TIPO que representa a topologia de transições.
+- [ (Locked,   -> LISTA de pares.
+    [Unlocked])    Cada par tem: (origem, [destinos permitidos]).
+  , ...        -> VÍRGULA separadora de elementos da lista.
+  ]            -> FIM da lista.
+- ( ... )      -> PAR ORDENADO.
+- [ ... ]      -> LISTA.
+
+O QUE FAZ:
+- $(singletons [d| ... |]) é uma QUASI-QUOTATION do Template Haskell que
+  promove definições de nível de valor para o NÍVEL DE TIPOS, gerando
+  automaticamente:
+    * Tipos singleton (STurnstileVertex).
+    * Instâncias que permitem usar valores como tipos.
+- turnstileTopology é uma lista de pares (estado_origem,
+  [estados_destino_permitidos]):
+    * De Locked, só é possível ir para Unlocked.
+    * De Unlocked, só é possível ir para Locked.
+
+FUNDAMENTAÇÃO (Perone, 2023; Hutton, 2016):
+- Estende o sistema de tipos de Haskell: em vez de restringir apenas o TIPO
+  de um valor, a topologia restringe QUAIS VALORES DE TRANSIÇÃO SÃO
+  ACEITÁVEIS.
+- A regra de negócio da FSM torna-se uma PROPRIEDADE DO PRÓPRIO SISTEMA
+  DE TIPOS.
+- É uma aplicação do conceito de FUNCTOR REPRESENTÁVEL: a topologia é um
+  "contêiner" que indexa as transições permitidas.
+
+========================================================================
+9. AÇÃO FORMALIZADA COM PROVA EM TEMPO DE COMPILAÇÃO (CREM — Seção 5.9)
+========================================================================
+
+CÓDIGO:
+    turnstileAction :: Applicative m
+      => STurnstileVertex initialVertex
+      -> Input
+      -> ActionResult m TurnstileTopology STurnstileVertex initialVertex Output
+
+    turnstileAction SLocked Coin   = pureResult "Unlocked (insert coin)"   SUnlocked
+    turnstileAction SLocked Push   = pureResult "Locked (push denied)"     SLocked
+    turnstileAction SUnlocked Coin = pureResult "Unlocked (already open)"  SUnlocked
+    turnstileAction SUnlocked Push = pureResult "Locked (passed through)"  SLocked
+
+SIGNIFICADO DOS SÍMBOLOS USADOS:
+- Applicative m => -> RESTRIÇÃO DE TIPO: m deve ser um functor aplicativo.
+- STurnstileVertex -> TIPO SINGLETON gerado pelo singletons.
+- initialVertex   -> variável de tipo que representa o vértice atual.
+- ActionResult    -> TIPO que encapsula o resultado de uma ação.
+- TurnstileTopology -> TOPOLOGIA promovida ao nível de tipos.
+- Output          -> tipo da saída produzida.
+- SLocked,        -> VALORES SINGLETON (prefixo "S").
+  SUnlocked          Representam Locked e Unlocked no nível de tipos.
+- pureResult      -> FUNÇÃO AUXILIAR que constrói um ActionResult.
+
+O QUE FAZ:
+- turnstileAction é a ação da FSM, genérica sobre um contexto Applicative m
+  arbitrário.
+- O construtor ActionResult exige, IMPLICITAMENTE, uma prova em tempo de
+  compilação (a restrição AllowedTransition topology initialVertex
+  finalVertex) de que a transição declarada PERTENCE À TOPOLOGIA.
+- Cada chamada a pureResult carrega essa restrição: se a transição não
+  estiver na topologia, o GHC rejeita o código.
+
+FUNDAMENTAÇÃO (Perone, 2023; Hutton, 2016):
+- O TYPE SAFETY de Hutton é estendido do nível sintático para o NÍVEL
+  SEMÂNTICO DO DOMÍNIO.
+- Tentar codificar turnstileAction SLocked Push = pureResult "..." SUnlocked
+  (transição proibida) resulta em ERRO DE COMPILAÇÃO — o GHC não encontra
+  a instância AllowedTransition correspondente.
+- O erro não é uma simples incompatibilidade estrutural entre tipos
+  primitivos, mas uma VIOLAÇÃO DE REGRA DE NEGÓCIO CODIFICADA COMO
+  RESTRIÇÃO DE TIPO.
+
+========================================================================
+10. EXECUÇÃO E VALIDAÇÃO CRUZADA (Seção 5.10)
+========================================================================
+
+TRAÇO DE EXECUÇÃO:
+    Coin -> Unlocked (insert coin)
+    Push -> Locked (passed through)
+    Push -> Locked (push denied)
+    Coin -> Unlocked (insert coin)
+    Coin -> Unlocked (already open)
+    Push -> Locked (passed through)
+
+SIGNIFICADO DOS SÍMBOLOS USADOS:
+- ->           -> SETA que indica a transição (evento -> novo estado).
+- ( ... )      -> PARÊNTESES com a mensagem de saída associada.
+
+O QUE FAZ:
+- Traço de execução do CREM sobre [Coin, Push, Push, Coin, Coin, Push].
+- O estado final é Locked, IDÊNTICO ao obtido pela implementação ingênua
+  com foldl.
+
+SIGNIFICADO:
+- VALIDAÇÃO CRUZADA EMPÍRICA entre duas formalizações estruturalmente
+  distintas:
+    1. Pattern matching simples + foldl.
+    2. Topologia promovida ao nível de tipos + efeito monádico genérico.
+- Reforça a CORRETUDE SEMÂNTICA da função de transição δ modelada desde
+  o início.
+
+========================================================================
+11. LIMITAÇÃO: TOPOLOGIA RESTRINGE APENAS Q → Q (Seção 5.11)
+========================================================================
+
+PROBLEMA IDENTIFICADO:
+- Como o EVENTO (Input) não está codificado no próprio vértice do tipo, a
+  Topology declarada restringe apenas a ALCANÇABILIDADE ESTADO-A-ESTADO
+  (Q → Q), e NÃO O PAR COMPLETO (Q × Σ) → Q exigido pela definição formal
+  de δ.
+
+SIGNIFICADO DOS SÍMBOLOS USADOS:
+- Q → Q        -> restrição apenas entre estados (não considera eventos).
+- Q × Σ → Q    -> restrição completa (estado E evento).
+
+ENCAMINHAMENTO SUGERIDO:
+- Usar a noção de FUNCTOR REPRESENTÁVEL (Milewski, 2020): um functor pode
+  ser interpretado como "um contêiner para armazenar resultados memoizados
+  de chamadas de função", indexado por um TIPO-CHAVE.
+- Isso sugere codificar o alfabeto Σ COMO ÍNDICE (CHAVE) DAS TRANSIÇÕES
+  PERMITIDAS em cada vértice da topologia, aproximando a representação em
+  tipos da definição matemática completa de δ.
+
+========================================================================
+12. SÍNTESE GERAL DA EVOLUÇÃO DO RIGOR FORMAL (Seção 5.12)
+========================================================================
+
+TABELA:
+
+| Etapa                     | Mecanismo de Corretude                  | Fundamento Teórico                          |
+|---------------------------|-----------------------------------------|---------------------------------------------|
+| Implementação ingênua     | Exaustividade do pattern matching       | Hutton (2016) — Tipos de Dados Algébricos   |
+| Formalização teórica      | State Monad + operador fish (>=>)       | Milewski (2020) — Categoria de Kleisli      |
+| Verificação formal (CREM) | Prova AllowedTransition em tempo de comp.| Perone (2023) — Topologia promovida a tipos |
+
+EVOLUÇÃO:
+- Etapas iniciais: transições inválidas não eram detectáveis ou resultavam
+  em indefinição.
+- Etapa final: tais violações são capturadas como ERROS DE COMPILAÇÃO.
+
+HIPÓTESES DE PESQUISA:
+- COMPLETUDE FUNCIONAL: confirmada na implementação inicial (exaustividade
+  do pattern matching).
+- SEGURANÇA DE TIPOS: validada em dois níveis — básico (type safety de
+  Haskell) e profundo (rejeição de transições fora da topologia em tempo
+  de compilação).
+- COMPOSABILIDADE E MODULAÇÃO: fundamentação teórica estabelecida
+  (Categoria de Kleisli + State Monad); primeira instância prática obtida
+  com o CREM. DEMONSTRAÇÃO COMPLETA ainda depende da composição efetiva de
+  múltiplas FSMs via Sequential, Parallel, Alternative e Feedback.
+
+========================================================================
+RESUMO VISUAL DA CADEIA DE ABSTRAÇÕES
+========================================================================
+
+FSM simples (Q, Σ, δ)
+    │
+    ├── Tipos Soma (data State, data Input)  <- coprodutos (2 = 1 + 1)
+    │
+    ├── transition :: State -> Input -> State  <- morfismo curried
+    │
+    ├── run = foldl transition  <- composição pura
+    │
+    ├── Necessidade de carregar efeitos (log, saída)
+    │       │
+    │       └── Categoria de Kleisli (Writer, >=>)  <- funções embelezadas
+    │
+    ├── State Monad (ST a = S (State -> (a, State)))  <- threading puro
+    │       │
+    │       └── transicaoM :: Input -> ST Output  <- FSM monádica
+    │
+    ├── mapM + notação do  <- sequenciação monádica
+    │
+    ├── Monad = Monoide na categoria dos endofunctores  <- μ, η
+    │
+    └── CREM: Topologia promovida a tipos + prova AllowedTransition
+            │
+            └── Verificação formal em tempo de compilação
+
+========================================================================
+FIM DO ARQUIVO
+========================================================================

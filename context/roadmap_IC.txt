@@ -1,0 +1,91 @@
+Aqui está um **roadmap** estruturado para o desenvolvimento do seu projeto de Iniciação Científica (*"Formalização de Máquinas de Estados Finitos Componíveis em Haskell: Segurança de Tipos e Completude Funcional via Monads e Tipos Algébricos"*), baseado nas fases e no cronograma do seu trabalho:
+
+---
+
+# Roadmap do Projeto: FSMs Componíveis em Haskell
+
+```
+[Fase 1: Fundamentação & Formalização]
+       │
+       ▼
+[Fase 2: Gestão de Estado & Monads]
+       │
+       ▼
+[Fase 3: Composabilidade & Framework CREM]
+       │
+       ▼
+[Fase 4: Validação, Escrita & Entrega]
+
+```
+
+---
+
+### Fase 1: Fundamentação Teórica & Formalização Inicial
+
+* **Revisão Bibliográfica Aprofundada**
+* Estudo detalhado dos fundamentos matemáticos de FSMs Determinísticas (DFSMs).
+* Leitura e fichamento de literaturas sobre Tipos de Dados Algébricos (ADTs) e Teoria das Categorias em Haskell.
+
+
+* **Modelagem Teórica em Tipos**
+* Mapeamento dos conjuntos matemáticos de Estados ($Q$) e Eventos ($\Sigma$) diretamente para **Tipos Soma** (ADTs).
+
+
+* **Construção da Função de Transição Pura ($\delta$)**
+* Implementação da função de transição utilizando *pattern matching* exaustivo.
+* Validação da **Completude Funcional**: verificação de que o compilador exige a cobertura de 100% das combinações válidas de $(\text{Estado} \times \text{Evento})$.
+
+
+
+---
+
+### Fase 2: Gestão do Estado e Sequenciação Monádica
+
+* **Implementação da `State Monad**`
+* Encapsulamento da manipulação de estado, garantindo que as mudanças ocorram de forma pura e imutável.
+
+
+* **Composição via Categoria Kleisli**
+* Utilização do formalismo da Categoria Kleisli para encadear sequências de transições monádicas.
+* Estruturação de sequências de eventos utilizando a sintaxe `do-notation` do Haskell.
+
+
+
+---
+
+### Fase 3: Composabilidade Arquitetural & Framework CREM
+
+* **Estudo de Caso Prático**
+* Seleção/Modelagem de um domínio que exija a composição de múltiplas FSMs independentes.
+
+
+* **Aplicação da Biblioteca CREM**
+* Codificação das topologias de estado e regras de domínio no nível de tipos (*type-level features* / *singletons*).
+* Definição explícita de transições permitidas e proibidas.
+
+
+* **Testes de Invalidez de Tipagem (Type Safety)**
+* Injeção intencional de transições proibidas pela lógica do domínio.
+* Documentação e prova de que violações geram **erros em tempo de compilação** em vez de falhas em tempo de execução (*runtime*).
+
+
+* **Geração Automática de Diagramas**
+* Extração da representação gráfica/topológica das máquinas de estados diretamente a partir do código.
+
+
+
+---
+
+### Fase 4: Análise Comparativa, Documentação e Entrega
+
+* **Análise Comparativa & Estado da Arte**
+* Comparação entre a abordagem funcional pura (Haskell/CREM) e implementações imperativas tradicionais.
+* Atualização e consolidação da seção de Estado da Arte no relatório.
+
+
+* **Elaboração do Relatório Final**
+* Organização dos resultados, códigos-fonte, provas de compilação e gráficos gerados.
+
+
+* **Entrega e Apresentação**
+* Submissão do relatório de Iniciação Científica e preparação da apresentação para a banca/avaliadores.

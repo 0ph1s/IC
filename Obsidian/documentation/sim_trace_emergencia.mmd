@@ -1,0 +1,31 @@
+%% gerado por avionics-sim (Avionics.Sim.Mermaid)
+%% cenário: emergencia
+sequenceDiagram
+  participant Op as Operador
+  participant Amb as Ambiente
+  participant Av as Avionica
+  participant Pw as Energia
+  Note over Op,Pw: estado inicial Av=Grounded Pw=Charged
+  Note over Op,Pw: tick 0
+  Op->>Av: TakeoffSignal
+  Av-->>Amb: MsgTakeoff, Av=InFlight
+  Note over Op,Pw: tick 1
+  Op->>Pw: Drain
+  Pw-->>Amb: ReportLow, Pw=Low
+  Note over Op,Pw: tick 2
+  Op->>Pw: Drain
+  Pw-->>Amb: ReportCritical, Pw=Critical
+  Note over Amb: retém (CriticalHeld)
+  Note over Op,Pw: tick 3
+  Amb->>Av: CriticalBattery
+  Av-->>Amb: MsgEmergency, Av=EmergencyLanding
+  Note over Amb: retém (TouchdownHeld)
+  Note over Op,Pw: tick 4
+  Amb->>Pw: ShedLoad
+  Pw-->>Amb: ReportLow, Pw=Low
+  Amb->>Av: LandedSignal
+  Av-->>Amb: MsgLanded, Av=Grounded
+  Note over Amb: retém (CutoffHeld)
+  Note over Op,Pw: tick 5
+  Amb->>Av: SystemCutoff
+  Av-->>Amb: MsgShutdown, Av=Shutdown

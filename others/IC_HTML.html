@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Relatório Parcial de Iniciação Científica — FSMs em Haskell</title>
+<style>
+  @page { size: A4; margin: 2cm 1.8cm; }
+  * { box-sizing: border-box; }
+
+  body {
+    font-family: "Georgia", "Cambria", "Times New Roman", serif;
+    font-size: 11pt;
+    line-height: 1.55;
+    color: #1a1a1a;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+    background: #fff;
+  }
+
+  /* ===== Capa ===== */
+  .capa {
+    text-align: center;
+    padding: 40px 20px 30px 20px;
+    border-bottom: 3px double #1a3a6b;
+    margin-bottom: 30px;
+    page-break-after: always;
+  }
+  .capa .instituicao {
+    font-size: 10pt; letter-spacing: 0.5px; color: #555;
+    text-transform: uppercase; line-height: 1.5; margin-bottom: 30px;
+  }
+  .capa .autor {
+    font-size: 13pt; font-weight: bold; color: #1a3a6b;
+    margin: 40px 0 10px 0;
+  }
+  .capa h1 {
+    font-size: 16pt; color: #1a3a6b; margin: 30px 0; line-height: 1.35;
+  }
+  .capa .nota-capa {
+    font-size: 10.5pt; color: #333; text-align: justify;
+    max-width: 600px; margin: 40px auto 20px auto; line-height: 1.5;
+  }
+  .capa .local {
+    font-size: 11pt; color: #1a3a6b; font-weight: bold; margin-top: 40px;
+  }
+
+  /* ===== Seções ===== */
+  h2.secao {
+    font-size: 13.5pt; color: #1a3a6b;
+    border-bottom: 1.5px solid #c8d3e0;
+    padding-bottom: 5px; margin-top: 30px; margin-bottom: 12px;
+    page-break-after: avoid;
+  }
+  h3.subsecao {
+    font-size: 11.5pt; color: #24467a;
+    margin-top: 20px; margin-bottom: 8px; page-break-after: avoid;
+  }
+  h4.subsubsecao {
+    font-size: 11pt; color: #24467a;
+    margin-top: 14px; margin-bottom: 6px;
+    font-style: italic; page-break-after: avoid;
+  }
+  p { text-align: justify; margin: 8px 0; }
+
+  /* ===== Listas ===== */
+  ul, ol { margin: 8px 0; padding-left: 22px; }
+  li { margin-bottom: 4px; text-align: justify; }
+
+  /* ===== Código ===== */
+  pre {
+    background: #f4f6f9; border-left: 4px solid #1a3a6b;
+    border-radius: 3px; padding: 10px 14px;
+    font-family: "Consolas", "Monaco", "Courier New", monospace;
+    font-size: 9.5pt; line-height: 1.45; overflow-x: auto;
+    margin: 10px 0; page-break-inside: avoid; color: #1a1a1a;
+  }
+  code {
+    font-family: "Consolas", "Monaco", "Courier New", monospace;
+    background: #eef1f6; padding: 1px 5px; border-radius: 3px;
+    font-size: 9.5pt; color: #9b2c2c;
+  }
+  pre code { background: none; padding: 0; color: inherit; }
+
+  /* ===== Citações ===== */
+  blockquote {
+    border-left: 3px solid #b8a04a; background: #fdfbf3;
+    margin: 12px 0; padding: 8px 16px;
+    font-style: italic; color: #4a4020; font-size: 10.5pt;
+    page-break-inside: avoid;
+  }
+
+  /* ===== Tabelas ===== */
+  table {
+    width: 100%; border-collapse: collapse; margin: 14px 0;
+    font-size: 10pt; page-break-inside: avoid;
+  }
+  th {
+    background: #1a3a6b; color: #fff; text-align: left;
+    padding: 8px 10px; font-weight: 600; font-size: 10pt;
+  }
+  td {
+    border: 1px solid #d0d7e0; padding: 7px 10px; vertical-align: top;
+  }
+  tr:nth-child(even) td { background: #f7f9fc; }
+
+  /* ===== Destaques ===== */
+  .ok { color: #1e7a3c; font-weight: bold; }
+  .parcial { color: #b8860b; font-weight: bold; }
+  .pendente { color: #9b2c2c; font-weight: bold; }
+
+  .nota {
+    background: #fff8e6; border: 1px solid #f0d98a;
+    border-radius: 4px; padding: 10px 14px; margin: 12px 0;
+    font-size: 10.5pt; page-break-inside: avoid;
+  }
+  .nota strong { color: #8a6d1a; }
+
+  /* ===== Sumário ===== */
+  .sumario {
+    background: #f9fafc; border: 1px solid #d0d7e0;
+    border-radius: 4px; padding: 16px 22px; margin: 20px 0 30px 0;
+  }
+  .sumario h2 {
+    font-size: 13pt; color: #1a3a6b;
+    margin: 0 0 12px 0; border: none; padding: 0;
+  }
+  .sumario ol { list-style: none; padding-left: 0; margin: 0; }
+  .sumario ol li {
+    padding: 3px 0; border-bottom: 1px dotted #d0d7e0;
+    font-size: 10.5pt;
+  }
+  .sumario ol li:last-child { border-bottom: none; }
+  .sumario .num {
+    display: inline-block; width: 50px;
+    color: #1a3a6b; font-weight: bold;
+  }
+
+  /* ===== Cronograma ===== */
+  .cronograma-table { font-size: 9pt; }
+  .cronograma-table th {
+    text-align: center; padding: 6px 4px; font-size: 9pt;
+  }
+  .cronograma-table td { text-align: center; padding: 5px 4px; }
+  .cronograma-table td:first-child {
+    text-align: left; font-weight: 500;
+  }
+  .cronograma-table .x { color: #1a3a6b; font-weight: bold; }
+
+  /* ===== Referências ===== */
+  .referencias p {
+    text-indent: -22px; padding-left: 22px;
+    margin-bottom: 10px; font-size: 10.5pt; text-align: left;
+  }
+
+  /* ===== Rodapé ===== */
+  footer {
+    margin-top: 40px; padding-top: 12px;
+    border-top: 1px solid #ccc;
+    font-size: 9pt; color: #777; text-align: center;
+  }
+
+  .page-break { page-break-before: always; }
+  h2.secao, h3.subsecao, h4.subsubsecao { break-after: avoid; }
+
+  @media print {
+    body { padding: 0; font-size: 10.5pt; }
+    pre { font-size: 9pt; }
+    a { color: inherit; text-decoration: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= CAPA ================= -->
+<section class="capa">
+  <p class="instituicao">
+    Centro Estadual de Educação Tecnológica Paula Souza<br>
+    Faculdade de Tecnologia da Baixada Santista "Rubens Lara"<br>
+    Curso Superior de Tecnologia em Ciência de Dados<br>
+    Programa de Iniciação Científica
+  </p>
+
+  <p class="autor">PETERSON CARARA JUNIOR</p>
+
+  <h1>FORMALIZAÇÃO DE MÁQUINAS DE ESTADOS FINITOS COMPONÍVEIS EM HASKELL: SEGURANÇA DE TIPOS E COMPLETUDE FUNCIONAL VIA MONADS E TIPOS ALGÉBRICOS</h1>
+
+  <p class="nota-capa">
+    Projeto de pesquisa apresentado à Faculdade de Tecnologia da Baixada Santista "Rubens Lara", do Curso Superior de Tecnologia em Ciência de Dados, no Programa de Iniciação Científica.<br><br>
+    <strong>Orientador:</strong> Prof. Felipe Canarozzo Lourenço
+  </p>
+
+  <p class="local">Santos — SP<br>2025</p>
+</section>
+
+<!-- ================= SUMÁRIO ================= -->
+<section class="sumario">
+  <h2>Sumário</h2>
+  <ol>
+    <li><span class="num">1</span> INTRODUÇÃO</li>
+    <li><span class="num">1.1</span> PROBLEMA DE PESQUISA</li>
+    <li><span class="num">1.2</span> JUSTIFICATIVA DO TEMA</li>
+    <li><span class="num">1.2.1</span> Hipóteses</li>
+    <li><span class="num">1.2.2</span> Objetivo Geral</li>
+    <li><span class="num">1.2.3</span> Objetivos Específicos</li>
+    <li><span class="num">2</span> REFERENCIAL TEÓRICO INICIAL</li>
+    <li><span class="num">2.1</span> Máquinas de Estados Finitos e a Questão da Mutabilidade</li>
+    <li><span class="num">2.2</span> Haskell e a Garantia de Corretude em Tempo de Compilação</li>
+    <li><span class="num">2.3</span> Teoria das Categorias: Monads, Estado Puro e a Categoria Kleisli</li>
+    <li><span class="num">2.4</span> Composabilidade Arquitetural e o Framework CREM</li>
+    <li><span class="num">3</span> PROCEDIMENTOS METODOLÓGICOS</li>
+    <li><span class="num">4</span> ESTADO DA ARTE</li>
+    <li><span class="num">5</span> PROGRESSO PARCIAL</li>
+    <li><span class="num">5.1</span> Correspondência entre ADTs e os Conjuntos Q e Σ</li>
+    <li><span class="num">5.2</span> A Função de Transição δ como Morfismo em Hask</li>
+    <li><span class="num">5.3</span> Sequenciação Inicial e Validação Empírica</li>
+    <li><span class="num">5.4</span> Da Composição Ingênua à Necessidade de uma Abstração Monádica</li>
+    <li><span class="num">5.5</span> Reformulação Teórica da FSM sobre a State Monad</li>
+    <li><span class="num">5.6</span> Sequenciação via Notação do e a Função mapM</li>
+    <li><span class="num">5.7</span> Fundamentação Categorial: o Monad como Monóide na Categoria dos Endofuntores</li>
+    <li><span class="num">5.8</span> Estudo de Caso: Topologia Promovida ao Nível de Tipos</li>
+    <li><span class="num">5.9</span> Verificação Formal de Segurança de Tipos em Tempo de Compilação</li>
+    <li><span class="num">5.10</span> Execução e Validação Cruzada</li>
+    <li><span class="num">5.11</span> Limitações Identificadas e Encaminhamentos</li>
+    <li><span class="num">5.12</span> Síntese Geral e Validação Preliminar das Hipóteses</li>
+    <li><span class="num">6</span> CRONOGRAMA</li>
+    <li><span class="num">7</span> REFERÊNCIAS</li>
+  </ol>
+</section>
+
+<!-- ================= 1 INTRODUÇÃO ================= -->
+<section>
+  <h2 class="secao">1 INTRODUÇÃO</h2>
+  <p>
+    As Máquinas de Estados Finitos (FSMs) constituem uma das abstrações mais duradouras e essenciais da Ciência da Computação. Elas fornecem o formalismo matemático rigoroso para a modelagem de sistemas cujo comportamento é estritamente determinado por um conjunto discreto de estados e regras de transição. O modelo é crucial para a especificação do comportamento de sistemas reativos, abrangendo desde protocolos de rede até a lógica de domínio em arquiteturas de software complexas. Conforme Perone (2023), é possível construir arquiteturas de software a partir da composição de máquinas de estados.
+  </p>
+  <p>
+    No entanto, a tradução desse modelo abstrato para linguagens de programação de propósito geral do paradigma imperativo, como C++, é frequentemente marcada pela dependência de variáveis mutáveis, tipicamente campos de classe ou variáveis globais, para armazenar o estado atual. Essa prática compromete a pureza do modelo matemático. Segundo Malakhovski e Shalyto (2009), a implementação em linguagens imperativas não permite a aplicação direta dos métodos tradicionais de FSMs em um ambiente funcional. A dependência da mutabilidade e de tipos fracos para o estado expõe o sistema a erros lógicos e transições inválidas, delegando a responsabilidade de verificar a corretude à fase de testes em tempo de execução.
+  </p>
+  <p>
+    O presente projeto de pesquisa propõe resolver essa discrepância fundamental através da formalização e implementação de FSMs em Haskell. Por ser uma linguagem puramente funcional (Hutton, 2016), Haskell exige que a função de transição seja implementada como uma função pura. O diferencial reside no seu sistema de tipos avançado: a utilização de Tipos de Dados Algébricos (ADTs) é essencial para a modelagem de dados (Milewski, 2020), permitindo que os conjuntos finitos de estados e eventos sejam mapeados diretamente para tipos de dados. Essa correspondência de tipo não é apenas uma convenção, mas uma imposição que, por meio da verificação de exaustividade do pattern matching, viabiliza a verificação da correção das funções de transição no estágio de compilação (Malakhovski &amp; Shalyto, 2009).
+  </p>
+  <p>
+    Além da segurança de tipos básica, a abordagem em Haskell permite a exploração de conceitos avançados para o tratamento do estado. A capacidade de sequenciar transições e lidar com o estado de forma pura é resolvida através de Monads. Essa abstração, que expressa de forma concisa programas que manipulam estado (Wadler, 1992), permite o tratamento puro do estado através de estruturas como a State Monad (Milewski, 2020). Esse arcabouço monádico, estruturado pela Categoria Kleisli (Maia, 2022), fornece o formalismo necessário para a composição segura de transições.
+  </p>
+  <p>
+    A capacidade de composabilidade é o ponto culminante desta abordagem. O framework Crem (Crème de la Crem: Composable Representable Executable Machines), desenvolvido por Marco Perone (2023), ilustra como os advanced type-level features de Haskell podem ser usados para especificar transições de estado permitidas e proibidas. Essa especificação transforma as regras de domínio em propriedades intrínsecas ao tipo de dados, permitindo a composição de máquinas de estados independentes (Perone, 2023), resultando em um sistema robusto e verificável.
+  </p>
+
+  <h3 class="subsecao">1.1 PROBLEMA DE PESQUISA</h3>
+  <p>
+    Considerando o descompasso entre a formalidade matemática das FSMs e a fragilidade de tipos nas implementações tradicionais (Malakhovski &amp; Shalyto, 2009), o problema de pesquisa é formulado como:
+  </p>
+  <blockquote>
+    De que forma a linguagem de programação funcional pura Haskell, explorando seu sistema de tipos avançados (Tipos de Dados Algébricos) e suas abstrações de ordem superior (Monads e Categoria Kleisli), pode ser utilizada para obter uma formalização de Máquinas de Estados Finitos que ofereça garantias verificáveis de correção (type safety) e completude (completeness) na especificação das funções de transição, e que suporte a composição de FSMs complexas de maneira modular e representável?
+  </blockquote>
+
+  <h3 class="subsecao">1.2 JUSTIFICATIVA DO TEMA</h3>
+  <p>
+    A relevância do projeto reside em transferir a verificação da corretude da FSM da fase de testes para a fase de compilação. Segundo Malakhovski e Shalyto (2009), uma das vantagens da implementação funcional é a verificação da correção do código das funções de transição já no estágio de compilação, o que é possível pelo uso de Tipos de Dados Algébricos (ADTs) para representar eventos e estados.
+  </p>
+
+  <h4 class="subsubsecao">1.2.1 Hipóteses</h4>
+  <p>
+    O sistema de tipos de Haskell oferece uma Segurança de Tipos superior, onde o uso dos Tipos de Dados Algébricos (ADTs) e o pattern matching conseguem impor, em tempo de compilação, a proibição de estados e transições logicamente impossíveis. Essa garantia se estende à Completude Funcional, onde o pattern matching exaustivo assegura que a função de transição cubra todas as combinações válidas de (Estado × Evento), o que é uma superioridade na verificação da lógica da FSM em relação às linguagens imperativas (Malakhovski &amp; Shalyto, 2009).
+  </p>
+  <p>
+    Finalmente, postula-se a Hipótese de Composabilidade e Modulação: a aplicação de abstrações categoriais como Monads e recursos avançados de type-level de Haskell (como os utilizados na biblioteca Crem) permite a criação de Máquinas de Estados Finitos Componíveis de forma puramente funcional, resultando em uma arquitetura modular cujas regras de domínio são validadas pelo compilador (Perone, 2023).
+  </p>
+
+  <h4 class="subsubsecao">1.2.2 Objetivo Geral</h4>
+  <p>
+    O objetivo geral desta Iniciação Científica é formalizar e implementar Máquinas de Estados Finitos Determinísticas (DFSMs) em Haskell, explorando o sistema de tipagem avançado e as estruturas funcionais da linguagem para garantir a segurança e a completude na definição das funções de transição, com ênfase na demonstração de um modelo que suporte a composição de sistemas.
+  </p>
+
+  <h4 class="subsubsecao">1.2.3 Objetivos Específicos</h4>
+  <p>
+    Para alcançar o objetivo geral de formalizar e implementar FSMs de forma segura e componível em Haskell, o projeto se desdobra nos seguintes objetivos específicos.
+  </p>
+  <p>
+    O primeiro objetivo visa o alicerce do projeto: definir modelos de dados em Haskell que traduzam com precisão os elementos formais de uma FSM. Esta formalização será realizada através da criação de Tipos de Dados Algébricos (ADTs), nos quais os conjuntos finitos de Estados (Q) e Eventos (Σ) serão mapeados diretamente para Tipos Soma. Essa técnica visa incorporar o rigor do modelo matemático ao código, seguindo o princípio de que ADTs são o conceito mais importante na modelagem funcional (Milewski, 2020).
+  </p>
+  <p>
+    O segundo objetivo trata da validação da lógica interna da máquina: implementar o mecanismo de processamento de sequências de entrada e a função de transição (δ). Serão exploradas as funções de alta ordem e, sobretudo, o pattern matching exaustivo para definir a função δ : Estado × Evento → Estado. Essa abordagem é fundamental para atingir a Hipótese de Completude Funcional, pois o compilador de Haskell garantirá a exaustividade, assegurando que todo par válido (Estado, Evento) seja tratado, transferindo a verificação da correção do código das funções de transição para o estágio de compilação (Malakhovski &amp; Shalyto, 2009).
+  </p>
+  <p>
+    Em seguida, o terceiro objetivo foca na gestão do estado e na composabilidade: explorar a aplicação do State Monad e da Categoria Kleisli. Será demonstrado como a State Monad permite gerenciar a sequência de mudanças de estado de forma pura, encapsulando o estado e garantindo a mudança de estado de forma pura (Milewski, 2020). Esta etapa é crítica para lidar com o histórico de transições. Além disso, a Categoria Kleisli será utilizada como base teórica para compor transições monádicas, fornecendo o formalismo para encadear logicamente as transições de estado, como sugerido por Milewski (2020) e Maia (2022).
+  </p>
+  <p>
+    Finalmente, o quarto objetivo é a validação prática da abordagem: demonstrar a composabilidade de máquinas de estados por meio de um estudo de caso. Este estudo de caso ilustrará como a tipagem de Haskell pode ser usada para garantir transições válidas e o encapsulamento do domínio, permitindo que a lógica do software seja estruturada como uma composição de máquinas de estados modulares (Perone, 2023). O resultado esperado é um sistema onde as regras de transição — inclusive a especificação de transições de estado permitidas e proibidas (Perone, 2023) — são validadas pelo compilador, confirmando o potencial das estruturas funcionais para o desenvolvimento de software robusto.
+  </p>
+</section>
+
+<!-- ================= 2 REFERENCIAL TEÓRICO ================= -->
+<section class="page-break">
+  <h2 class="secao">2 REFERENCIAL TEÓRICO INICIAL</h2>
+  <p>
+    O presente referencial teórico estabelece a base de conhecimento necessária para a formalização das Máquinas de Estados Finitos (FSMs) no ambiente funcional puro. A abordagem é construída sobre a fusão de quatro domínios conceituais: a Teoria de Autômatos, a Programação Funcional Pura (PFP), a Teoria das Categorias e as Arquiteturas de Software Componíveis.
+  </p>
+
+  <h3 class="subsecao">2.1 Máquinas de Estados Finitos e a Questão da Mutabilidade</h3>
+  <p>
+    As FSMs são o modelo canônico para descrever sistemas sequenciais e reativos, cuja dinâmica é regida por uma quíntupla formal (Q, Σ, δ, q0, F), onde Q é o conjunto finito de estados, Σ é o alfabeto de entrada (eventos), δ é a rigorosa função de transição, q0 é o estado inicial, e F é o conjunto de estados finais. A função δ : Q × Σ → Q é o coração do sistema, definindo como o autômato se move entre os estados.
+  </p>
+  <p>
+    A implementação tradicional desse modelo em linguagens de programação imperativas, como C++ ou Java, cria uma divergência perigosa entre o modelo e o código. A representação do estado recorre, invariavelmente, a variáveis mutáveis — tipicamente um campo de classe (se a programação orientada a objetos for usada) ou uma variável global (Malakhovski &amp; Shalyto, 2009). Além disso, os identificadores de estado são frequentemente representados por abstrações de baixo nível, como strings ou inteiros, que carecem de garantias de tipo. Essa dependência de estado mutável e a fragilidade de tipos resultam numa tradução que não consegue aplicar diretamente os métodos utilizados na implementação de máquinas de estados finitos em linguagens de programação imperativas no rigoroso domínio funcional (Malakhovski &amp; Shalyto, 2009), expondo a FSM a estados logicamente impossíveis ou transições inválidas que só são detectadas em tempo de execução, através de pesados testes unitários.
+  </p>
+
+  <h3 class="subsecao">2.2 Haskell e a Garantia de Corretude em Tempo de Compilação</h3>
+  <p>
+    O projeto propõe a Programação Funcional Pura (PFP) como a solução para este descompasso. Haskell, uma linguagem puramente funcional, baseia-se na imutabilidade e na ausência de efeitos colaterais. Sua filosofia exige que a função de transição (δ) seja implementada como uma função pura, uma transformação que recebe o estado e o evento e retorna, deterministicamente, o novo estado, preservando a imutabilidade do sistema e produzindo software claro, conciso e correto (Hutton, 2016).
+  </p>
+
+  <h4 class="subsubsecao">2.2.1 Tipos de Dados Algébricos (ADTs)</h4>
+  <p>
+    A segurança formal em Haskell é fornecida por seu sistema de tipos avançado, ancorado nos Tipos de Dados Algébricos (ADTs). Os ADTs permitem que os conjuntos finitos Q e Σ da FSM sejam mapeados diretamente para Tipos Soma, que são considerados o conceito mais importante para a modelagem em Haskell (Milewski, 2020). Por exemplo, se uma FSM possui estados Ligado e Desligado, o Tipo Soma <code>data Estado = Ligado | Desligado</code> traduz essa finitude para o sistema de tipos. Essa codificação evita o uso de strings e inteiros como identificadores de estado (Malakhovski &amp; Shalyto, 2009), garantindo que o compilador imponha a integridade estrutural da máquina.
+  </p>
+
+  <h4 class="subsubsecao">2.2.2 Pattern Matching e Completude Funcional</h4>
+  <p>
+    A função de transição é implementada por meio de pattern matching, uma funcionalidade poderosa para examinar a estrutura dos dados (Hutton, 2016). O aspecto crucial é que o compilador de Haskell executa uma verificação de exaustividade neste pattern matching. Essa checagem garante que toda combinação possível de (Estado × Evento) tenha sido tratada explicitamente na definição da função δ. Caso uma combinação válida seja omitida, o compilador alerta o programador com um erro, o que se traduz na verificação da correção do código das funções de transição no estágio de compilação (Malakhovski &amp; Shalyto, 2009), confirmando a completude (completeness) da FSM antes da execução.
+  </p>
+
+  <h3 class="subsecao">2.3 Teoria das Categorias: Monads, Estado Puro e a Categoria Kleisli</h3>
+  <p>
+    Em um ambiente funcional puro, onde as transições de estado devem ser implementadas como funções puras, o desafio inerente é a gestão da sequência de transições ao longo do tempo. O projeto aborda este desafio recorrendo à Teoria das Categorias, que é a disciplina matemática que fornece os fundamentos lógicos para a linguagem Haskell. O princípio orientador é que a composição é a essência da programação (Milewski, 2020), e a Teoria das Categorias define o arcabouço para a composição segura e coerente.
+  </p>
+
+  <h4 class="subsubsecao">2.3.1 Monads: Origem Categorial, Leis e a Abstração do Efeito de Estado</h4>
+  <p>
+    As Monads são o dispositivo arquitetônico que permite a Programação Funcional Pura gerir efeitos colaterais, como o estado, exceções ou I/O, sem violar a imutabilidade. Conforme Philip Wadler (1992) explica, Monads proporcionam as indulgências de impureza com as bênçãos de pureza ao encapsular o "efeito".
+  </p>
+  <p>
+    A sua origem é estritamente matemática: Monads foram inventadas na década de 1960 por teóricos de categorias para expressar concisamente certos aspectos da álgebra universal (Wadler, 1992). A definição categorial formal e mais abstrata estabelece uma Monad como um Monóide na Categoria dos Endofuntores (Jahn, 2020). Esta definição, embora abstrata, é fundamental, pois garante que a estrutura Monádica satisfaça as Leis das Monads (identidade e associatividade), assegurando que o encadeamento de efeitos seja previsível e deterministicamente seguro.
+  </p>
+  <p>
+    Para a FSM, a State Monad é a Monad específica empregada. Ela resolve o dilema do estado ao modelar a transição como uma função de transformação de estado, na qual a função de transição pura δ é encapsulada. Isto permite que a mudança de estado de forma pura seja realizada (Milewski, 2020), pois a função não modifica o estado, mas sim calcula o novo estado a partir do antigo, retornando o par (Valor, Novo Estado) e mantendo a imutabilidade fora da abstração monádica.
+  </p>
+
+  <h4 class="subsubsecao">2.3.2 A Categoria Kleisli para a Composição de Transições</h4>
+  <p>
+    Embora Monads resolvam o problema do estado encapsulado, a composição dessas funções monádicas (as transições de estado) não pode ser realizada pela composição de funções padrão. É aqui que entra a Categoria Kleisli.
+  </p>
+  <p>
+    A Kleisli é uma construção categorial específica que é projetada para compor morfismos monádicos, ou seja, funções "sujas" que carregam o efeito do Monad. Em vez de funções A → B, a Kleisli compõe morfismos do tipo A → MB (Maia, 2022), onde M é o Functor Monádico (a State Monad no nosso caso) que carrega o estado. Essa categoria fornece as regras e, mais importante, o operador de composição monádica (&gt;=&gt;) que automatiza a logística da sequenciação.
+  </p>
+  <p>
+    O uso da Categoria Kleisli é crucial para o projeto, pois ele fornece o formalismo para encadear múltiplas transições de estado da FSM de forma segura e elegante. A Monad, sob a estrutura da Kleisli, garante que o estado do autômato seja automaticamente passado, transformado e extraído em cada etapa da sequência de eventos. Isso não só simplifica a sintaxe, como garante, a partir dos fundamentos da Teoria das Categorias, que a composição de transições monádicas seja sempre coerente e associativa, um pré-requisito fundamental para a composabilidade de FSMs complexas em arquiteturas modulares.
+  </p>
+
+  <h3 class="subsecao">2.4 Composabilidade Arquitetural e o Framework CREM</h3>
+  <p>
+    A validação final da abordagem reside na sua capacidade de suportar arquiteturas de software complexas. O projeto alinha-se aos princípios do Domain-Driven Design (DDD), utilizando a FSM como um agregado de domínio verificável.
+  </p>
+  <p>
+    O framework Crème de la Crem (CREM) é um exemplo prático que demonstra o potencial máximo da PFP nesse contexto. O CREM utiliza os recursos avançados de type-level de Haskell para permitir que o software seja estruturado como uma composição de máquinas de estados independentes (Perone, 2023). Essa modularidade permite que subsistemas de domínio sejam desenvolvidos de forma isolada e testada, e combinados de forma segura.
+  </p>
+  <p>
+    A maior contribuição do CREM é a capacidade de codificar regras de negócio como tipos. Ele permite ao usuário especificar transições de estado permitidas e proibidas diretamente na assinatura de tipos (Perone, 2023). Isso significa que as restrições mais complexas da lógica de domínio da FSM são transformadas em restrições de tipo, e qualquer violação de uma regra de negócio resultará em um erro de compilação, e não em um erro de runtime. Isso garante que a implementação de um sistema se mantenha sincronizada com a sua representação gráfica (Perone, 2023), estabelecendo um nível de representabilidade e integridade arquitetural superior, onde a lógica de negócio é verificada pelo compilador.
+  </p>
+</section>
+
+<!-- ================= 3 PROCEDIMENTOS METODOLÓGICOS ================= -->
+<section class="page-break">
+  <h2 class="secao">3 PROCEDIMENTOS METODOLÓGICOS</h2>
+  <p>
+    A metodologia deste projeto será de natureza mista, combinando o rigor da pesquisa formal com a validação prática, pautando-se numa abordagem qualitativa para analisar a fundo o fenômeno da formalização de Máquinas de Estados Finitos (FSMs) no contexto da programação funcional pura. O trabalho se desenvolverá em duas vertentes principais: a Pesquisa Bibliográfica e a Pesquisa Aplicada (ou Tecnológica). A Pesquisa Bibliográfica fornecerá a base formal, coletando e analisando o referencial teórico sobre FSMs, Programação Funcional Pura (Haskell), Tipos de Dados Algébricos (ADTs), Teoria das Categorias (Monads, Categoria Kleisli) e os princípios do framework CREM. Esta base teórica é crucial para a construção do modelo computacional.
+  </p>
+  <p>
+    A Pesquisa Aplicada será a fase de experimentação, focada no desenvolvimento de um artefato de software (código em Haskell) para comprovar as hipóteses de segurança e composabilidade. Os procedimentos serão organizados em quatro fases interligadas que visam, em última instância, cumprir todos os objetivos específicos do projeto.
+  </p>
+  <p>
+    A Fase 1: Revisão Teórica e Formalização Inicial visa estabelecer o alicerce do código. Inicialmente, será concluída a revisão aprofundada dos fundamentos da FSM e de como a imutabilidade da PFP se traduz numa alternativa superior ao modelo imperativo. Em seguida, o primeiro objetivo específico será atendido pela modelagem de ADTs, onde os conjuntos de Estados (Q) e Eventos (Σ) de uma FSM canônica serão declarados como Tipos Soma em Haskell. O segundo objetivo será alcançado com a implementação da função de transição pura δ utilizando pattern matching exaustivo, o que é um procedimento metodológico chave para validar a Hipótese de Completude Funcional, demonstrando que o compilador exige o tratamento de todas as combinações válidas (Estado × Evento).
+  </p>
+  <p>
+    A Fase 2: Gestão do Estado e Sequenciação Monádica endereçará o desafio da pureza na manipulação de estado, cumprindo o terceiro objetivo específico. O estudo da State Monad será traduzido na implementação, garantindo que a sequência de transições seja realizada através de uma função que calcula o novo estado a partir do antigo, mantendo a mudança de estado de forma pura (Milewski, 2020). Esta fase incluirá a sequenciação de eventos utilizando a notação do-notation de Haskell, demonstrando como a Categoria Kleisli fornece o formalismo necessário para a composição segura dessas transições monádicas.
+  </p>
+  <p>
+    A Fase 3: Demonstração da Composabilidade e Segurança é a fase de validação prática da arquitetura. Será selecionado um Estudo de Caso de Domínio que exija a composição de múltiplas FSMs independentes. O procedimento metodológico aqui será aplicar os conceitos da Categoria Kleisli para compor as máquinas, provando a modularidade arquitetural. O ponto de maior rigor será o Teste de Invalidez de Tipagem, que envolverá a tentativa intencional de codificar uma transição proibida pela lógica do domínio da FSM. A documentação do erro de compilação resultante comprovará a Hipótese de Segurança de Tipos, validando que o sistema de tipos de Haskell é capaz de especificar transições de estado permitidas e proibidas (Perone, 2023) em tempo de compilação.
+  </p>
+
+  <h3 class="subsecao">Fase 4: Análise Comparativa e Documentação</h3>
+  <p>
+    A quarta fase compreende a sistematização dos resultados obtidos nas fases anteriores, a comparação entre as diferentes abordagens de implementação (ingênua, teórica e com o framework CREM) e a documentação formal dos achados. Esta fase culminará na elaboração do relatório final e na preparação da apresentação dos resultados, consolidando as contribuições teóricas e práticas do projeto.
+  </p>
+</section>
+
+<!-- ================= 4 ESTADO DA ARTE ================= -->
+<section>
+  <h2 class="secao">4 ESTADO DA ARTE</h2>
+  <p>
+    O desenvolvimento desta seção encontra-se em fase preliminar devido à necessidade de aprofundamento e identificação de referencial teórico específico que aborde a fusão dos domínios da Teoria de Autômatos, Programação Funcional Pura, Teoria das Categorias e o framework CREM.
+  </p>
+  <p>
+    A literatura revisada até o momento estabelece os fundamentos teóricos (FSMs, Monads, ADTs), mas a análise comparativa de soluções que aplicam formalismos de Categoria Kleisli para a composabilidade de Máquinas de Estados Finitos em arquiteturas de software ainda requer a exploração de artigos de conferência e periódicos de alta relevância, que podem ser menos acessíveis em bases de dados iniciais.
+  </p>
+  <p>
+    Dessa forma, a construção integral e conclusiva do Estado da Arte será realizada concomitantemente com o desenvolvimento do projeto. À medida que o artefato de software for implementado e novos referenciais técnicos forem analisados, esta seção será complementada com a devida contextualização da pesquisa em relação à fronteira do conhecimento atual.
+  </p>
+</section>
+
+<!-- ================= 5 PROGRESSO PARCIAL ================= -->
+<section class="page-break">
+  <h2 class="secao">5 PROGRESSO PARCIAL</h2>
+  <p>
+    Esta seção apresenta, de forma detalhada, os resultados alcançados no desenvolvimento do projeto, que seguiu uma abordagem estruturada para a implementação de Máquinas de Estados Finitos (FSMs) em Haskell. A exposição segue a ordem cronológica do trabalho, evidenciando a correspondência explícita entre o código-fonte produzido e o arcabouço teórico que o fundamenta, e culmina na aplicação do framework CREM para a verificação formal das propriedades do sistema.
+  </p>
+
+  <h3 class="subsecao">5.1 Correspondência entre Tipos de Dados Algébricos e os Conjuntos Q e Sigma</h3>
+  <p>
+    O primeiro resultado obtido consiste na tradução direta dos conjuntos finitos de Estados (Q) e Eventos (Σ) da quíntupla formal da FSM para Tipos Soma em Haskell, por meio do artefato <code>stateMachine.hs</code>:
+  </p>
+<pre><code>data State = Locked | Unlocked deriving (Show, Eq)
+data Input = Coin   | Push     deriving (Show, Eq)</code></pre>
+  <ul>
+    <li>Conjunto de Estados (Q) → tipo <code>State</code></li>
+    <li>Alfabeto de Eventos (Σ) → tipo <code>Input</code></li>
+    <li>Eliminação do uso de <em>strings</em> ou inteiros como identificadores de estado (Malakhovski &amp; Shalyto, 2009)</li>
+  </ul>
+
+  <h3 class="subsecao">5.2 A Função de Transição delta como Morfismo em Hask</h3>
+  <p>
+    O segundo resultado é a implementação da função de transição δ : Q × Σ → Q por meio de <em>pattern matching</em> exaustivo:
+  </p>
+<pre><code>transition :: State -> Input -> State
+transition Locked   Coin = Unlocked
+transition Locked   Push = Locked
+transition Unlocked Coin = Unlocked
+transition Unlocked Push = Locked</code></pre>
+  <p>
+    A assinatura <code>State -> Input -> State</code> é a versão <em>curried</em> da função. Milewski (2020) discute o processo de <em>currying</em>, segundo o qual uma função de múltiplos argumentos pode ser reescrita, sem perda de informação, como uma sequência de funções de um único argumento. Em particular, uma função do tipo <code>(a, b) -> c</code> é equivalente, via <em>currying</em>, a <code>a -> b -> c</code>. Isso estabelece uma correspondência direta e não apenas metafórica entre a assinatura de tipo do código e a definição formal δ : Q × Σ → Q.
+  </p>
+  <blockquote>
+    "Porque a inferência de tipos precede a avaliação, os programas em Haskell são <em>type safe</em>, no sentido de que erros de tipo nunca podem ocorrer durante a avaliação. Na prática, a inferência de tipos detecta uma classe muito ampla de erros de programa, e é uma das características mais úteis de Haskell." (Hutton, 2016, tradução nossa)
+  </blockquote>
+  <p>
+    A <strong>Completude Funcional</strong> decorre diretamente do mecanismo de <em>pattern matching</em> de Haskell: o compilador garante a exaustividade, assegurando que todo par válido (Estado × Evento) seja tratado.
+  </p>
+
+  <h3 class="subsecao">5.3 Sequenciação Inicial e Validação Empírica</h3>
+  <p>
+    A composição de múltiplas transições foi inicialmente resolvida por meio da função de alta ordem <code>foldl</code>, aplicando repetidamente δ sobre uma lista de entradas:
+  </p>
+<pre><code>run :: State -> [Input] -> State
+run = foldl transition</code></pre>
+  <p>
+    A execução sobre a sequência <code>[Coin, Push, Push, Coin, Coin, Push]</code>, a partir do estado <code>Locked</code>, produziu deterministicamente o estado final <code>Locked</code>.
+  </p>
+  <ul>
+    <li>A função <code>transition</code> satisfaz a definição de função pura de Milewski (2020)</li>
+    <li>Ausência de estado mutável de classe ou de variável global (Malakhovski &amp; Shalyto, 2009)</li>
+    <li>Viabiliza a verificação de tipos e a exaustividade do <em>pattern matching</em> como mecanismos de corretude</li>
+  </ul>
+
+  <h3 class="subsecao">5.4 Da Composição Ingênua à Necessidade de uma Abstração Monádica</h3>
+  <p>
+    A composição via <code>foldl</code> é suficiente apenas enquanto a função de transição não precisa carregar informação adicional associada a cada mudança de estado (mensagem de saída, registro de auditoria etc.). Quando essa necessidade surge, a função de transição deixa de ser uma função pura simples do tipo Q × Σ → Q e passa a ser o que Milewski (2020) denomina uma função <em>"embelezada"</em> (<em>embellished function</em>), do tipo:
+  </p>
+<pre><code>Q × Σ → M Q</code></pre>
+  <p>
+    em que <code>M</code> é um functor monádico responsável por carregar o efeito computacional associado à transição. A solução formal é dada pela <strong>Categoria Kleisli</strong>:
+  </p>
+<pre><code>(&gt;=&gt;) :: (a -&gt; Writer b) -&gt; (b -&gt; Writer c) -&gt; (a -&gt; Writer c)
+m1 &gt;=&gt; m2 = \x -&gt; let (y, s1) = m1 x
+                      (z, s2) = m2 y
+                  in (z, s1 ++ s2)
+
+return :: a -&gt; Writer a
+return x = (x, "")</code></pre>
+  <p>
+    Esse formalismo é diretamente análogo ao problema do projeto: assim como o <em>Writer monad</em> acumula uma trilha textual (<em>log</em>) a cada composição, a FSM precisa acumular tanto o novo estado quanto uma eventual saída associada a cada transição, sem delegar essa responsabilidade a uma variável mutável externa.
+  </p>
+
+  <h3 class="subsecao">5.5 Reformulação Teórica da FSM sobre a State Monad</h3>
+  <p>
+    Para o tratamento específico do estado, o resultado teórico central foi mapear a FSM sobre a <em>State Monad</em> tal como formalizada por Hutton (2016):
+  </p>
+<pre><code>newtype ST a = S (State -&gt; (a, State))
+
+app :: ST a -&gt; State -&gt; (a, State)
+app (S st) x = st x
+
+instance Functor ST where
+  fmap g st = S (\s -&gt; let (x, s') = app st s in (g x, s'))
+
+instance Applicative ST where
+  pure x = S (\s -&gt; (x, s))
+  stf &lt;*&gt; stx = S (\s -&gt; let (f, s')  = app stf s
+                             (x, s'') = app stx s'
+                         in (f x, s''))
+
+instance Monad ST where
+  st &gt;&gt;= f = S (\s -&gt; let (x, s') = app st s in app (f x) s')</code></pre>
+  <p>
+    A partir dessa estrutura, o projeto derivou a formalização de uma transição monádica para a FSM, em que o "estado" é instanciado pelo estado do autômato (Q) e o valor produzido a cada passo é a saída associada à transição:
+  </p>
+<pre><code>transicaoM :: Input -&gt; ST Output
+transicaoM evt = S (\q -&gt; let q' = transition q evt
+                          in (mensagem q evt, q'))</code></pre>
+  <p>
+    Essa reformulação segue o mesmo padrão estrutural do exemplo canônico de Hutton (2016) para geração de valores frescos durante o percurso de uma árvore, no qual um contador interno é encapsulado e <em>threaded</em> de forma pura através de sucessivas aplicações.
+  </p>
+
+  <h3 class="subsecao">5.6 Sequenciação via Notação do e a Função mapM</h3>
+  <p>
+    Um segundo resultado foi a identificação do mecanismo exato para generalizar a composição de <code>foldl</code> para o contexto monádico. Hutton (2016) define, de forma genérica para qualquer Monad <code>m</code>:
+  </p>
+<pre><code>mapM :: Monad m =&gt; (a -&gt; m b) -&gt; [a] -&gt; m [b]
+mapM f []     = return []
+mapM f (x:xs) = do y  &lt;- f x
+                   ys &lt;- mapM f xs
+                   return (y:ys)</code></pre>
+  <p>
+    Aplicando <code>mapM</code> à função <code>transicaoM</code> sobre uma lista de eventos, obtém-se a ação monádica:
+  </p>
+<pre><code>mapM transicaoM eventos :: ST [Output]</code></pre>
+  <p>
+    cuja execução por meio de <code>app (mapM transicaoM eventos) Locked</code> produziria simultaneamente (i) a lista de saídas associadas a cada transição e (ii) o estado final do autômato, generalizando de maneira formalmente rigorosa o resultado obtido apenas com <code>foldl</code>.
+  </p>
+
+  <h3 class="subsecao">5.7 Fundamentação Categorial: o Monad como Monóide na Categoria dos Endofuntores</h3>
+  <p>
+    Consolidou-se a fundamentação categorial mais abstrata do projeto. Milewski (2020) define formalmente um <em>monad</em> como um <strong>endofunctor</strong> <code>T</code> equipado com duas transformações naturais:
+  </p>
+  <pre><code>μ : T ∘ T → T        η : I → T</code></pre>
+  <p>
+    satisfazendo leis de associatividade e de unidade estruturalmente idênticas às leis de um monóide, resultado que o autor sintetiza na conhecida formulação atribuída a Saunders Mac Lane:
+  </p>
+  <blockquote>
+    "monad is just a monoid in the category of endofunctors" (Milewski, 2020)
+  </blockquote>
+  <p>
+    Esse resultado garante que a composição de transições por meio do operador <em>fish</em> <code>(&gt;=&gt;)</code> seja associativa e possua um elemento neutro (<code>return</code>), propriedade essencial para que a sequenciação de eventos da FSM produza o mesmo resultado independentemente de como a lista de eventos for particionada ou agrupada durante o processamento — generalizando com rigor formal a associatividade implicitamente exigida pelo uso de <code>foldl</code>.
+  </p>
+
+  <h3 class="subsecao">5.8 Estudo de Caso: Topologia Promovida ao Nível de Tipos</h3>
+  <p>
+    A etapa atual do projeto aplicou o <em>framework</em> CREM (<em>Composable Representable Executable Machines</em>), de Perone (2023), ao mesmo estudo de caso da catraca, com o objetivo de investigar a Hipótese de Composabilidade e Modulação. O primeiro resultado foi a codificação da topologia de transições como um valor de primeira classe, posteriormente promovido ao nível de tipos por meio do mecanismo de <em>singletons</em>:
+  </p>
+<pre><code>$(singletons [d|
+  data TurnstileVertex = Locked | Unlocked
+    deriving (Show, Eq)
+
+  turnstileTopology :: Topology TurnstileVertex
+  turnstileTopology = Topology
+    [ (Locked,   [Unlocked])
+    , (Unlocked, [Locked])
+    ]
+  |])</code></pre>
+  <p>
+    Essa construção representa uma extensão do sistema de tipos descrito por Hutton (2016): em vez de restringir apenas o tipo de um valor, a topologia restringe quais <em>valores de transição</em> são aceitáveis, tornando a regra de negócio da FSM uma propriedade do próprio sistema de tipos.
+  </p>
+
+  <h3 class="subsecao">5.9 Verificação Formal de Segurança de Tipos em Tempo de Compilação</h3>
+  <p>
+    O resultado mais significativo é a verificação prática da Hipótese de Segurança de Tipos. As ações da FSM foram implementadas como:
+  </p>
+<pre><code>turnstileAction
+  :: Applicative m
+  =&gt; STurnstileVertex initialVertex
+  -&gt; Input
+  -&gt; ActionResult m TurnstileTopology STurnstileVertex initialVertex Output
+
+turnstileAction SLocked   Coin = pureResult "Unlocked (insert coin)"   SUnlocked
+turnstileAction SLocked   Push = pureResult "Locked (push denied)"     SLocked
+turnstileAction SUnlocked Coin = pureResult "Unlocked (already open)"  SUnlocked
+turnstileAction SUnlocked Push = pureResult "Locked (passed through)"  SLocked</code></pre>
+  <p>
+    A assinatura de <code>turnstileAction</code> confirma diretamente a conclusão teórica da etapa anterior: a ação é genérica sobre um contexto <code>Applicative m</code> arbitrário, e o construtor <code>ActionResult</code> exige, implicitamente, uma prova em tempo de compilação (<code>AllowedTransition topology initialVertex finalVertex</code>) de que a transição declarada pertence à topologia especificada.
+  </p>
+  <div class="nota">
+    <strong>Teste de invalidez:</strong> uma tentativa deliberada de codificar uma transição fora da topologia declarada (por exemplo, <code>turnstileAction SLocked Push = pureResult "..." SUnlocked</code>) foi <strong>rejeitada pelo compilador GHC antes da execução</strong>, por ausência da instância <code>AllowedTransition</code> correspondente. O erro de tipo, nesse caso, decorre de uma violação de regra de negócio codificada como restrição de tipo — exatamente a proposta de Perone (2023).
+  </div>
+
+  <h3 class="subsecao">5.10 Execução e Validação Cruzada</h3>
+  <p>
+    A execução do artefato (via <code>cabal run</code>) sobre a mesma sequência de entradas <code>[Coin, Push, Push, Coin, Coin, Push]</code> produziu o seguinte traço:
+  </p>
+<pre><code>Coin -&gt; Unlocked (insert coin)
+Push -&gt; Locked   (passed through)
+Push -&gt; Locked   (push denied)
+Coin -&gt; Unlocked (insert coin)
+Coin -&gt; Unlocked (already open)
+Push -&gt; Locked   (passed through)</code></pre>
+  <p>
+    O estado final resultante é <code>Locked</code>, idêntico ao estado final obtido de forma independente pela implementação ingênua (<code>run Locked inputs = Locked</code>). Essa coincidência não é trivial: trata-se de uma <strong>validação cruzada empírica</strong> entre duas formalizações estruturalmente distintas da mesma FSM.
+  </p>
+  <table>
+    <thead>
+      <tr>
+        <th>Abordagem</th>
+        <th>Mecanismo</th>
+        <th>Estado Final</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Ingênua</td>
+        <td><em>pattern matching</em> + <code>foldl</code></td>
+        <td><code>Locked</code></td>
+      </tr>
+      <tr>
+        <td>CREM</td>
+        <td>Topologia ao nível de tipos + efeito monádico genérico</td>
+        <td><code>Locked</code></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3 class="subsecao">5.11 Limitações Identificadas e Encaminhamentos</h3>
+  <p>
+    Em conformidade com o rigor científico exigido, registra-se uma limitação identificada na formalização atual: como o evento (<code>Input</code>) não está codificado no próprio vértice do tipo, a <code>Topology</code> declarada restringe apenas a alcançabilidade estado-a-estado (Q → Q), e não o par completo (Q × Σ) → Q exigido pela definição formal de δ.
+  </p>
+  <p>
+    Uma direção metodológica identificada para o refinamento dessa modelagem é o uso da noção de <strong>functor representável</strong> descrita por Milewski (2020), segundo a qual um functor pode ser interpretado como "um contêiner para armazenar resultados memoizados de chamadas de função", indexado por um tipo-chave. Essa técnica sugere um caminho formal para codificar o alfabeto Σ como índice (chave) das transições permitidas em cada vértice da topologia, aproximando ainda mais a representação em tipos da definição matemática completa de δ.
+  </p>
+  <p>
+    Adicionalmente, a geração automática de diagramas topológicos, prevista pelo módulo <code>Render</code> do CREM (Perone, 2023), ainda não foi exercitada, permanecendo como resultado pendente.
+  </p>
+
+  <h3 class="subsecao">5.12 Síntese Geral e Validação Preliminar das Hipóteses</h3>
+  <p>
+    A síntese dos resultados obtidos permite uma sistematização da evolução do rigor formal alcançado em cada etapa do projeto:
+  </p>
+  <table>
+    <thead>
+      <tr>
+        <th>Etapa</th>
+        <th>Mecanismo de verificação</th>
+        <th>Composição</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Implementação ingênua</td>
+        <td>Exaustividade do <em>pattern matching</em></td>
+        <td><code>foldl</code></td>
+      </tr>
+      <tr>
+        <td>Formalização teórica</td>
+        <td>Leis do monóide / monad</td>
+        <td>State Monad + <code>(&gt;=&gt;)</code></td>
+      </tr>
+      <tr>
+        <td>Verificação formal (CREM)</td>
+        <td>Prova <code>AllowedTransition</code> em tempo de compilação</td>
+        <td><code>Sequential</code> / <code>Parallel</code></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>
+    Enquanto nas etapas iniciais transições inválidas não eram detectáveis ou resultavam em indefinição, na etapa final tais violações são capturadas como erros de compilação. Os resultados obtidos permitem uma avaliação preliminar das hipóteses de pesquisa:
+  </p>
+
+  <ul>
+    <li><strong>Hipótese de Completude Funcional</strong> — <span class="ok">Confirmada</span> já na implementação inicial, por meio da exaustividade do <em>pattern matching</em> garantida pelo compilador (Hutton, 2016).</li>
+    <li><strong>Hipótese de Segurança de Tipos</strong> — <span class="ok">Validada</span> em dois níveis: (i) básico, decorrente da própria natureza <em>type safe</em> de Haskell (Hutton, 2016); (ii) profundo, específico do domínio da FSM, comprovado empiricamente pela rejeição, em tempo de compilação, de transições não previstas na topologia (Perone, 2023).</li>
+    <li><strong>Hipótese de Composabilidade e Modulação</strong> — <span class="parcial">Parcialmente fundamentada</span>: fundamentação teórica estabelecida através da Categoria Kleisli e da State Monad (Hutton, 2016; Milewski, 2020); primeira instância prática obtida via <code>ActionResult</code> do CREM; a demonstração completa depende ainda da composição efetiva de múltiplas FSMs independentes por meio dos construtores <code>Sequential</code>, <code>Parallel</code>, <code>Alternative</code> e <code>Feedback</code>, etapa que permanece como objetivo central para a continuidade do trabalho.</li>
+  </ul>
+</section>
+
+<!-- ================= 6 CRONOGRAMA ================= -->
+<section class="page-break">
+  <h2 class="secao">6 CRONOGRAMA</h2>
+  <p>
+    O cronograma a seguir descreve o planejamento de todas as etapas da pesquisa ao longo do período de desenvolvimento do projeto de Iniciação Científica.
+  </p>
+
+  <table class="cronograma-table">
+    <thead>
+      <tr>
+        <th>Etapas</th>
+        <th>Fev</th><th>Mar</th><th>Abr</th><th>Mai</th>
+        <th>Jun</th><th>Jul</th><th>Ago</th><th>Set</th>
+        <th>Out</th><th>Nov</th><th>Dez</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Revisão bibliográfica aprofundada</td>
+        <td class="x">X</td><td class="x">X</td>
+        <td></td><td></td><td></td><td></td><td></td>
+        <td></td><td></td><td></td><td></td>
+      </tr>
+      <tr>
+        <td>Modelagem de ADTs e função de transição</td>
+        <td></td><td class="x">X</td><td class="x">X</td>
+        <td></td><td></td><td></td><td></td>
+        <td></td><td></td><td></td><td></td>
+      </tr>
+      <tr>
+        <td>Implementação de State Monad e Kleisli</td>
+        <td></td><td></td><td class="x">X</td><td class="x">X</td>
+        <td></td><td></td><td></td>
+        <td></td><td></td><td></td><td></td>
+      </tr>
+      <tr>
+        <td>Estudo de caso e composição de FSMs</td>
+        <td></td><td></td><td></td><td class="x">X</td>
+        <td class="x">X</td><td></td><td></td>
+        <td></td><td></td><td></td><td></td>
+      </tr>
+      <tr>
+        <td>Testes de invalidez de tipagem</td>
+        <td></td><td></td><td></td><td></td>
+        <td class="x">X</td><td class="x">X</td><td></td>
+        <td></td><td></td><td></td><td></td>
+      </tr>
+      <tr>
+        <td>Análise comparativa e documentação</td>
+        <td></td><td></td><td></td><td></td>
+        <td></td><td class="x">X</td><td class="x">X</td>
+        <td></td><td></td><td></td><td></td>
+      </tr>
+      <tr>
+        <td>Elaboração do relatório final</td>
+        <td></td><td></td><td></td><td></td>
+        <td></td><td></td><td class="x">X</td>
+        <td class="x">X</td><td class="x">X</td>
+        <td></td><td></td>
+      </tr>
+      <tr>
+        <td>Entrega e apresentação</td>
+        <td></td><td></td><td></td><td></td>
+        <td></td><td></td><td></td>
+        <td></td><td></td>
+        <td class="x">X</td><td class="x">X</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ================= 7 REFERÊNCIAS ================= -->
+<section class="page-break">
+  <h2 class="secao">7 REFERÊNCIAS</h2>
+  <div class="referencias">
+    <p>ASSOCIAÇÃO BRASILEIRA DE NORMAS TÉCNICAS - ABNT. <strong>NBR 6023</strong>: Informação e documentação - Referências - Elaboração. Rio de Janeiro, 2018.</p>
+    <p>ASSOCIAÇÃO BRASILEIRA DE NORMAS TÉCNICAS - ABNT. <strong>NBR 10520</strong>: Informação e documentação - Citações em documentos - Apresentação. Rio de Janeiro, 2023.</p>
+    <p>BOCCHINO JR., R. L. <strong>Monads, Categories, and Computation</strong>. [S.l.]: [s.n.], 2025.</p>
+    <p>HUTTON, G. <strong>Programming in Haskell</strong>. 2. ed. Cambridge: Cambridge University Press, 2016.</p>
+    <p>JAHN, M. <strong>Monads and their Applications in Haskell</strong>. 2020. Trabalho de Conclusão de Curso (Bachelor's Thesis) – Department of Mathematics, Technische Universität München, Munich, 2020.</p>
+    <p>MAIA, D. <strong>Applied Category Theory: Monads and Haskell</strong>. 2022.</p>
+    <p>MALAKHOVSKI, Y. M.; SHALYTO, A. A. [Máquinas de estados finitos em linguagens de programação funcional pura]. <strong>RSDN Magazine</strong>, São Petersburgo, n. 1, 2009.</p>
+    <p>MILEWSKI, B. <strong>Category Theory for Programmers</strong>. [S.l.]: [s.n.], 2020. E-book.</p>
+    <p>OLIVEIRA, A. G. de. <strong>Haskell: Uma introdução à programação funcional</strong>. São Paulo: Casa do Código, 2017.</p>
+    <p>PERONE, M. <strong>Crème de la Crem: Composable Representable Executable Machines</strong>. 2023.</p>
+    <p>WADLER, P. Comprehending Monads. <strong>Mathematical Structures in Computer Science</strong>, v. 2, n. 4, p. 461-493, 1992.</p>
+  </div>
+</section>
+
+<footer>
+  Relatório Parcial de Iniciação Científica · Peterson Carara Junior · Orientador: Prof. Felipe Canarozzo Lourenço · Fatec Baixada Santista "Rubens Lara" · 2025
+</footer>
+
+</body>
+</html>

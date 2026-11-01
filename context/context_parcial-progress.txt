@@ -1,0 +1,413 @@
+================================================================================
+EXPLICAÇÃO DO ARQUIVO "PROGRESSO.PDF"
+================================================================================
+
+O arquivo Progresso.pdf é um relatório parcial de um projeto de Iniciação
+Científica que investiga a formalização de Máquinas de Estados Finitos (FSMs)
+na linguagem de programação funcional pura Haskell. O objetivo central é
+demonstrar como o sistema de tipos avançado de Haskell pode garantir a
+segurança e a completude das transições de estado em tempo de compilação,
+além de permitir a composição de sistemas complexos de forma modular.
+
+O documento descreve a evolução do projeto em etapas, desde uma implementação
+ingênua até o uso de um framework avançado. Abaixo, um resumo detalhado de
+cada seção.
+
+
+--------------------------------------------------------------------------------
+1. CONTEXTO E PROBLEMA DE PESQUISA
+--------------------------------------------------------------------------------
+
+O documento inicia contextualizando que, embora as FSMs sejam um modelo
+matemático rigoroso, sua implementação em linguagens imperativas (como C++)
+geralmente depende de variáveis mutáveis para armazenar o estado. Isso quebra
+a pureza do modelo e torna a verificação de corretude dependente de testes em
+tempo de execução, que são lentos e suscetíveis a erros.
+
+A pesquisa propõe resolver esse problema usando Haskell, que exige funções
+puras e possui um sistema de tipos poderoso. A hipótese é que, usando Tipos de
+Dados Algébricos (ADTs), Monads e a Categoria Kleisli, é possível obter uma
+formalização de FSMs que ofereça garantias verificáveis de corretude (type
+safety) e completude (completeness), além de suportar a composição modular de
+sistemas.
+
+
+--------------------------------------------------------------------------------
+2. PROGRESSO PARCIAL (SEÇÃO 5)
+--------------------------------------------------------------------------------
+
+Esta é a parte central do relatório, que descreve os resultados alcançados em
+ordem cronológica.
+
+2.1 Correspondência entre ADTs e os Conjuntos Q e Sigma
+------------------------------------------------------
+
+O primeiro passo foi traduzir os conjuntos finitos de Estados (Q) e Eventos
+(Sigma) da FSM para Tipos Soma em Haskell. Exemplo:
+
+    data State = Locked | Unlocked deriving (Show, Eq)
+    data Input = Coin | Push deriving (Show, Eq)
+
+O relatório argumenta que isso não é uma escolha sintática, mas uma
+instanciação direta da álgebra dos tipos, onde Bool (e por extensão, tipos com
+dois valores) corresponde ao coproduto 2 = 1 + 1 na categoria Hask.
+
+2.2 A Função de Transição delta como Morfismo em Hask
+------------------------------------------------------
+
+A função de transição delta: Q x Sigma -> Q foi implementada com pattern
+matching exaustivo:
+
+    transition :: State -> Input -> State
+    transition Locked Coin = Unlocked
+    transition Locked Push = Locked
+    -- ...
+
+A assinatura State -> Input -> State é a versão curried de um morfismo cujo
+domínio é o produto categorial State x Input, estabelecendo uma correspondência
+formal com a definição matemática.
+
+A completude funcional é garantida pelo compilador, que verifica se todos os
+casos possíveis de (Estado, Evento) foram tratados. Se um caso for omitido, o
+programa não compila.
+
+2.3 Sequenciação Inicial e Validação Empírica
+----------------------------------------------
+
+A composição de múltiplas transições foi feita com a função de alta ordem
+foldl:
+
+    run :: State -> [Input] -> State
+    run = foldl transition
+
+A execução sobre a sequência [Coin, Push, Push, Coin, Coin, Push] a partir de
+Locked resultou em Locked, validando a pureza e o determinismo da função.
+
+2.4 Da Composição Ingênua à Necessidade de uma Abstração Monádica
+-------------------------------------------------------------------
+
+O relatório identifica que a abordagem com foldl é insuficiente quando a
+transição precisa carregar informação adicional (como uma mensagem de saída).
+Nesse momento, a função de transição deixa de ser pura (Q x Sigma -> Q) e se
+torna uma função "embelezada" (Q x Sigma -> M Q), onde M é uma Monad. A solução
+formal é a Categoria Kleisli, que define como compor essas funções monádicas.
+
+2.5 Reformulação Teórica da FSM sobre a State Monad
+----------------------------------------------------
+
+A FSM foi reformulada usando a State Monad (formalizada por Hutton). O estado
+do autômato é "rosqueado" (threaded) de forma pura através das transições:
+
+    transicaoM :: Input -> ST Output
+    transicaoM evt = S (\q -> let q' = transition q evt
+                              in (mensagem q evt, q'))
+
+Isso encapsula o estado e evita mutabilidade.
+
+2.6 Sequenciação via Notação do e a Função mapM
+------------------------------------------------
+
+Para generalizar a composição de foldl para o contexto monádico, foi usada a
+função mapM:
+
+    mapM :: Monad m => (a -> m b) -> [a] -> m [b]
+
+Isso permite executar uma sequência de transições monádicas e obter tanto a
+lista de saídas quanto o estado final.
+
+2.7 Fundamentação Categorial: o Monad como Monoide na Categoria dos Endofuntores
+----------------------------------------------------------------------------------
+
+O relatório consolida a base teórica: um Monad é um monoide na categoria dos
+endofuntores, com duas transformações naturais (mu: T^2 -> T e eta: I -> T).
+Isso garante que a composição de transições (via operador fish >=>) seja
+associativa e tenha um elemento neutro (return), propriedade essencial para a
+composabilidade.
+
+2.8 Estudo de Caso: Topologia Promovida ao Nível de Tipos (Framework CREM)
+---------------------------------------------------------------------------
+
+O projeto aplicou o framework CREM (Composable Representable Executable
+Machines) ao exemplo da catraca. A topologia de transições é codificada como um
+valor de primeira classe e depois promovida ao nível de tipos via singletons:
+
+    turnstileTopology :: Topology TurnstileVertex
+    turnstileTopology = Topology
+      [ (Locked,   [Unlocked])
+      , (Unlocked, [Locked])
+      ]
+
+Isso torna a regra de negócio (quais transições são permitidas) uma propriedade
+do sistema de tipos.
+
+2.9 Verificação Formal de Segurança de Tipos em Tempo de Compilação
+--------------------------------------------------------------------
+
+O resultado mais significativo: as ações da FSM foram implementadas com uma
+assinatura que exige uma prova em tempo de compilação (AllowedTransition) de
+que a transição pertence à topologia:
+
+    turnstileAction :: Applicative m
+      => STurnstileVertex initialVertex
+      -> Input
+      -> ActionResult m TurnstileTopology STurnstileVertex initialVertex Output
+
+Uma tentativa de codificar uma transição proibida (ex: Locked -> Unlocked com
+Push) é rejeitada pelo compilador GHC. Isso estende o conceito de type safety
+do nível sintático para o nível semântico do domínio.
+
+2.10 Execução e Validação Cruzada
+----------------------------------
+
+A execução do artefato CREM sobre a mesma sequência de entradas produziu o
+mesmo estado final (Locked) que a implementação ingênua com foldl, validando a
+corretude semântica da função de transição.
+
+2.11 Limitações Identificadas e Encaminhamentos
+------------------------------------------------
+
+- Limitação: A topologia atual restringe apenas a alcançabilidade estado-a-
+  estado (Q -> Q), mas não o par completo (Q x Sigma) -> Q. O evento (Input)
+  não está codificado no vértice do tipo.
+
+- Encaminhamento: Usar a noção de functor representável para codificar o
+  alfabeto Sigma como índice das transições permitidas.
+
+- Pendência: A geração automática de diagramas topológicos (módulo Render do
+  CREM) ainda não foi exercitada.
+
+2.12 Síntese Geral e Validação Preliminar das Hipóteses
+--------------------------------------------------------
+
+- Hipótese de Completude Funcional: Confirmada pela exaustividade do pattern
+  matching.
+
+- Hipótese de Segurança de Tipos: Validada em dois níveis (básico e específico
+  do domínio, com a rejeição de transições inválidas em tempo de compilação).
+
+- Hipótese de Composabilidade e Modulação: Fundamentação teórica estabelecida,
+  mas a demonstração completa ainda depende da composição efetiva de múltiplas
+  FSMs usando os construtores Sequential, Parallel, Alternative e Feedback do
+  CREM.
+
+
+--------------------------------------------------------------------------------
+3. O QUE É O CREM?
+--------------------------------------------------------------------------------
+
+CREM é a abreviação de Compositional Representable Executable Machines
+(Máquinas Executáveis, Representáveis e Composicionais). Trata-se de uma
+biblioteca Haskell, desenvolvida por Marco Perone e Georgios Karachalias, que
+permite definir, compor, executar e renderizar Máquinas de Estados Finitos
+(mais especificamente, Máquinas de Mealy) de forma puramente funcional.
+
+O CREM foi projetado com base nos princípios do Domain-Driven Design (DDD),
+onde Aggregates, Policies e Projections são modelados como máquinas de estados
+que podem ser compostas para formar sistemas maiores.
+
+3.1 Motivação e Contexto de Desenvolvimento
+--------------------------------------------
+
+Segundo os autores, a motivação para o desenvolvimento do CREM surgiu de dois
+problemas práticos enfrentados ao usar Domain-Driven Design:
+
+(a) Falta de Definição Precisa: Termos como "aggregates", "policies" e
+    "projections" carecem de definição precisa e delimitação, o que tende a
+    criar discussões e confusão.
+
+(b) Distância entre Modelo e Implementação: Há uma distância entre o modelo
+    teórico desenvolvido com especialistas de domínio e a implementação
+    concreta desse modelo. Isso é o mesmo problema que ocorre com documentação
+    desatualizada, onde a documentação de um código não está em sincronia com
+    o comportamento atual do código.
+
+O CREM resolve esses problemas ao expressar DDD e arquiteturas baseadas em
+eventos em termos de máquinas de estados, tornando tudo composicional (já que
+máquinas de estados compõem extremamente bem) e representável (já que a
+representação gráfica pode ser gerada automaticamente a partir da
+implementação).
+
+3.2 As Duas Ideias Centrais do CREM
+------------------------------------
+
+O CREM é baseado em duas ideias principais:
+
+(a) Rastrear o Conjunto de Transições Permitidas no Nível de Tipos
+
+    O CREM usa a Topology para armazenar a lista de transições permitidas.
+    A Topology é uma lista de arestas, agrupadas por seu vértice inicial:
+
+        turnstileTopology :: Topology TurnstileVertex
+        turnstileTopology = Topology
+          [ (Locked,   [Unlocked])
+          , (Unlocked, [Locked])
+          ]
+
+    Ao armazenar a Topology no nível de tipos (usando o mecanismo de
+    singletons), o CREM é capaz de impor em tempo de compilação que transições
+    proibidas nunca sejam executadas. A classe de tipos AllowedTransition
+    verifica se uma transição de initialVertex para finalVertex é permitida
+    pela topologia, construindo uma prova disso através do tipo de dados
+    AllowTransition.
+
+(b) Usar uma Estrutura "Free-like" para Restaurar a Composicionalidade
+
+    O tipo BaseMachine armazena a informação da Topology no nível de tipos,
+    mas esse parâmetro de tipo torna a composição mais difícil, pois compor
+    duas máquinas exigiria computar no nível de tipos a topologia da máquina
+    composta. Além disso, a presença desse terceiro parâmetro não permite usar
+    classes de tipos comuns como Category, Profunctor ou Arrow.
+
+    Para restaurar a composicionalidade, o CREM define uma estrutura "free-like"
+    que adiciona operações de composição sobre o tipo BaseMachine. Essa
+    estrutura é o tipo StateMachine, que funciona como uma árvore de sintaxe
+    abstrata onde as folhas são BaseMachines e os outros nós descrevem como as
+    subárvores são compostas.
+
+3.3 Os Construtores de Composição do StateMachine
+--------------------------------------------------
+
+O tipo StateMachine possui os seguintes construtores:
+
+    data StateMachine input output where
+      Basic      :: ... => BaseMachine topology input output -> StateMachine input output
+      Sequential :: StateMachine a b -> StateMachine b c -> StateMachine a c
+      Parallel   :: StateMachine a b -> StateMachine c d -> StateMachine (a,c) (b,d)
+      Alternative :: StateMachine a b -> StateMachine c d
+                  -> StateMachine (Either a c) (Either b d)
+      Feedback   :: StateMachine a [b] -> StateMachine b [a] -> StateMachine a [b]
+      Kleisli    :: StateMachine a [b] -> StateMachine b [c] -> StateMachine a [c]
+
+A função de cada construtor é:
+
+- Sequential: Restaura a composição categorial sequencial, onde a saída de
+  uma máquina se torna a entrada da próxima.
+
+- Parallel: Permite implementar Arrow e Strong, processando duas máquinas
+  simultaneamente e recebendo/produzindo tuplas.
+
+- Alternative: Permite implementar ArrowChoice e Choice, processando uma
+  entre duas máquinas dependendo da entrada (usando Either).
+
+- Feedback: Usado para fazer loop entre duas máquinas de estados, alimentando
+  respectivamente a saída de uma como entrada da outra.
+
+- Kleisli: Permite compor sequencialmente duas máquinas de estados que
+  produzem múltiplas saídas, enquanto processam entradas únicas.
+
+3.4 Exemplo de Composição: O Domínio do Carrinho de Compras
+------------------------------------------------------------
+
+No paper, os autores demonstram o poder do CREM através de um exemplo de
+e-commerce. Supondo que temos implementado o agregado Cart, a política
+PaymentGateway e a projeção PaymentStatus:
+
+    cart          :: StateMachine CartCommand [CartEvent]
+    paymentGateway :: StateMachine CartEvent [CartCommand]
+    paymentStatus :: StateMachine CartEvent [CartView]
+
+Podemos compô-los para criar uma implementação para todo o domínio:
+
+    wholeCartDomain :: StateMachine CartCommand [CartView]
+    wholeCartDomain = Kleisli (Feedback cart paymentGateway) paymentStatus
+
+A partir dessa definição, o CREM é capaz de gerar automaticamente um diagrama
+que mostra como a aplicação está estruturada (ver Figura 7 do paper). No
+diagrama, é fácil entender como o agregado Cart está conectado em um loop com
+a política PaymentGateway e como as saídas do loop são então alimentadas como
+entradas na projeção PaymentStatus. Dentro de cada caixa, também é possível ver
+a topologia do espaço de estados da máquina de estados que controla aquele
+componente específico.
+
+3.5 Renderização Gráfica Automática
+-------------------------------------
+
+Graças à informação sobre as transições permitidas que o CREM coleta durante a
+definição de uma máquina (a Topology), a biblioteca é capaz de gerar
+automaticamente uma representação gráfica do fluxo e do espaço de estados da
+máquina.
+
+Os autores argumentam que isso permite que a documentação visual do sistema
+permaneça sincronizada com a implementação, eliminando o problema de
+documentação desatualizada. Isso é extremamente útil ao discutir o
+comportamento do domínio com especialistas de domínio, removendo a necessidade
+de entender e explicar o comportamento do código puro.
+
+3.6 Limitações Conhecidas do CREM
+-----------------------------------
+
+Os autores documentam as seguintes limitações no estado atual do CREM:
+
+(a) Tamanho das Máquinas: O CREM não foi testado em máquinas de estados muito
+    grandes; os tempos de compilação podem crescer rapidamente.
+
+(b) Topologias Finitas: As topologias precisam ser finitas e relativamente
+    pequenas. Por exemplo, não é viável usar Int como tipo de vértices para
+    uma topologia.
+
+(c) StateMachine Não Extensível: O tipo StateMachine não é extensível em seu
+    estado atual; possui um conjunto predefinido de construtores.
+
+(d) Sem Conexão entre Transições e Inputs: A implementação atual rastreia
+    apenas uma lista de transições de estado permitidas. Não há conexão entre
+    as transições permitidas e os inputs que as disparam. Em outras palavras,
+    não há restrição sobre quais inputs podem ser recebidos em um dado estado.
+
+(e) Sem Concorrência ou Paralelismo: A implementação atual não tira proveito
+    de concorrência ou paralelismo. Em casos onde uma máquina de estados é
+    composta de múltiplas sub-máquinas em paralelo, poderia ser interessante
+    permitir executá-las em threads separadas.
+
+3.7 Trabalhos Futuros Sugeridos pelos Autores
+-----------------------------------------------
+
+Os autores sugerem várias direções para trabalhos futuros:
+
+- Investigar a relação entre o construtor Feedback e as classes de tipos
+  ArrowLoop ou Costrong, potencialmente removendo o Feedback e substituindo-o
+  por algo mais próximo de loop ou unfirst.
+
+- Unificar os construtores Sequential e Kleisli, que ambos lidam com composição
+  sequencial.
+
+- Implementar uma forma de expressar que, em um certo estado, apenas certos
+  inputs são válidos, conectando as transições permitidas aos inputs que as
+  disparam.
+
+- Introduzir um passo de otimização que reestruture a árvore de sintaxe
+  abstrata que constitui uma StateMachine, usando a estrutura algébrica
+  fornecida pela estrutura categorial (por exemplo, remover máquinas
+  identidade compostas sequencialmente).
+
+- Investigar como testar sistemas construídos com CREM, incluindo testes
+  unitários, testes baseados em propriedades, e o uso de linguagens como TLA+
+  ou Alloy para verificar invariantes do domínio.
+
+3.8 Relevância para o Projeto
+-------------------------------
+
+A aplicação do CREM no projeto (conforme descrito na seção 2.8 deste
+relatório) representa a etapa de maior rigor formal, onde as regras de negócio
+da FSM são codificadas como restrições de tipo e validadas pelo compilador
+antes da execução do programa. Isso demonstra, na prática, a Hipótese de
+Segurança de Tipos proposta pelo projeto de pesquisa.
+
+
+--------------------------------------------------------------------------------
+4. REFERÊNCIAS
+--------------------------------------------------------------------------------
+
+O documento finaliza com a lista de referências bibliográficas utilizadas no
+projeto.
+
+
+--------------------------------------------------------------------------------
+CONCLUSÃO
+--------------------------------------------------------------------------------
+
+O Progresso.pdf documenta uma pesquisa que evolui de uma implementação simples
+de FSM em Haskell para uma formalização avançada usando o framework CREM,
+demonstrando como o sistema de tipos de Haskell pode ser usado para verificar a
+corretude das regras de negócio em tempo de compilação. A pesquisa está em
+andamento, com a próxima etapa focada em demonstrar a composabilidade de
+múltiplas FSMs.

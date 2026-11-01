@@ -1,0 +1,25 @@
+
+
+add :: Nat -> Nat -> Nat
+add Zero n = n
+add (Succ m) n = Succ (add m n)
+
+
+add (Succ Zero) (Suc Zero) 
+
+add (Suc Zero) (Suc Zero) = Succ (add Zero (Suc Zero)
+	add Zero (Suc Zero) = Suc Zero 
+
+
+add (Succ Succ Zero) (Succ Succ Zero)
+
+add (Succ (Succ Zero) (Succ (Succ Zero) = Succ (add (Succ Zero) (Succ (Succ Zero)
+add (Succ Zero) (Succ (Succ Zero) = Succ ( add Zero (Succ Succ Zero) =
+add Zero (Succ (Succ Zero) = Succ (Succ Zero) 
+
+
+
+Succ (add (Zero) (Suc Zero) = 
+
+
+equational reasoning = 

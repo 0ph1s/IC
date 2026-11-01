@@ -1,0 +1,18 @@
+-- ============================================================================
+-- AvionicsFSM — ponteiro
+-- ----------------------------------------------------------------------------
+-- A versão anterior deste arquivo não compilava e não usava o CREM; foi
+-- preservada em `AvionicsFSM_v1_nao_compila.hs` (histórico, não corrigida).
+--
+-- A implementação com o CREM real (singletons + Template Haskell, State Monad
+-- com provas das leis, composição Basic/Sequential/Parallel/Alternative,
+-- PowerFSM, diagramas e teste de invalidez) depende de pacotes do Hackage e
+-- por isso é um projeto cabal:
+--
+--     others/avionics-crem/
+--
+--   cabal build
+--   cabal run avionics-crem
+--   cabal build invalid-inflight-shutdown --enable-tests   -- falha de propósito
+-- ============================================================================
+module AvionicsFSM () where

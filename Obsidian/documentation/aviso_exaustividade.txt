@@ -1,0 +1,28 @@
+# Saída REAL do GHC (The Glorious Glasgow Haskell Compilation System, version 9.6.7) para uma função de transição com um par omitido
+# Experimento: others/avionics-crem/src/Avionics/Naive.hs sem a linha 'transition Shutdown SystemCutoff = Shutdown'
+# Mostra que a exaustividade é AVISO (-Wincomplete-patterns, incluído em -Wall) e vira ERRO só com -Werror.
+
+### ghc -Wall -fno-code (sem -Werror)
+[1 of 1] Compiling Avionics.Naive   ( Naive.hs, nothing )
+
+Naive.hs:62:1: warning: [GHC-62161] [-Wincomplete-patterns]
+    Pattern match(es) are non-exhaustive
+    In an equation for `transition':
+        Patterns of type `AvState', `AvEvent' not matched:
+            Shutdown SystemCutoff
+   |
+62 | transition Grounded         TakeoffSignal   = InFlight
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^...
+exit=0
+### ghc -Wall -Werror=incomplete-patterns -fno-code
+[1 of 1] Compiling Avionics.Naive   ( Naive.hs, nothing )
+
+Naive.hs:62:1: error: [GHC-62161] [-Wincomplete-patterns, Werror=incomplete-patterns]
+    Pattern match(es) are non-exhaustive
+    In an equation for `transition':
+        Patterns of type `AvState', `AvEvent' not matched:
+            Shutdown SystemCutoff
+   |
+62 | transition Grounded         TakeoffSignal   = InFlight
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^...
+exit=1

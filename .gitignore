@@ -1,0 +1,13 @@
+﻿# Projects/ contem repositorios proprios (git aninhado)
+Projects/avionics-crem/
+Projects/crem-example/
+dist-newstyle/
+.claude/
+*.hi
+*.o
+*.aux
+*.log
+*.out
+*.synctex.gz
+.obsidian/workspace.json
+.DS_Store
