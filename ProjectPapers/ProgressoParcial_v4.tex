@@ -14,6 +14,8 @@
 \usepackage[hidelinks]{hyperref}
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,fit,backgrounds}
 
 % Configuração das margens (ABNT)
 \geometry{
@@ -457,6 +459,48 @@ $(singletons [d|
 
 A regra de domínio é que um UAV em voo (\texttt{InFlight}) não pode ser desligado diretamente (\texttt{Shutdown}); por isso não existe essa aresta. A analogia com as classes de tipos de Hutton (2016), como \texttt{Eq} e \texttt{Ord}, vale em parte: ambas expressam restrições que o compilador resolve. A diferença é que uma classe restringe tipos, enquanto a topologia restringe valores (os vértices) promovidos a tipos pela biblioteca \texttt{singletons}, o que permite ao compilador raciocinar sobre eles.
 
+A Figura~\ref{fig:topologias} mostra as duas topologias do estudo de caso. As auto-transições (aresta identidade) não foram desenhadas.
+
+\begin{figure}[h]
+\centering
+\footnotesize
+\begin{tikzpicture}[
+    st/.style={draw, rounded corners=2pt, minimum height=0.8cm, inner sep=4pt, font=\ttfamily\footnotesize},
+    ar/.style={-{Stealth[length=2.2mm]}, thick},
+    lb/.style={font=\scriptsize, fill=white, inner sep=1pt}
+]
+\node[st] (g) at (0,0) {Grounded};
+\node[st] (f) at (5,0) {InFlight};
+\node[st] (e) at (2.5,-2.4) {EmergencyLanding};
+\node[st] (s) at (9.5,0) {Shutdown};
+\draw[ar] (g) -- node[lb, above] {TakeoffSignal} (f);
+\draw[ar] (f) -- node[lb, right, xshift=2pt] {CriticalBattery} (e);
+\draw[ar] (e) -- node[lb, left, xshift=-2pt] {LandedSignal} (g);
+\draw[ar] (g) to[out=50, in=130, looseness=0.9] node[lb, above] {SystemCutoff} (s);
+\draw[ar, dashed] (f) -- node[lb, above] {proibida} node[midway, below=1pt] {$\times$} (s);
+\node[font=\scriptsize\bfseries] at (-0.3,1.35) {(a) Aviônica};
+\end{tikzpicture}
+
+\vspace{0.8cm}
+
+\begin{tikzpicture}[
+    st/.style={draw, rounded corners=2pt, minimum height=0.8cm, inner sep=4pt, font=\ttfamily\footnotesize},
+    ar/.style={-{Stealth[length=2.2mm]}, thick},
+    lb/.style={font=\scriptsize, fill=white, inner sep=1pt}
+]
+\node[st] (c) at (0,0) {Charged};
+\node[st] (l) at (4.5,0) {Low};
+\node[st] (k) at (9,0) {Critical};
+\draw[ar] (c) to[bend left=20] node[lb, above] {Drain} (l);
+\draw[ar] (l) to[bend left=20] node[lb, below] {Recharge} (c);
+\draw[ar] (l) to[bend left=20] node[lb, above] {Drain} (k);
+\draw[ar] (k) to[bend left=20] node[lb, below] {Recharge, ShedLoad} (l);
+\node[font=\scriptsize\bfseries] at (0,1.0) {(b) Energia};
+\end{tikzpicture}
+\caption{Topologias do estudo de caso. A aresta tracejada de \texttt{InFlight} a \texttt{Shutdown} não existe: é a transição proibida pela regra de domínio e rejeitada pelo compilador. \texttt{ShedLoad} foi acrescentado pelo simulador (seção 5.11) e usa a aresta \texttt{Critical} para \texttt{Low} que já existia.}
+\label{fig:topologias}
+\end{figure}
+
 A catraca, usada nas seções anteriores, tem a topologia com as arestas \texttt{Locked} para \texttt{Unlocked} e o inverso. O CREM admite sempre a aresta identidade (um vértice para ele mesmo), por uma instância da classe \texttt{AllowedTransition} (Perone e Karachalias, 2023, Fig. 4); logo, as auto-transições são sempre permitidas. Com dois vértices, as quatro arestas resultantes cobrem todos os pares, e a topologia da catraca é um grafo completo. Por isso ela não serve para demonstrar rejeição.
 
 Também foram escritas, no mesmo projeto, a máquina \texttt{PowerFSM} (subsistema de energia, com os vértices \texttt{Charged}, \texttt{Low} e \texttt{Critical}) e as composições da seção 5.10.
@@ -538,7 +582,30 @@ Até a seção 5.10, a verificação de comportamento se apoiava em uma sequênc
 
 Alguns termos. Um \textit{tick} é um passo discreto de simulação, sem correspondência com segundos. Um \textit{traço} é o registro, por tick, da entrada recebida e dos passos de cada máquina (evento, saída e vértice em que ficou). Em malha aberta, cada máquina só recebe o que o cenário manda. Em malha fechada, o ambiente observa a telemetria e realimenta as máquinas, de modo que a saída de uma influencia a entrada da outra.
 
-\textit{Arquitetura.} A planta é a composição em paralelo da aviônica e da energia, com as ações \texttt{avionicsAction} e \texttt{powerAction} originais. O ambiente é uma terceira máquina, \texttt{Mission}, com quatro vértices (\texttt{Standby}, \texttt{CriticalHeld}, \texttt{TouchdownHeld} e \texttt{CutoffHeld}), topologia tipada e 20 equações, sem curinga. Ela é ligada à planta pelo construtor \texttt{Feedback} do CREM: o caminho direto contém a planta e o ambiente, e o caminho de retorno reinjeta os sinais que o ambiente liberou. A State Monad do projeto carrega, de passo em passo, a própria máquina composta como estado. Para relatar em que vértice cada máquina ficou, o simulador observa o vértice de destino dentro da ação, sem reescrever nenhuma regra de transição; o resultado é reconstruído com a mesma prova \texttt{AllowedTransition}, e a garantia por aresta continua valendo.
+\textit{Arquitetura.} A planta é a composição em paralelo da aviônica e da energia, com as ações \texttt{avionicsAction} e \texttt{powerAction} originais. O ambiente é uma terceira máquina, \texttt{Mission}, com quatro vértices (\texttt{Standby}, \texttt{CriticalHeld}, \texttt{TouchdownHeld} e \texttt{CutoffHeld}), topologia tipada e 20 equações, sem curinga. Ela é ligada à planta pelo construtor \texttt{Feedback} do CREM: o caminho direto contém a planta e o ambiente, e o caminho de retorno reinjeta os sinais que o ambiente liberou. A State Monad do projeto carrega, de passo em passo, a própria máquina composta como estado. Para relatar em que vértice cada máquina ficou, o simulador observa o vértice de destino dentro da ação, sem reescrever nenhuma regra de transição; o resultado é reconstruído com a mesma prova \texttt{AllowedTransition}, e a garantia por aresta continua valendo. A Figura~\ref{fig:laco} resume o laço.
+
+\begin{figure}[h]
+\centering
+\footnotesize
+\begin{tikzpicture}[
+    box/.style={draw, rounded corners=2pt, minimum height=0.9cm, align=center, inner sep=5pt},
+    ar/.style={-{Stealth[length=2.2mm]}, thick},
+    lb/.style={font=\scriptsize, align=center}
+]
+\node[box] (av) at (0,0.7) {Aviônica\\{\scriptsize\texttt{avionicsAction}}};
+\node[box] (pw) at (0,-0.9) {Energia\\{\scriptsize\texttt{powerAction}}};
+\begin{scope}[on background layer]
+\node[draw, dashed, rounded corners=3pt, fit=(av)(pw), inner sep=8pt, label={[font=\scriptsize]above:Planta (\texttt{Parallel})}] (planta) {};
+\end{scope}
+\node[box] (mis) at (7.4,0) {Ambiente\\{\scriptsize\texttt{Mission}, 1 slot}};
+\node[lb] (ext) at (-4.6,0) {sinais externos\\{\scriptsize\texttt{Beat}, comando,}\\{\scriptsize energia}};
+\draw[ar] (ext) -- (planta.west);
+\draw[ar] (planta.east) -- node[lb, above] {telemetria\\classificada} (mis.west);
+\draw[ar] (mis.south) -- ++(0,-1.5) -| node[lb, pos=0.25, below] {\texttt{ToAvionics}, \texttt{ToPower}, liberados\\no \texttt{Beat} do tick seguinte (caminho de retorno)} (planta.south);
+\end{tikzpicture}
+\caption{Laço fechado com o \texttt{Feedback} do CREM. O ambiente retém a telemetria relevante e só a libera no \texttt{Beat} do tick seguinte, o que produz o atraso de um tick.}
+\label{fig:laco}
+\end{figure}
 
 \textit{Duas decisões de modelagem.} Primeira, o \texttt{Feedback} do CREM é instantâneo: o laço é repetido dentro do mesmo tick até o caminho de retorno parar de emitir. O efeito desejado era influenciar o tick seguinte; ele foi obtido no próprio modelo, com a \texttt{Mission} funcionando como um registrador de um slot: a telemetria relevante a faz reter um evento, e o sinal de relógio (\texttt{Beat}) do tick seguinte a faz liberá-lo. Como o \texttt{Beat} vem só do cenário e a máquina só emite ao recebê-lo, o laço termina; esse argumento está no código, e não há guarda de terminação em execução. Segunda, para que a emergência também afete a energia, foi acrescentado um evento \texttt{ShedLoad} (corte de cargas não essenciais) a \texttt{PowerEvent}. Ele usa apenas a aresta \texttt{Critical} para \texttt{Low}, que já existia, de modo que a topologia de energia não mudou. O atraso de um tick, o próprio \texttt{ShedLoad} e a ordem em que o ambiente libera \texttt{ShedLoad} e \texttt{LandedSignal} são escolhas de modelagem do autor, sem justificativa em requisitos de um domínio real (seção 5.15).
 
