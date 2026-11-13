@@ -1,0 +1,26 @@
+# ============================================================================
+# TABELA DE TRANSIÇÕES DA ENERGIA (bateria) — 9 linhas
+# Colunas:  estado,evento,destino,relato,origem
+#
+# Os requisitos (Obsidian/documentation/"Example Avionics.md", Fase 4) pedem apenas "uma FSM secundária
+# para o subsistema de energia/bateria (PowerFSM)"; NÃO dão regras de transição. Todas as linhas são,
+# portanto, ESCOLHAS DE MODELAGEM do projeto (origem = MODEL), a serem validadas pela orientação:
+#   - a bateria desce um nível por Drain e sobe um por Recharge; não há aresta Charged -> Critical;
+#   - o relato (Report*) reflete o nível em que a bateria ficou;
+#   - ShedLoad (corte de cargas não essenciais) foi acrescentado para o simulador: só alivia Critical -> Low.
+#
+# PERGUNTAS PARA A REVISÃO:
+#   Q4. Recharge em Low deve subir direto a Charged (como aqui) ou só um nível?
+#   Q5. ShedLoad em Critical deve levar a Low? Deve existir como evento externo?
+#
+# STATUS DA REVISÃO: PENDENTE.
+# ============================================================================
+Charged,Drain,Low,ReportLow,MODEL
+Charged,Recharge,Charged,ReportOk,MODEL
+Charged,ShedLoad,Charged,ReportOk,MODEL
+Low,Drain,Critical,ReportCritical,MODEL
+Low,Recharge,Charged,ReportOk,MODEL
+Low,ShedLoad,Low,ReportLow,MODEL
+Critical,Drain,Critical,ReportCritical,MODEL
+Critical,Recharge,Low,ReportLow,MODEL
+Critical,ShedLoad,Low,ReportLow,MODEL

@@ -1,0 +1,83 @@
+cabal-version: 3.0
+name: avionics-validation
+version: 0.1.0.0
+synopsis: Validacao independente da FSM de avionica em CREM (parecer de 03/11/2026, Revisao_v5)
+build-type: Simple
+extra-source-files:
+  spec/*.csv
+  scenarios/*.scn
+
+common warnings
+  -- Mesmas opcoes do pacote avionics-crem: um par omitido e erro, nao aviso.
+  ghc-options: -Wall -Werror=incomplete-patterns -Wno-all-missed-specialisations -Wno-missing-export-lists -Wno-missing-local-signatures -Wno-name-shadowing -Wno-type-defaults
+  default-language: GHC2021
+
+library
+  import: warnings
+  hs-source-dirs: src
+  exposed-modules:
+    Validation.Types
+    Validation.Boundary
+    Validation.Table
+    Validation.RefModel
+    Validation.Compare
+    Validation.Reach
+  build-depends:
+    base,
+    avionics-crem,
+    containers,
+    crem,
+    singletons-base
+
+-- Nivel 2 (relatorio da orientacao): tabela de transicoes lida de spec/*.csv comparada, de forma
+-- EXAUSTIVA, com a acao do CREM, a FSM ingenua e a topologia.   cabal test validation-conformance-tests
+test-suite validation-conformance-tests
+  import: warnings
+  type: exitcode-stdio-1.0
+  main-is: ConformanceSpec.hs
+  hs-source-dirs: test
+  build-depends:
+    base,
+    avionics-crem,
+    avionics-validation,
+    crem,
+    singletons-base
+
+-- Fronteira tipada: contrato do adaptador String -> Either BoundaryError AvEvent.
+--   cabal test validation-boundary-tests
+test-suite validation-boundary-tests
+  import: warnings
+  type: exitcode-stdio-1.0
+  main-is: BoundarySpec.hs
+  hs-source-dirs: test
+  build-depends:
+    base,
+    avionics-crem,
+    avionics-validation
+
+-- Nivel 3: testes baseados em modelo com Hedgehog (geradores reprodutiveis, shrinking).
+--   cabal test validation-model-tests
+test-suite validation-model-tests
+  import: warnings
+  type: exitcode-stdio-1.0
+  main-is: ModelSpec.hs
+  hs-source-dirs: test
+  other-modules: Gen
+  build-depends:
+    base,
+    avionics-crem,
+    avionics-validation,
+    hedgehog
+
+-- Nivel 2: alcancabilidade exaustiva do laco fechado (todas as sequencias, qualquer comprimento).
+--   cabal test validation-reach-tests
+test-suite validation-reach-tests
+  import: warnings
+  type: exitcode-stdio-1.0
+  main-is: ReachSpec.hs
+  hs-source-dirs: test
+  build-depends:
+    base,
+    avionics-crem,
+    avionics-validation,
+    containers

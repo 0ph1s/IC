@@ -1,0 +1,271 @@
+Build profile: -w ghc-9.6.7 -O1
+In order, the following will be built (use -v for more details):
+ - avionics-validation-0.1.0.0 (test:validation-model-tests) (ephemeral targets)
+Preprocessing test suite 'validation-model-tests' for avionics-validation-0.1.0.0...
+Building test suite 'validation-model-tests' for avionics-validation-0.1.0.0...
+Running 1 test suites...
+Test suite validation-model-tests: RUNNING...
+=== 1. Equivalência CREM x oráculo (tabelas), cenários de até 40 ticks ===
+  -- malha fechada
+  ✓ <interactive> passed 5000 tests.
+  -- malha aberta
+  ✓ <interactive> passed 3000 tests.
+
+=== 2. Propriedades de traço do pacote base em cenários de até 60 ticks ===
+  -- Shutdown só após Grounded; EmergencyLanding só de InFlight; ShedLoad nunca descarrega; atraso de um tick
+  ✓ <interactive> passed 3000 tests.
+
+=== 3. Política da bateria no modelo ===
+  -- Level: nunca termina preso (InFlight, Critical) após 2 ticks ociosos
+  ✓ <interactive> passed 5000 tests.
+
+=== 4. Fronteira tipada ===
+  -- ida-e-volta decodeScenario . encodeScenario
+  ✓ <interactive> passed 3000 tests.
+  -- texto arbitrário: total e re-codificável
+  ✓ <interactive> passed 5000 tests.
+  -- decodificação estrita
+  ✓ <interactive> passed 5000 tests.
+
+=== 5. Traço de regressão prioritário (scenarios/regressao_bateria_critica.scn) ===
+  [ok]    regressão: CREM e oráculo OneSlot coincidem passo a passo
+  [ok]    regressão, OneSlot: termina com aviônica InFlight, bateria Critical e ambiente livre (a lacuna borda x nível)
+  [ok]    regressão, OneSlot: a única saída significativa é MsgTakeoff
+  [ok]    regressão, Level: o ambiente reage ao NÍVEL; aviônica vai a EmergencyLanding e pousa; bateria alivia a Low
+  [ok]    regressão, Level: saídas [MsgTakeoff, MsgEmergency, MsgLanded]
+  [ok]    regressão: o CREM termina em InFlight (não em Grounded) — Level e CREM divergem
+
+=== 6. Mutantes (defeitos injetados; cada um deve ser detectado e reduzido pelo shrinking) ===
+  -- M1 destino errado em aresta permitida (Grounded+TakeoffSignal -> Shutdown)   (falha esperada: o relatório abaixo É o contraexemplo reduzido)
+  ✗ <interactive> failed at test\ModelSpec.hs:118:55
+    after 12 tests and 1 shrink.
+    shrink path: 12:c
+  
+        ┏━━ test\ModelSpec.hs ━━━
+    115 ┃ equivWith :: Tables -> Property
+    116 ┃ equivWith t = withTests 3000 . property $ do
+    117 ┃   sc <- forAll (genScenario 40)
+        ┃   │ [ TickInput { tiCommand = Just TakeoffSignal , tiPower = Nothing }
+        ┃   │ ]
+    118 ┃   compareSteps (cremSteps sc) (refSteps t OneSlot sc) === Nothing
+        ┃   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        ┃   │ ━━━ Failed (- lhs) (+ rhs) ━━━
+        ┃   │ - Just
+        ┃   │ -   Divergence
+        ┃   │ -     { dvIndex = 1
+        ┃   │ -     , dvActual =
+        ┃   │ -         Just
+        ┃   │ -           StepSum
+        ┃   │ -             { ssTick = 0
+        ┃   │ -             , ssAvIn = Just TakeoffSignal
+        ┃   │ -             , ssPwIn = Nothing
+        ┃   │ -             , ssAvOut = Just MsgTakeoff
+        ┃   │ -             , ssAv = InFlight
+        ┃   │ -             , ssPw = PwCharged
+        ┃   │ -             , ssMission = "Standby"
+        ┃   │ -             }
+        ┃   │ -     , dvExpected =
+        ┃   │ -         Just
+        ┃   │ -           StepSum
+        ┃   │ -             { ssTick = 0
+        ┃   │ -             , ssAvIn = Just TakeoffSignal
+        ┃   │ -             , ssPwIn = Nothing
+        ┃   │ -             , ssAvOut = Just MsgTakeoff
+        ┃   │ -             , ssAv = Shutdown
+        ┃   │ -             , ssPw = PwCharged
+        ┃   │ -             , ssMission = "Standby"
+        ┃   │ -             }
+        ┃   │ -     }
+        ┃   │ + Nothing
+  
+    This failure can be reproduced by running:
+    > recheckAt (Seed 14884345217762728810 11418918866961219985) "12:c" <property>
+  
+  [ok]    mutante detectado: M1 destino errado em aresta permitida (Grounded+TakeoffSignal -> Shutdown)
+  -- M2 aresta ilegal (InFlight+SystemCutoff -> Shutdown)   (falha esperada: o relatório abaixo É o contraexemplo reduzido)
+  ✗ <interactive> failed at test\ModelSpec.hs:118:55
+    after 30 tests and 4 shrinks.
+    shrink path: 30:cBcE
+  
+        ┏━━ test\ModelSpec.hs ━━━
+    115 ┃ equivWith :: Tables -> Property
+    116 ┃ equivWith t = withTests 3000 . property $ do
+    117 ┃   sc <- forAll (genScenario 40)
+        ┃   │ [ TickInput { tiCommand = Just TakeoffSignal , tiPower = Nothing }
+        ┃   │ , TickInput { tiCommand = Just SystemCutoff , tiPower = Nothing }
+        ┃   │ ]
+    118 ┃   compareSteps (cremSteps sc) (refSteps t OneSlot sc) === Nothing
+        ┃   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        ┃   │ ━━━ Failed (- lhs) (+ rhs) ━━━
+        ┃   │ - Just
+        ┃   │ -   Divergence
+        ┃   │ -     { dvIndex = 3
+        ┃   │ -     , dvActual =
+        ┃   │ -         Just
+        ┃   │ -           StepSum
+        ┃   │ -             { ssTick = 1
+        ┃   │ -             , ssAvIn = Just SystemCutoff
+        ┃   │ -             , ssPwIn = Nothing
+        ┃   │ -             , ssAvOut = Just MsgIgnored
+        ┃   │ -             , ssAv = InFlight
+        ┃   │ -             , ssPw = PwCharged
+        ┃   │ -             , ssMission = "Standby"
+        ┃   │ -             }
+        ┃   │ -     , dvExpected =
+        ┃   │ -         Just
+        ┃   │ -           StepSum
+        ┃   │ -             { ssTick = 1
+        ┃   │ -             , ssAvIn = Just SystemCutoff
+        ┃   │ -             , ssPwIn = Nothing
+        ┃   │ -             , ssAvOut = Just MsgShutdown
+        ┃   │ -             , ssAv = Shutdown
+        ┃   │ -             , ssPw = PwCharged
+        ┃   │ -             , ssMission = "Standby"
+        ┃   │ -             }
+        ┃   │ -     }
+        ┃   │ + Nothing
+  
+    This failure can be reproduced by running:
+    > recheckAt (Seed 5852111252347336382 8478794776297812465) "30:cBcE" <property>
+  
+  [ok]    mutante detectado: M2 aresta ilegal (InFlight+SystemCutoff -> Shutdown)
+  -- M3 eventos trocados (TakeoffSignal <-> SystemCutoff em Grounded)   (falha esperada: o relatório abaixo É o contraexemplo reduzido)
+  ✗ <interactive> failed at test\ModelSpec.hs:118:55
+    after 10 tests and 1 shrink.
+    shrink path: 10:c
+  
+        ┏━━ test\ModelSpec.hs ━━━
+    115 ┃ equivWith :: Tables -> Property
+    116 ┃ equivWith t = withTests 3000 . property $ do
+    117 ┃   sc <- forAll (genScenario 40)
+        ┃   │ [ TickInput { tiCommand = Just TakeoffSignal , tiPower = Nothing }
+        ┃   │ ]
+    118 ┃   compareSteps (cremSteps sc) (refSteps t OneSlot sc) === Nothing
+        ┃   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        ┃   │ ━━━ Failed (- lhs) (+ rhs) ━━━
+        ┃   │ - Just
+        ┃   │ -   Divergence
+        ┃   │ -     { dvIndex = 1
+        ┃   │ -     , dvActual =
+        ┃   │ -         Just
+        ┃   │ -           StepSum
+        ┃   │ -             { ssTick = 0
+        ┃   │ -             , ssAvIn = Just TakeoffSignal
+        ┃   │ -             , ssPwIn = Nothing
+        ┃   │ -             , ssAvOut = Just MsgTakeoff
+        ┃   │ -             , ssAv = InFlight
+        ┃   │ -             , ssPw = PwCharged
+        ┃   │ -             , ssMission = "Standby"
+        ┃   │ -             }
+        ┃   │ -     , dvExpected =
+        ┃   │ -         Just
+        ┃   │ -           StepSum
+        ┃   │ -             { ssTick = 0
+        ┃   │ -             , ssAvIn = Just TakeoffSignal
+        ┃   │ -             , ssPwIn = Nothing
+        ┃   │ -             , ssAvOut = Just MsgShutdown
+        ┃   │ -             , ssAv = Shutdown
+        ┃   │ -             , ssPw = PwCharged
+        ┃   │ -             , ssMission = "Standby"
+        ┃   │ -             }
+        ┃   │ -     }
+        ┃   │ + Nothing
+  
+    This failure can be reproduced by running:
+    > recheckAt (Seed 1264761215982828844 4389063300186277539) "10:c" <property>
+  
+  [ok]    mutante detectado: M3 eventos trocados (TakeoffSignal <-> SystemCutoff em Grounded)
+  -- M4 saída errada (EmergencyLanding+LandedSignal emite MsgIgnored)   (falha esperada: o relatório abaixo É o contraexemplo reduzido)
+  ✗ <interactive> failed at test\ModelSpec.hs:118:55
+    after 31 tests and 3 shrinks.
+    shrink path: 31:eH2
+  
+        ┏━━ test\ModelSpec.hs ━━━
+    115 ┃ equivWith :: Tables -> Property
+    116 ┃ equivWith t = withTests 3000 . property $ do
+    117 ┃   sc <- forAll (genScenario 40)
+        ┃   │ [ TickInput { tiCommand = Just TakeoffSignal , tiPower = Nothing }
+        ┃   │ , TickInput
+        ┃   │     { tiCommand = Just CriticalBattery , tiPower = Nothing }
+        ┃   │ , TickInput { tiCommand = Nothing , tiPower = Nothing }
+        ┃   │ ]
+    118 ┃   compareSteps (cremSteps sc) (refSteps t OneSlot sc) === Nothing
+        ┃   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        ┃   │ ━━━ Failed (- lhs) (+ rhs) ━━━
+        ┃   │ - Just
+        ┃   │ -   Divergence
+        ┃   │ -     { dvIndex = 6
+        ┃   │ -     , dvActual =
+        ┃   │ -         Just
+        ┃   │ -           StepSum
+        ┃   │ -             { ssTick = 2
+        ┃   │ -             , ssAvIn = Just LandedSignal
+        ┃   │ -             , ssPwIn = Nothing
+        ┃   │ -             , ssAvOut = Just MsgLanded
+        ┃   │ -             , ssAv = Grounded
+        ┃   │ -             , ssPw = PwCharged
+        ┃   │ -             , ssMission = "CutoffHeld"
+        ┃   │ -             }
+        ┃   │ -     , dvExpected =
+        ┃   │ -         Just
+        ┃   │ -           StepSum
+        ┃   │ -             { ssTick = 2
+        ┃   │ -             , ssAvIn = Just LandedSignal
+        ┃   │ -             , ssPwIn = Nothing
+        ┃   │ -             , ssAvOut = Just MsgIgnored
+        ┃   │ -             , ssAv = Grounded
+        ┃   │ -             , ssPw = PwCharged
+        ┃   │ -             , ssMission = "Standby"
+        ┃   │ -             }
+        ┃   │ -     }
+        ┃   │ + Nothing
+  
+    This failure can be reproduced by running:
+    > recheckAt (Seed 2155282506784699891 9674831172255585725) "31:eH2" <property>
+  
+  [ok]    mutante detectado: M4 saída errada (EmergencyLanding+LandedSignal emite MsgIgnored)
+  -- M5 política do ambiente: CREM (OneSlot) contra o oráculo Level — reencontra a lacuna borda x nível, reduzida   (falha esperada: o relatório abaixo É o contraexemplo reduzido)
+  ✗ <interactive> failed at test\ModelSpec.hs:124:53
+    after 40 tests and 8 shrinks.
+    shrink path: 40:eF2e2GhK
+  
+        ┏━━ test\ModelSpec.hs ━━━
+    121 ┃ equivLevel :: Tables -> Property
+    122 ┃ equivLevel t = withTests 3000 . property $ do
+    123 ┃   sc <- forAll (genScenario 40)
+        ┃   │ [ TickInput { tiCommand = Nothing , tiPower = Just Drain }
+        ┃   │ , TickInput { tiCommand = Nothing , tiPower = Just Drain }
+        ┃   │ , TickInput { tiCommand = Just TakeoffSignal , tiPower = Nothing }
+        ┃   │ , TickInput { tiCommand = Nothing , tiPower = Nothing }
+        ┃   │ ]
+    124 ┃   compareSteps (cremSteps sc) (refSteps t Level sc) === Nothing
+        ┃   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        ┃   │ ━━━ Failed (- lhs) (+ rhs) ━━━
+        ┃   │ - Just
+        ┃   │ -   Divergence
+        ┃   │ -     { dvIndex = 8
+        ┃   │ -     , dvActual = Nothing
+        ┃   │ -     , dvExpected =
+        ┃   │ -         Just
+        ┃   │ -           StepSum
+        ┃   │ -             { ssTick = 3
+        ┃   │ -             , ssAvIn = Just CriticalBattery
+        ┃   │ -             , ssPwIn = Nothing
+        ┃   │ -             , ssAvOut = Just MsgEmergency
+        ┃   │ -             , ssAv = EmergencyLanding
+        ┃   │ -             , ssPw = PwCritical
+        ┃   │ -             , ssMission = "TouchdownHeld"
+        ┃   │ -             }
+        ┃   │ -     }
+        ┃   │ + Nothing
+  
+    This failure can be reproduced by running:
+    > recheckAt (Seed 9263384202554186067 5290021467201553839) "40:eF2e2GhK" <property>
+  
+  [ok]    mutante detectado: M5 política do ambiente: CREM (OneSlot) contra o oráculo Level — reencontra a lacuna borda x nível, reduzida
+
+18 verificações, 0 falhas.
+Test suite validation-model-tests: PASS
+Test suite logged to:
+C:\Users\Peterson\Documents\GitHub\IC\Revisao_v5\03_codigo\dist-newstyle\build\x86_64-windows\ghc-9.6.7\avionics-validation-0.1.0.0\t\validation-model-tests\test\avionics-validation-0.1.0.0-validation-model-tests.log
+1 of 1 test suites (1 of 1 test cases) passed.

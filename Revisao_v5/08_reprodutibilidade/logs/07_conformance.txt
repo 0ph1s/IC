@@ -1,0 +1,44 @@
+Build profile: -w ghc-9.6.7 -O1
+In order, the following will be built (use -v for more details):
+ - avionics-validation-0.1.0.0 (test:validation-conformance-tests) (ephemeral targets)
+Preprocessing test suite 'validation-conformance-tests' for avionics-validation-0.1.0.0...
+Building test suite 'validation-conformance-tests' for avionics-validation-0.1.0.0...
+Running 1 test suites...
+Test suite validation-conformance-tests: RUNNING...
+=== 0. As tabelas lidas ===
+  [ok]    aviônica: 16 linhas (esperado 16), 4 REQ e 12 CONV
+  [ok]    aviônica: função total e determinística (uma linha por par estado x evento)
+  [ok]    energia: 9 linhas (esperado 9), todas MODEL
+  [ok]    energia: função total e determinística (uma linha por par estado x evento)
+
+=== (A) ação do CREM x tabela (16 + 9 pares: destino e saída/relato) ===
+  [ok]    avionicsAction: destino igual ao da tabela nos 16 pares
+  [ok]    avionicsAction: saída igual à da tabela nos 16 pares
+  [ok]    powerAction: destino igual ao da tabela nos 9 pares
+  [ok]    powerAction: relato igual ao da tabela nos 9 pares
+
+=== (B) FSM ingênua x tabela (16 pares) ===
+  [ok]    transition: destino igual ao da tabela
+  [ok]    outputOf: saída igual à da tabela
+
+=== (C) topologia do CREM x arestas da tabela ===
+  [ok]    arestas da aviônica: topologia == tabela (4 arestas fora a identidade)
+  [ok]    InFlight -> Shutdown não é aresta da tabela nem da topologia (proibição explícita dos requisitos)
+  [ok]    arestas da energia: topologia == tabela (4 arestas fora a identidade)
+
+=== (D) conferência cruzada com spec/domain_rules.txt do pacote base ===
+  [ok]    as 4 linhas REQ da tabela == as 4 regras `allow` do pacote base (origem, destino, evento)
+
+=== (E) o validador de tabelas consegue falhar (tabelas corrompidas à mão) ===
+  [ok]    linha ausente é detectada (par sem linha)
+  [ok]    linha repetida é detectada (par com duas linhas)
+  [ok]    nome de evento desconhecido é recusado na leitura
+  [ok]    número de colunas errado é recusado na leitura
+  [ok]    nível de bateria desconhecido é recusado na leitura
+  [ok]    mkTables recusa tabela mal formada
+
+20 verificações, 0 falhas.
+Test suite validation-conformance-tests: PASS
+Test suite logged to:
+C:\Users\Peterson\Documents\GitHub\IC\Revisao_v5\03_codigo\dist-newstyle\build\x86_64-windows\ghc-9.6.7\avionics-validation-0.1.0.0\t\validation-conformance-tests\test\avionics-validation-0.1.0.0-validation-conformance-tests.log
+1 of 1 test suites (1 of 1 test cases) passed.

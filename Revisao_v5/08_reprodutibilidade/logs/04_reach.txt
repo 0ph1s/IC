@@ -1,0 +1,98 @@
+Build profile: -w ghc-9.6.7 -O1
+In order, the following will be built (use -v for more details):
+ - avionics-validation-0.1.0.0 (test:validation-reach-tests) (file test\ReachSpec.hs changed)
+Preprocessing test suite 'validation-reach-tests' for avionics-validation-0.1.0.0...
+Building test suite 'validation-reach-tests' for avionics-validation-0.1.0.0...
+[1 of 1] Compiling Main             ( test\ReachSpec.hs, C:\Users\Peterson\Documents\GitHub\IC\Revisao_v5\03_codigo\dist-newstyle\build\x86_64-windows\ghc-9.6.7\avionics-validation-0.1.0.0\t\validation-reach-tests\build\validation-reach-tests\validation-reach-tests-tmp\Main.o ) [Source file changed]
+[2 of 2] Linking C:\\Users\\Peterson\\Documents\\GitHub\\IC\\Revisao_v5\\03_codigo\\dist-newstyle\\build\\x86_64-windows\\ghc-9.6.7\\avionics-validation-0.1.0.0\\t\\validation-reach-tests\\build\\validation-reach-tests\\validation-reach-tests.exe [Objects changed]
+Running 1 test suites...
+Test suite validation-reach-tests: RUNNING...
+=== Espaço de estados do laço fechado: 4 x 3 x 4 = 48 ternos possíveis, alfabeto de 20 ticks ===
+  [medida] implementação (CREM): 26 ternos alcançáveis, 520 arestas
+  [medida] oráculo OneSlot     : 26 estados, 520 arestas
+  [medida] oráculo Queue       : 28 estados, 560 arestas
+  [medida] oráculo Level       : 26 estados, 520 arestas
+  [lista]  ternos alcançáveis (aviônica, energia, ambiente) da implementação:
+             (Grounded, Charged, Standby)
+             (Grounded, Charged, CutoffHeld)
+             (Grounded, Low, Standby)
+             (Grounded, Low, TouchdownHeld)
+             (Grounded, Low, CutoffHeld)
+             (Grounded, Critical, Standby)
+             (Grounded, Critical, CriticalHeld)
+             (Grounded, Critical, TouchdownHeld)
+             (Grounded, Critical, CutoffHeld)
+             (InFlight, Charged, Standby)
+             (InFlight, Charged, CutoffHeld)
+             (InFlight, Low, Standby)
+             (InFlight, Low, CutoffHeld)
+             (InFlight, Critical, Standby)
+             (InFlight, Critical, CriticalHeld)
+             (InFlight, Critical, CutoffHeld)
+             (EmergencyLanding, Charged, TouchdownHeld)
+             (EmergencyLanding, Low, TouchdownHeld)
+             (EmergencyLanding, Critical, TouchdownHeld)
+             (Shutdown, Charged, Standby)
+             (Shutdown, Charged, CutoffHeld)
+             (Shutdown, Low, Standby)
+             (Shutdown, Low, CutoffHeld)
+             (Shutdown, Critical, Standby)
+             (Shutdown, Critical, CriticalHeld)
+             (Shutdown, Critical, CutoffHeld)
+
+=== 1. A abstração (terno de vértices) é fiel ao simulador de cenários ===
+  [ok]    iterar cremNext == simulateClosed (terno final e todos os passos) em 8421 cenários de até 3 ticks
+
+=== 2. Segurança da topologia, para TODAS as arestas do grafo (qualquer comprimento) ===
+  [ok]    CREM: nenhum passo viola 'InFlight -> Shutdown', 'Shutdown só de Grounded', 'EmergencyLanding só de InFlight' em 520 arestas
+  [ok]    oráculo (Queue e Level): idem
+
+=== 3. Equivalência implementação x oráculo (política do projeto), para TODAS as sequências ===
+  [ok]    mesmos estados alcançáveis
+  [ok]    mesmas arestas, com os mesmos passos (evento, saída, vértices e ambiente) em cada aresta
+
+=== 4. Composição e terminação: a realimentação para dentro de cada tick? ===
+  [ok]    a exploração fechou: todas as 520 combinações (estado, tick) terminaram; no máximo 5 passos por tick
+  [ok]    limite de passos por tick igual no oráculo OneSlot
+
+=== 5. Política da bateria: reação à BORDA (OneSlot) versus ao NÍVEL (Level) ===
+  [achado] OneSlot (CREM): 2 estado(s) alcançável(is) com aviônica InFlight e bateria Critical de que, só com ticks ociosos, nunca se sai
+           (InFlight, Critical, Standby), a 3 tick(s) do início
+           (InFlight, Critical, CutoffHeld), a 3 tick(s) do início
+           menor caminho até (InFlight, Critical, Standby) [o mais curto] (formato da fronteira; depois, ticks ociosos à vontade):
+             DRAIN
+             DRAIN
+             TAKEOFF
+           menor caminho até (InFlight, Critical, CutoffHeld) (formato da fronteira; depois, ticks ociosos à vontade):
+             TAKEOFF
+             CRITICAL DRAIN
+             TAKEOFF DRAIN
+  [achado] caminho infinito, com QUAISQUER entradas, sempre cego (NoPermanentBlindness do TLA+): OneSlot 2 estado(s), Queue 1, Level 0
+  [achado] Queue  (oráculo): 1 estado(s) nessa situação (a fila sem perda não resolve a lacuna)
+  [achado] Level  (oráculo): 0 estado(s) nessa situação
+  [ok]    [regressão do achado] OneSlot: existe ao menos um estado preso (a lacuna borda x nível do relatório v4 se reproduz)
+  [ok]    OneSlot: o oráculo e a implementação concordam sobre quantos estados presos existem
+  [ok]    Level elimina a lacuna: nenhum estado preso, para TODAS as sequências (não só até N = 8)
+  [ok]    [regressão do achado] OneSlot viola NoPermanentBlindness (existe caminho infinito sempre cego) — o que o TLC deve mostrar com Policy = OneSlot
+  [ok]    Level satisfaz NoPermanentBlindness: nenhum caminho infinito, com quaisquer entradas, fica cego para sempre — o que o TLC deve confirmar com Policy = Level
+
+=== 6. Descarte do slot: o relatório v4 mediu Queue x OneSlot só com alfabeto reduzido (4 ticks) e N = 8 ===
+  [medida] produto OneSlot x Queue: 282 pares alcançáveis, alfabeto completo de 20 ticks
+  [achado] pares alcançáveis em que (aviônica, energia) DIFEREM entre OneSlot e Queue ao fim de um tick: 232
+           menor caminho até um par que difere (a 4 tick(s)):
+             DRAIN
+             TAKEOFF DRAIN
+             LANDED
+             RECHARGE
+           OneSlot: (Grounded,PwCharged)   Queue: (Shutdown,PwCharged)
+  [achado] menor cenário em que o CREM (OneSlot) diverge, passo a passo, do oráculo Level: 4 ticks
+             DRAIN
+             DRAIN
+             TAKEOFF
+             IDLE
+
+12 verificações, 0 falhas.
+Test suite validation-reach-tests: PASS
+Test suite logged to:
+C:\Users\Peterson\Documents\GitHub\IC\Revisao_v5\03_codigo\dist-newstyle\build\x86_64-windows\ghc-9.6.7\avionics-validation-0.1.0.0\t\validation-reach-tests\test\avionics-validation-0.1.0.0-validation-reach-tests.log
+1 of 1 test suites (1 of 1 test cases) passed.

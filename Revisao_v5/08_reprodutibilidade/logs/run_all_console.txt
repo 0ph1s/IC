@@ -1,0 +1,19 @@
+pdflatex: major issue: So far, you have not checked for MiKTeX updates.
+versões registradas                                       ok
+compilação de todos os alvos (-Wall -Werror=incomplete-patterns) ok
+gerado: cabal.project.freeze
+invalid-inflight-shutdown: não compila, com 'Could not deduce AllowedTransition' (esperado) ok
+base: avionics-spec-tests (conformidade, 16 verificações) ok
+base: avionics-sim-tests (simulador, N = 4)                ok
+base: avionics-chain-tests (cadeia da bateria, N = 8)      ok
+base: avionics-policy-tests (oráculo e políticas, N = 8) ok
+novo: validation-conformance-tests (tabelas x CREM, exaustivo) ok
+novo: validation-boundary-tests (fronteira tipada)         ok
+novo: validation-reach-tests (alcançabilidade exaustiva)  ok
+novo: validation-model-tests (Hedgehog, com mutantes)      ok
+matriz de rejeição: 8 compilam, 8 rejeitados, causa conferida ok
+auditoria C/C++: versões sem defeito sem aviso e iguais à tabela ok
+
+sumário: /c/Users/Peterson/Documents/GitHub/IC/Revisao_v5/08_reprodutibilidade/logs/SUMARIO.md
+TUDO OK
+EXIT=0

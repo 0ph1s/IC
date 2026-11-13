@@ -1,0 +1,6 @@
+[baseline] compilando a cópia sem mutação...
+[baseline] todas as suítes passam sem mutação
+[H9] CURINGA: Grounded+TakeoffSignal omitida e cláusula final avionicsAction s _ = pureResult MsgIgnored s (identidade)
+      -> morto por: spec-tests, sim-tests (N=3), conformance, reach, model (Hedgehog)
+relatório: /c/Users/Peterson/Documents/GitHub/IC/Revisao_v5/08_reprodutibilidade/logs/06_mutation_h9.md   (vivos: 0 de 1)
+EXIT=0

@@ -1,0 +1,43 @@
+# ============================================================================
+# TABELA DE TRANSIÇÕES DA AVIÔNICA (função δ e função de saída λ) — 16 linhas
+# Colunas:  estado,evento,destino,saida,origem
+#
+# ESTE ARQUIVO É O ARTEFATO PARA REVISÃO PELA ORIENTAÇÃO (parecer de 03/11/2026, seção 5, nível 2).
+# Foi derivado do TEXTO DOS REQUISITOS, e não do código:
+#   Obsidian/documentation/"Example Avionics.md", seção "1. REQUISITOS DO DOMÍNIO DE AVIÔNICA"
+#       "De Grounded, permite-se ir apenas para InFlight (via TakeoffSignal)."
+#       "De InFlight, permite-se ir apenas para EmergencyLanding (via CriticalBattery)."
+#       "De EmergencyLanding, permite-se ir apenas para Grounded (via LandedSignal)."
+#       "De Grounded, permite-se ir para Shutdown (via SystemCutoff)."
+#       "Transição Proibida Crítica: É EXPLICITAMENTE PROIBIDO ir do estado InFlight diretamente para Shutdown."
+#
+# Coluna `origem` (vale para o DESTINO):
+#   REQ  = a regra está escrita no texto dos requisitos (4 linhas).
+#   CONV = convenção do PROJETO, não dos requisitos: o texto não diz o que ocorre naquele par.
+#          Convenção adotada: o estado não muda (aresta identidade do CREM).
+# SAÍDAS: o texto dos requisitos NÃO define mensagens de saída. Os nomes (MsgTakeoff, ...) e o
+#          mapeamento são convenção do projeto em todas as 16 linhas.
+#
+# PERGUNTAS PARA A REVISÃO (marcar a resposta na ata da reunião, ver 01_plano/PLANO_DE_ACAO.md):
+#   Q1. InFlight + SystemCutoff deve (a) ser ignorado, como aqui, (b) emitir um erro/rejeição explícita?
+#   Q2. Os pares CONV devem ficar como "estado inalterado + MsgIgnored", ou algum deles tem destino próprio?
+#   Q3. Os nomes de saída (MsgTakeoff, MsgEmergency, MsgLanded, MsgShutdown, MsgIgnored) são os desejados?
+#
+# STATUS DA REVISÃO: PENDENTE. Nenhuma linha foi aprovada pela orientação até agora.
+# ============================================================================
+Grounded,TakeoffSignal,InFlight,MsgTakeoff,REQ
+Grounded,CriticalBattery,Grounded,MsgIgnored,CONV
+Grounded,LandedSignal,Grounded,MsgIgnored,CONV
+Grounded,SystemCutoff,Shutdown,MsgShutdown,REQ
+InFlight,TakeoffSignal,InFlight,MsgIgnored,CONV
+InFlight,CriticalBattery,EmergencyLanding,MsgEmergency,REQ
+InFlight,LandedSignal,InFlight,MsgIgnored,CONV
+InFlight,SystemCutoff,InFlight,MsgIgnored,CONV
+EmergencyLanding,TakeoffSignal,EmergencyLanding,MsgIgnored,CONV
+EmergencyLanding,CriticalBattery,EmergencyLanding,MsgIgnored,CONV
+EmergencyLanding,LandedSignal,Grounded,MsgLanded,REQ
+EmergencyLanding,SystemCutoff,EmergencyLanding,MsgIgnored,CONV
+Shutdown,TakeoffSignal,Shutdown,MsgIgnored,CONV
+Shutdown,CriticalBattery,Shutdown,MsgIgnored,CONV
+Shutdown,LandedSignal,Shutdown,MsgIgnored,CONV
+Shutdown,SystemCutoff,Shutdown,MsgIgnored,CONV

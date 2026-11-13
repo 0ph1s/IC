@@ -1,0 +1,23 @@
+Build profile: -w ghc-9.6.7 -O1
+In order, the following will be built (use -v for more details):
+ - avionics-crem-0.1.0.0 (test:avionics-chain-tests) (ephemeral targets)
+Preprocessing test suite 'avionics-chain-tests' for avionics-crem-0.1.0.0...
+Building test suite 'avionics-chain-tests' for avionics-crem-0.1.0.0...
+Running 1 test suites...
+Test suite avionics-chain-tests: RUNNING...
+=== Cadeia da bateria e descarte do slot (N = 8, 87381 cenários, malha fechada) ===
+  [ok]    toda entrada da bateria em Critical, com a aviônica em voo, leva a EmergencyLanding no tick seguinte
+  [achado] cenários que alcançam EmergencyLanding: 22172
+  [achado] cenários que terminam em Shutdown tendo recebido ao menos um Drain: 8160
+  [ok]    a enumeração alcança a cadeia completa induzida pela bateria (antes inalcançável com N = 4)
+  [achado] cenários que terminam com bateria Critical e aviônica em voo, sem reação em 2 ticks ociosos: 172
+           menor exemplo: ["Drain","Drain","TakeoffSignal","idle","idle"]
+           (o ambiente reage à BORDA 'bateria entrou em Critical', e não ao NÍVEL 'bateria está em Critical')
+  [achado] cenários com ao menos um descarte de telemetria pelo ambiente: 8726 de 87381
+           (CutoffHeld,CueBatteryCritical): 4144 ocorrências
+           (TouchdownHeld,CueBatteryCritical): 5651 ocorrências
+           menor exemplo: ["TakeoffSignal","Drain","Drain","Drain"]
+Test suite avionics-chain-tests: PASS
+Test suite logged to:
+C:\Users\Peterson\Documents\GitHub\IC\Revisao_v5\03_codigo\dist-newstyle\build\x86_64-windows\ghc-9.6.7\avionics-crem-0.1.0.0\t\avionics-chain-tests\test\avionics-crem-0.1.0.0-avionics-chain-tests.log
+1 of 1 test suites (1 of 1 test cases) passed.

@@ -1,0 +1,41 @@
+Build profile: -w ghc-9.6.7 -O1
+In order, the following will be built (use -v for more details):
+ - avionics-validation-0.1.0.0 (test:validation-boundary-tests) (ephemeral targets)
+Preprocessing test suite 'validation-boundary-tests' for avionics-validation-0.1.0.0...
+Building test suite 'validation-boundary-tests' for avionics-validation-0.1.0.0...
+Running 1 test suites...
+Test suite validation-boundary-tests: RUNNING...
+=== 1. Vocabulário e ida-e-volta ===
+  [ok]    decodeEvent . encodeEvent == Right nos 4 eventos de comando
+  [ok]    decodePowerEvent . encodePowerEvent == Right nos 3 eventos de energia
+  [ok]    os 4 tokens de comando são distintos (a codificação é injetiva)
+  [ok]    exemplo do parecer: TAKEOFF -> TakeoffSignal, CRITICAL -> CriticalBattery, LANDED -> LandedSignal, CUTOFF -> SystemCutoff
+  [ok]    evento desconhecido vira Left (UnknownToken), como no exemplo do parecer
+
+=== 2. Entrada arbitrária nunca lança exceção ===
+  [ok]    decodeEvent total sobre 13 cadeias hostis
+  [ok]    decodeEvent recusa toda cadeia hostil acima
+  [ok]    decodeScenario total sobre as mesmas cadeias
+
+=== 3. Cenários: formato, comentários, erros com número de linha ===
+  [ok]    comentários, linhas em branco e espaços extras são ignorados
+  [ok]    fim de linha do Windows (CRLF) é aceito
+  [ok]    cenário vazio é um cenário válido de zero ticks
+  [ok]    palavra desconhecida acusa a LINHA certa
+  [ok]    dois comandos no mesmo tick são recusados
+  [ok]    dois eventos de energia no mesmo tick são recusados
+  [ok]    IDLE misturado com outra palavra é recusado
+  [ok]    minúsculas são recusadas (decodificação estrita)
+  [ok]    encodeScenario . decodeScenario preserva a lista de ticks
+
+=== 4. Caminho completo: arquivo .scn -> ADTs -> CREM ===
+  [ok]    regressão (Drain, Drain, TakeoffSignal, Idle, Idle) em CREM: termina com aviônica InFlight e bateria Critical (política do projeto)
+  [ok]    regressão em CREM: única saída significativa é MsgTakeoff (ninguém levou a aviônica à emergência)
+  [ok]    emergência (TAKEOFF, DRAIN, DRAIN, 3 ociosos): saídas [MsgTakeoff, MsgEmergency, MsgLanded, MsgShutdown], estado final Shutdown
+  [ok]    cenário inválido nunca chega ao CREM (devolve Left)
+
+21 verificações, 0 falhas.
+Test suite validation-boundary-tests: PASS
+Test suite logged to:
+C:\Users\Peterson\Documents\GitHub\IC\Revisao_v5\03_codigo\dist-newstyle\build\x86_64-windows\ghc-9.6.7\avionics-validation-0.1.0.0\t\validation-boundary-tests\test\avionics-validation-0.1.0.0-validation-boundary-tests.log
+1 of 1 test suites (1 of 1 test cases) passed.

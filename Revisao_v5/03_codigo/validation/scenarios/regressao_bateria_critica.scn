@@ -1,0 +1,13 @@
+# Traço de regressão prioritário (parecer de 03/11/2026, seção 5, nível 3):
+#     Drain -> Drain -> TakeoffSignal -> Idle -> Idle
+# Segundo o relatório v4 (seção 5.13), expõe a diferença entre reagir à ENTRADA da bateria em
+# estado crítico (política do projeto, OneSlot) e reagir à PERSISTÊNCIA nesse estado (Level).
+#
+# Resultado esperado (conferido por test/BoundarySpec.hs e test/ModelSpec.hs):
+#   OneSlot (CREM, política do projeto): termina com aviônica InFlight e bateria Critical.
+#   Level   (só no modelo de referência): a aviônica vai a EmergencyLanding no 4o tick e pousa no 5o.
+DRAIN
+DRAIN
+TAKEOFF
+IDLE
+IDLE

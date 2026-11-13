@@ -1,0 +1,9 @@
+# Cenário de emergência do relatório v4 (seção 5.11, Tabela 2), no formato da fronteira:
+# decolagem, dois Drain e três ticks ociosos. Em malha fechada o ambiente encadeia
+# emergência, pouso e corte: saídas [MsgTakeoff, MsgEmergency, MsgLanded, MsgShutdown].
+TAKEOFF
+DRAIN
+DRAIN
+IDLE
+IDLE
+IDLE

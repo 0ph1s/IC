@@ -1,0 +1,52 @@
+Build profile: -w ghc-9.6.7 -O1
+In order, the following will be built (use -v for more details):
+ - avionics-crem-0.1.0.0 (test:avionics-sim-tests) (ephemeral targets)
+Preprocessing test suite 'avionics-sim-tests' for avionics-crem-0.1.0.0...
+Building test suite 'avionics-sim-tests' for avionics-crem-0.1.0.0...
+Running 1 test suites...
+Test suite avionics-sim-tests: RUNNING...
+=== A. Execução de referência ===
+  [ok]    malha aberta: decolagem, bateria crítica, pouso, corte => [MsgTakeoff, MsgEmergency, MsgLanded, MsgShutdown]
+  [ok]    malha aberta: estado final da aviônica == Shutdown
+  [ok]    malha aberta: saídas e estado final == FSM ingênua
+  [ok]    malha fechada: um Takeoff e dois Drain reproduzem as mesmas 4 saídas
+  [ok]    malha fechada: estado final da aviônica == Shutdown
+  [ok]    malha aberta, mesmo cenário: bateria Critical mas a aviônica fica em InFlight (sem realimentação nada acontece)
+  [ok]    atraso: MsgEmergency ocorre no tick seguinte àquele em que a bateria chega a Critical
+  [ok]    energia afetada: ShedLoad chega no tick seguinte ao MsgEmergency
+  [ok]    energia afetada: em malha fechada a bateria sai de Critical para Low (e fica Critical em malha aberta)
+
+=== B. Validação cruzada (sequências de até 4 eventos) ===
+  [ok]    malha aberta == FSM ingênua (saídas e estado final)  (341 cenários, 0.0 s)
+  [ok]    malha aberta: repetição passo a passo na FSM ingênua  (341 cenários, 0.0 s)
+  [ok]    malha fechada, só comandos: eventos RECEBIDOS repetidos na ingênua  (341 cenários, 1.0e-2 s)
+  [ok]    malha fechada, alfabeto completo de ticks (20 símbolos): idem  (168421 cenários, 7.76 s)
+  [ok]    observação não altera o comportamento: planta == Compose.uavSystem  (22621 sequências, 0.19 s)
+
+=== C. Propriedades sobre o traço (enumeração limitada, N = 4) ===
+  [ok]    malha aberta: Shutdown só é alcançado logo depois de Grounded  (168421 cenários, 0.54 s)
+  [ok]    malha aberta: toda entrada em EmergencyLanding vem de InFlight  (168421 cenários, 0.54 s)
+  [ok]    malha aberta: ShedLoad nunca reduz o nível da bateria  (168421 cenários, 0.5 s)
+  [ok]    malha aberta: determinismo (mesma entrada, mesmo traço)  (168421 cenários, 0.74 s)
+  [ok]    malha aberta: causalidade (traço do prefixo é prefixo do traço)  (8421 cenários, 8.0e-2 s)
+  [ok]    malha fechada: Shutdown só é alcançado logo depois de Grounded  (168421 cenários, 7.77 s)
+  [ok]    malha fechada: toda entrada em EmergencyLanding vem de InFlight  (168421 cenários, 7.7 s)
+  [ok]    malha fechada: ShedLoad nunca reduz o nível da bateria  (168421 cenários, 7.43 s)
+  [ok]    malha fechada: determinismo (mesma entrada, mesmo traço)  (168421 cenários, 8.52 s)
+  [ok]    malha fechada: causalidade (traço do prefixo é prefixo do traço)  (8421 cenários, 0.91 s)
+  [ok]    malha fechada: o Beat libera exatamente o que foi retido no tick anterior  (168421 cenários, 7.54 s)
+
+=== D. As verificações detectam violações (traços corrompidos à mão) ===
+  [ok]    Shutdown vindo de InFlight é detectado
+  [ok]    Shutdown vindo de Grounded é aceito
+  [ok]    EmergencyLanding vindo de Grounded é detectado
+  [ok]    EmergencyLanding vindo de InFlight é aceito
+  [ok]    mudança de vértice sem evento é detectada pela repetição na ingênua
+  [ok]    liberação sem retenção prévia é detectada
+  [ok]    ShedLoad que descarrega a bateria é detectado
+
+32 verificações, 0 falhas.
+Test suite avionics-sim-tests: PASS
+Test suite logged to:
+C:\Users\Peterson\Documents\GitHub\IC\Revisao_v5\03_codigo\dist-newstyle\build\x86_64-windows\ghc-9.6.7\avionics-crem-0.1.0.0\t\avionics-sim-tests\test\avionics-crem-0.1.0.0-avionics-sim-tests.log
+1 of 1 test suites (1 of 1 test cases) passed.
