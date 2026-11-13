@@ -39,7 +39,7 @@ Nada foi commitado. Para voltar ao estado anterior basta apagar esta pasta.
 2. **Revisor externo de C/C++** (não definido).
 3. **Busca sistemática de literatura** (só o protocolo foi escrito); sem ela não se pode alegar ineditismo.
 4. **Outras topologias e escalas** e estudo de manutenção.
-5. **Confirmar a declaração de uso de IA, autoria e financiamento** (`06_artigos/DECLARACAO_USO_IA.md`).
+5. **Definir com a orientação externa a declaração de uso de IA** (seções deixadas em branco; `06_artigos/DECLARACAO_USO_IA.md`) e **confirmar autoria e financiamento**.
 6. **QuickCheck State Machine, Motor e os testes do repositório CREM**: não testados.
 
 (O TLC **foi executado** depois do pedido de download: ver `04_tla/README.md`.)

@@ -141,6 +141,7 @@ State & \code{TakeoffSignal} & \code{CriticalBattery} & \code{LandedSignal} & \c
 \draw[ar] (plant.east) -- node[lb, above] {classified\\telemetry} (mis.west);
 \draw[ar] (mis.south) -- ++(0,-1.4) -| node[lb, pos=0.25, below] {\code{ToAvionics}, \code{ToPower}, released at the\\next \code{Beat} (return path of \code{Feedback})} (plant.south);
 \end{tikzpicture}
+\Description{Block diagram. On the left, external signals (the Beat, a command and a battery event) enter a dashed box labelled Plant (Parallel), which contains the avionics machine above the battery machine. An arrow labelled classified telemetry goes from the plant to the environment machine, Mission, on the right. A return arrow goes from the bottom of Mission back to the bottom of the plant, labelled ToAvionics and ToPower, released at the next Beat, which is the return path of Feedback.}
 \caption{The closed loop. The environment holds relevant telemetry and releases it at the next tick.}
 \label{fig:loop}
 \end{figure}
@@ -299,6 +300,7 @@ With \code{OneSlot}, two reachable triples have the avionics airborne and the ba
 \draw[ar] (s2) -- node[lb, above] {\code{TAKEOFF}} (s3);
 \draw[ar] (s3) to[out=60,in=120,looseness=6] node[lb, above] {\code{IDLE}: the \code{Beat} releases nothing} (s3);
 \end{tikzpicture}
+\Description{Four states in a row, each written as avionics, battery and environment. From Grounded, Charged, Standby, the input DRAIN leads to Grounded, Low, Standby; another DRAIN leads to Grounded, Critical, CriticalHeld; TAKEOFF leads to the shaded state InFlight, Critical, Standby. That last state has a self-loop labelled IDLE: the Beat releases nothing.}
 \caption{The shortest path to a blind state under \code{OneSlot}, written as (avionics, battery, environment). Idle ticks leave the state unchanged forever.}
 \label{fig:lasso}
 \end{figure}
@@ -385,7 +387,7 @@ Tying events to edges in the types is possible in principle with indexed monads 
 
 \paragraph{Mutants and tools.} The mutants were chosen by the author. We used one version of each tool, one machine and one operating system. The shrinker finds local minima only.
 
-\paragraph{Procedure.} The code, scripts and a first draft of this text were produced with the assistance of a generative AI system (see the statement below); every number comes from a recorded run, and the test suites include injected defects and hand-corrupted traces so that the checks demonstrably can fail.
+\paragraph{Procedure.} Every number comes from a recorded run, and the test suites include injected defects and hand-corrupted traces so that the checks demonstrably can fail.
 
 \section{Related work}
 \label{sec:related}
@@ -404,7 +406,7 @@ The code, tables, scenarios, TLA+ specification, scripts and all logs are in the
 
 \section*{Declaration of generative AI use}
 
-Generative AI (Claude, Anthropic, through Claude Code) was used at the author's request to write the Haskell validation package, the scripts, the TLA+ specification and a first draft of this text, and to run the commands whose results are reported. \textbf{[The author to state the extent of his own review of code, results and text, and confirm compliance with the policy of the journal and of his institution.]} The results are from recorded runs; the author remains responsible for the content.
+\textbf{[To be defined with the external advisor.]}
 
 \section*{Funding and competing interests}
 

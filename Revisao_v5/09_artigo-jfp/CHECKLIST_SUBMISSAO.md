@@ -12,7 +12,7 @@ para submissão**: faltam itens que só o autor ou a orientação podem resolver
 | 3 | **Decidir a coautoria** da orientação (Prof. Felipe Canarozzo Lourenço) | o v4 só diz "Orientação"; coautoria é decisão das pessoas | `\author` |
 | 4 | **Revisão da tabela e das políticas pela orientação** | o artigo declara que isso está pendente; sem a revisão, o oráculo é do mesmo autor do código | Sect. 5.1, 7.3 |
 | 5 | **Repositório público + DOI** (Zenodo, por exemplo) | o JFP incentiva material suplementar aberto e pede o artigo em arXiv/HAL/Zenodo; o repositório era privado | "Data availability statement" |
-| 6 | **Declaração de IA**: o autor preenche o grau de revisão e confere a política da revista e da Fatec | o texto foi escrito com IA; a política do JFP **não foi encontrada** nas páginas lidas | "Declaration of generative AI use" |
+| 6 | **Declaração de IA**: seção deixada em branco; o conteúdo será definido com a orientação externa | a política do JFP **não foi encontrada** nas páginas lidas | "Declaration of generative AI use" |
 | 7 | **Fomento e conflito de interesses** | placeholders | "Funding and competing interests" |
 | 8 | **Relatar na carta ao editor** que o trabalho não está em revisão em outro lugar e declarar trabalhos relacionados | exigência de originalidade; o artigo 1 (C/C++) é um trabalho relacionado do mesmo projeto | carta de apresentação |
 

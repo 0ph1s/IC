@@ -10,7 +10,7 @@ O manuscrito (`artigo/main.tex`, classe `elsarticle`, 21 páginas em modo de rev
 | 2 | **Coautoria da orientação?** | decisão das pessoas; o guia diz que mudanças de autoria **depois** do envio exigem formulário e aprovação do editor |
 | 3 | **CRediT**, **conflito de interesses** e **fomento** | marcadores no texto; o conflito é preenchido também na ferramenta de declarações |
 | 4 | **Repositório público + DOI** (Zenodo, por exemplo) | "Opção B" de dados de pesquisa: depositar e citar; o repositório era privado |
-| 5 | **Declaração de IA**: o autor confirma a frase "reviewed and edited the content… takes full responsibility" e a extensão da revisão | exigência da Elsevier; sem a confirmação, não pode ser enviada como está |
+| 5 | **Declaração de IA**: seção deixada em branco; o conteúdo será definido com a orientação externa | exigência da Elsevier (seção obrigatória antes das referências); sem o texto, não pode ser enviada |
 | 6 | **Sobreposição com o manuscrito do JFP** | ver abaixo |
 | 7 | **Revisão externa do código C/C++** | o artigo declara essa revisão como pendente (`05_c-cpp/REVISAO_EXTERNA_CHECKLIST.md`) |
 
@@ -44,7 +44,7 @@ sobreposição na carta ao editor de cada um. Qualquer que seja a escolha, **dec
 | figuras em arquivos separados | `Figure_1.pdf`, `Figure_2.pdf` |
 | tabelas sem linhas verticais | sim |
 | números do artigo × logs de `08_reprodutibilidade/` | sim (`05_c_cpp_matrix.md`, `15_typed_matrix.md`, `16_haskell_defects.md`, `02_negative_matrix.md`, `06_mutation_*.md`, `05_c-cpp/AUDITORIA.md`) |
-| marcadores `[...]` em negrito | no texto: e-mail, endereço, CRediT, conflito de interesses, fomento, URL/DOI e confirmação da IA; nada foi inventado |
+| marcadores `[...]` em negrito | no texto: e-mail, endereço, CRediT, conflito de interesses, fomento, URL/DOI e declaração de IA (a definir com a orientação externa); nada foi inventado |
 
 ## O que o artigo **não** afirma
 

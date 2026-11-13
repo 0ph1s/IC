@@ -122,7 +122,9 @@ Figure~\ref{fig:design} shows the design.
 \subsection{Subject machine and specification}
 \label{sec:spec}
 
+\begin{sloppypar}
 The machine has four states (\code{Grounded}, \code{InFlight}, \code{EmergencyLanding}, \code{Shutdown}) and four events (\code{TakeoffSignal}, \code{CriticalBattery}, \code{LandedSignal}, \code{SystemCutoff}); each event also produces an output message. The specification is a table of 16 rows, one per (state, event) pair, written from the requirement text. Only four rows are stated there (Table~\ref{tab:delta}); the other twelve pairs are a project convention (the state does not change), and the output names are also a convention. The table records the origin of each row so that a reviewer can see what is assumed. The one prohibition in the requirements is the direct edge from \code{InFlight} to \code{Shutdown}. All implementations are compared with this table.
+\end{sloppypar}
 
 \begin{table}[t]
 \caption{Destination of each (state, event) pair. \texttt{R}: stated in the requirement text. Unmarked cells keep the state (project convention).}
@@ -198,7 +200,9 @@ D6 & value outside the enumeration & the integer 42 returned as a state \\
 \item \textbf{Exhaustive test.} A harness that prints the 16 triples and compares them with the table. For \crem{}, the equivalent is a suite that compares the action's destination and output for every pair with the table.
 \end{itemize}
 
-For Haskell the compiler levels are \code{-Wall} and \code{-Wall} with \code{-Werror=incomplete-}\allowbreak\code{patterns}. For \crem{} we also injected nine defects into the project code that uses the library (Sect.~\ref{sec:crem}), and compiled two further variants of its action for D5 and D6.
+\begin{sloppypar}
+For Haskell the compiler levels are \code{-Wall} alone and \code{-Wall} together with \code{-Werror=}\allowbreak\code{incomplete-}\allowbreak\code{patterns}. For \crem{} we also injected nine defects into the project code that uses the library (Sect.~\ref{sec:crem}), and compiled two further variants of its action for D5 and D6.
+\end{sloppypar}
 
 \subsection{Procedure and reproducibility}
 
@@ -247,7 +251,7 @@ Class & C & C++ & C++17 typed & Haskell & Haskell + \crem{} \\
 \midrule
 D1 & warning (A, B); error with W. Test$^{a}$ passes & warning (A, B); error with W. Test$^{a}$ passes & error (no matching function) & warning; error with \code{-Werror=} \code{incomplete-} \code{patterns}; test: run-time exception & error (exhaustiveness as error) \\
 D2 & silent in A; warning in B; error with W. Test$^{a}$ passes & silent in A; warning in B; error with W. Test$^{a}$ passes & silent. Test$^{a}$ passes & silent. Test$^{a}$ passes & silent$^{b}$; test fails$^{b}$ \\
-D3 & silent; test detects & silent; test detects & error (\code{static\_assert}) & silent; test detects & error (no proof of the edge) \\
+D3 & silent; test detects & silent; test detects & error (\code{static\_}\allowbreak\code{assert}) & silent; test detects & error (no proof of the edge) \\
 D4 & silent; test detects & silent; test detects & silent; test detects & silent; test detects & silent; test detects \\
 D5 & silent; test detects only by numeric coincidence & error (distinct types) & error & error (type mismatch) & error (type mismatch) \\
 D6 & silent; test detects & silent (\code{static\_cast}); test detects & not applicable (closed sum) & error (no \code{Num} instance) & error (no \code{Num} instance) \\
@@ -311,7 +315,7 @@ Over a finite domain of 16 pairs, the exhaustive test detected every defect that
 
 \paragraph{Proxies} The size of the diagnostics is a proxy for readability; maintenance effort was not measured.
 
-\paragraph{Procedure} The scripts and a first draft of this text were produced with the assistance of a generative AI system (see the statement before the references). Every figure of the paper comes from a recorded run, and the scripts check that the clean baselines print the table exactly, so that the variants differ from a verified baseline by one defect.
+\paragraph{Procedure} Every figure of the paper comes from a recorded run, and the scripts check that the clean baselines print the table exactly, so that the variants differ from a verified baseline by one defect.
 
 \section{Related work}
 \label{sec:related}
@@ -338,7 +342,7 @@ For a four-state machine, a type-level topology rejects exactly the eight vertex
 The scripts, the transition table, the C, C++ and Haskell sources, the generated variants and all logs are in the artefact of this work: a frozen snapshot of the \code{avionics-crem} repository (commit \code{9689ce8}) and the added folders with the experiment scripts. \textbf{[Public repository URL and archived DOI to be added before submission; the repository was private at the time of writing.]} One script rebuilds and reruns everything.
 
 \section*{Declaration of generative AI and AI-assisted technologies in the manuscript preparation process}
-During the preparation of this work the author used Claude (Anthropic), through Claude Code, to write the experiment scripts and a first draft of this text, and to run the experiments whose results are reported. \textbf{[The author to confirm: ``After using this tool, the author reviewed and edited the content as needed and takes full responsibility for the content of the published article'', and to state the extent of the review.]}
+\textbf{[To be defined with the external advisor.]}
 
 \bibliographystyle{elsarticle-num}
 \bibliography{refs}

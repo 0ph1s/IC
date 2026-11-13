@@ -68,7 +68,7 @@ finais não foi feita (o relatório v4 já dizia isso).
 | Melhorar 1 | Ampliar o estado da arte | `07_estado-da-arte/PROTOCOLO_REVISAO.md`; relatório seção 4 | **em parte** (**busca não executada**) |
 | Melhorar 2 | Fortalecer a contribuição: perguntas, hipóteses, resultados próprios | relatório 1.2; `ARTIGO_2` | **feito** (texto e evidências) |
 | Melhorar 3 | Outras topologias, escalas, cenários, implementações; esforço, manutenção, diagnósticos | alfabeto completo e fechamento do grafo; cenários até 60 ticks; C++17 tipado; tamanho de diagnóstico | **em parte** (**outras topologias, escalas e manutenção: não feito**) |
-| Melhorar 4 | Separar contexto pedagógico de resultados novos; scripts reprodutíveis; ameaças à validade; autoria e declaração de IA | `run_all.sh`; `AMEACAS_A_VALIDADE.md`; `DECLARACAO_USO_IA.md`; relatório DECLARAÇÕES | **em parte** (separação pedagógica do texto e confirmação do autor pendentes) |
+| Melhorar 4 | Separar contexto pedagógico de resultados novos; scripts reprodutíveis; ameaças à validade; autoria e declaração de IA | `run_all.sh`; `AMEACAS_A_VALIDADE.md`; `DECLARACAO_USO_IA.md`; relatório DECLARAÇÕES | **em parte** (separação pedagógica do texto pendente; declaração de IA a definir com a orientação externa) |
 | Estratégia | Dividir em dois artigos só se cada um tiver contribuição distinta | `ARTIGO_1_*.md` e `ARTIGO_2_*.md`, com cuidados de integridade | **feito** (esqueletos) |
 | Conclusão | Priorizar SBLP e Haskell Symposium, depois SBMF e FormaliSE; Experience Report do ICFP a avaliar | `VENUES_E_PRAZOS.md` | **feito** (decisão é da orientação) |
 

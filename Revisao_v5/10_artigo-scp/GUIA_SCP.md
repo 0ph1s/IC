@@ -29,7 +29,7 @@ systems and methods"). Revisão **simples-anônima** (os revisores veem o autor)
 | Conflito de interesses | declaração obrigatória (ferramenta de declarações do sistema) | **pendente** |
 | Fomento | declarar; se não houve, a frase padrão da Elsevier | **pendente** |
 | Dados de pesquisa | **Opção B**: incentivado depositar em repositório e citar; senão, explicar por que não | **parcial**: URL e DOI pendentes |
-| **IA generativa** | declaração **obrigatória** no envio, em **nova seção antes das referências**, com o título "Declaration of generative AI and AI-assisted technologies in the manuscript preparation process" e o texto-modelo da Elsevier; IA **não** pode ser autora; o autor responde pelo conteúdo | **sim** (seção presente; o autor tem de confirmar a revisão) |
+| **IA generativa** | declaração **obrigatória** no envio, em **nova seção antes das referências**, com o título "Declaration of generative AI and AI-assisted technologies in the manuscript preparation process" e o texto-modelo da Elsevier; IA **não** pode ser autora; o autor responde pelo conteúdo | **em parte** (seção presente, conteúdo a definir com a orientação externa) |
 | Agradecimentos | seção própria, antes das referências | n/a (nenhum) |
 | Originalidade | trabalho não publicado nem em avaliação em outro lugar | **atenção**: ver a sobreposição com o artigo do JFP, no checklist |
 | Linguagem inclusiva | obrigatória | sim |
