@@ -131,22 +131,22 @@ C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/cpp/M5.cpp:12:11:
 --- S
 === typed/T1 — omite o par InFlight+LandedSignal (sem curinga)
 --- A
-C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T1.cpp:61:53: error: no matching function for call to 'step'
+C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T1.cpp:62:53: error: no matching function for call to 'step'
     return std::visit([](auto st, auto ev) { return step(st, ev); }, s, e);
                                                     ^~~~
 C:/ghcup/ghc/9.6.7/mingw/include/c++/v1/type_traits:3639:23: note: in instantiation of function template specialization 'transition(State, Event)::(anonymous class)::operator()<InFlight, LandedSignal>' requested here
 --- B
-C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T1.cpp:61:53: error: no matching function for call to 'step'
+C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T1.cpp:62:53: error: no matching function for call to 'step'
     return std::visit([](auto st, auto ev) { return step(st, ev); }, s, e);
                                                     ^~~~
 C:/ghcup/ghc/9.6.7/mingw/include/c++/v1/type_traits:3639:23: note: in instantiation of function template specialization 'transition(State, Event)::(anonymous class)::operator()<InFlight, LandedSignal>' requested here
 --- W
-C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T1.cpp:61:53: error: no matching function for call to 'step'
+C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T1.cpp:62:53: error: no matching function for call to 'step'
     return std::visit([](auto st, auto ev) { return step(st, ev); }, s, e);
                                                     ^~~~
 C:/ghcup/ghc/9.6.7/mingw/include/c++/v1/type_traits:3639:23: note: in instantiation of function template specialization 'transition(State, Event)::(anonymous class)::operator()<InFlight, LandedSignal>' requested here
 --- S
-C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T1.cpp:61:53: error: no matching function for call to 'step'
+C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T1.cpp:62:53: error: no matching function for call to 'step'
     return std::visit([](auto st, auto ev) { return step(st, ev); }, s, e);
                                                     ^~~~
 C:/ghcup/ghc/9.6.7/mingw/include/c++/v1/type_traits:3639:23: note: in instantiation of function template specialization 'transition(State, Event)::(anonymous class)::operator()<InFlight, LandedSignal>' requested here
@@ -157,25 +157,25 @@ C:/ghcup/ghc/9.6.7/mingw/include/c++/v1/type_traits:3639:23: note: in instantiat
 --- S
 === typed/T3 — transição proibida InFlight+SystemCutoff -> Shutdown
 --- A
-C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T3.cpp:38:5: error: static_assert failed due to requirement 'Allowed<InFlight, Shutdown>::value' "transicao fora da topologia"
+C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T3.cpp:39:5: error: static_assert failed due to requirement 'Allowed<InFlight, Shutdown>::value' "transicao fora da topologia"
     static_assert(Allowed<From, To>::value, "transicao fora da topologia");
     ^             ~~~~~~~~~~~~~~~~~~~~~~~~
-C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T3.cpp:49:50: note: in instantiation of function template specialization 'go<Shutdown, InFlight>' requested here
+C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T3.cpp:50:50: note: in instantiation of function template specialization 'go<Shutdown, InFlight>' requested here
 --- B
-C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T3.cpp:38:5: error: static_assert failed due to requirement 'Allowed<InFlight, Shutdown>::value' "transicao fora da topologia"
+C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T3.cpp:39:5: error: static_assert failed due to requirement 'Allowed<InFlight, Shutdown>::value' "transicao fora da topologia"
     static_assert(Allowed<From, To>::value, "transicao fora da topologia");
     ^             ~~~~~~~~~~~~~~~~~~~~~~~~
-C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T3.cpp:49:50: note: in instantiation of function template specialization 'go<Shutdown, InFlight>' requested here
+C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T3.cpp:50:50: note: in instantiation of function template specialization 'go<Shutdown, InFlight>' requested here
 --- W
-C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T3.cpp:38:5: error: static_assert failed due to requirement 'Allowed<InFlight, Shutdown>::value' "transicao fora da topologia"
+C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T3.cpp:39:5: error: static_assert failed due to requirement 'Allowed<InFlight, Shutdown>::value' "transicao fora da topologia"
     static_assert(Allowed<From, To>::value, "transicao fora da topologia");
     ^             ~~~~~~~~~~~~~~~~~~~~~~~~
-C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T3.cpp:49:50: note: in instantiation of function template specialization 'go<Shutdown, InFlight>' requested here
+C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T3.cpp:50:50: note: in instantiation of function template specialization 'go<Shutdown, InFlight>' requested here
 --- S
-C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T3.cpp:38:5: error: static_assert failed due to requirement 'Allowed<InFlight, Shutdown>::value' "transicao fora da topologia"
+C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T3.cpp:39:5: error: static_assert failed due to requirement 'Allowed<InFlight, Shutdown>::value' "transicao fora da topologia"
     static_assert(Allowed<From, To>::value, "transicao fora da topologia");
     ^             ~~~~~~~~~~~~~~~~~~~~~~~~
-C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T3.cpp:49:50: note: in instantiation of function template specialization 'go<Shutdown, InFlight>' requested here
+C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T3.cpp:50:50: note: in instantiation of function template specialization 'go<Shutdown, InFlight>' requested here
 === typed/T4 — aresta permitida, destino errado (Grounded+TakeoffSignal -> Shutdown)
 --- A
 --- B
@@ -183,22 +183,22 @@ C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T3.cpp:49:5
 --- S
 === typed/T5 — usa um evento como destino (estado x evento)
 --- A
-C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T5.cpp:38:5: error: static_assert failed due to requirement 'Allowed<Grounded, TakeoffSignal>::value' "transicao fora da topologia"
+C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T5.cpp:39:5: error: static_assert failed due to requirement 'Allowed<Grounded, TakeoffSignal>::value' "transicao fora da topologia"
     static_assert(Allowed<From, To>::value, "transicao fora da topologia");
     ^             ~~~~~~~~~~~~~~~~~~~~~~~~
-C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T5.cpp:43:50: note: in instantiation of function template specialization 'go<TakeoffSignal, Grounded>' requested here
+C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T5.cpp:44:50: note: in instantiation of function template specialization 'go<TakeoffSignal, Grounded>' requested here
 --- B
-C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T5.cpp:38:5: error: static_assert failed due to requirement 'Allowed<Grounded, TakeoffSignal>::value' "transicao fora da topologia"
+C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T5.cpp:39:5: error: static_assert failed due to requirement 'Allowed<Grounded, TakeoffSignal>::value' "transicao fora da topologia"
     static_assert(Allowed<From, To>::value, "transicao fora da topologia");
     ^             ~~~~~~~~~~~~~~~~~~~~~~~~
-C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T5.cpp:43:50: note: in instantiation of function template specialization 'go<TakeoffSignal, Grounded>' requested here
+C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T5.cpp:44:50: note: in instantiation of function template specialization 'go<TakeoffSignal, Grounded>' requested here
 --- W
-C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T5.cpp:38:5: error: static_assert failed due to requirement 'Allowed<Grounded, TakeoffSignal>::value' "transicao fora da topologia"
+C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T5.cpp:39:5: error: static_assert failed due to requirement 'Allowed<Grounded, TakeoffSignal>::value' "transicao fora da topologia"
     static_assert(Allowed<From, To>::value, "transicao fora da topologia");
     ^             ~~~~~~~~~~~~~~~~~~~~~~~~
-C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T5.cpp:43:50: note: in instantiation of function template specialization 'go<TakeoffSignal, Grounded>' requested here
+C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T5.cpp:44:50: note: in instantiation of function template specialization 'go<TakeoffSignal, Grounded>' requested here
 --- S
-C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T5.cpp:38:5: error: static_assert failed due to requirement 'Allowed<Grounded, TakeoffSignal>::value' "transicao fora da topologia"
+C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T5.cpp:39:5: error: static_assert failed due to requirement 'Allowed<Grounded, TakeoffSignal>::value' "transicao fora da topologia"
     static_assert(Allowed<From, To>::value, "transicao fora da topologia");
     ^             ~~~~~~~~~~~~~~~~~~~~~~~~
-C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T5.cpp:43:50: note: in instantiation of function template specialization 'go<TakeoffSignal, Grounded>' requested here
+C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T5.cpp:44:50: note: in instantiation of function template specialization 'go<TakeoffSignal, Grounded>' requested here

@@ -34,9 +34,21 @@ tlc OneSlot_sem_cegueira AvionicsLoop_OneSlot_sem_cegueira.cfg 0 14_tlc_OneSlot_
 tlc Level AvionicsLoop_Level.cfg 0 14_tlc_Level.txt
 tlc dumpOneSlot AvionicsLoop_OneSlot.cfg 13 14_tlc_dump_OneSlot.txt -dump states/dump_OneSlot.txt
 if [ -f "$LOGS/04_reach.txt" ]; then
-  python "$HERE/cross_check.py" | tee "$LOGS/14_tlc_crosscheck.txt" || FAIL=1
+  # interpretador que de fato roda (no Windows, `python3` pode ser só o atalho da loja, que não executa nada)
+  PY=""
+  for c in python python3; do if "$c" -c 'import sys' > /dev/null 2>&1; then PY="$c"; break; fi; done
+  if [ -z "$PY" ]; then
+    echo "FALHA conferência TLC x Haskell: nenhum interpretador Python encontrado" | tee "$LOGS/14_tlc_crosscheck.txt"
+    FAIL=1
+  else
+    # sem pipeline: o código de saída é o do cross_check.py, e não o do `tee`
+    "$PY" "$HERE/cross_check.py" > "$LOGS/14_tlc_crosscheck.txt" 2>&1; cc=$?
+    cat "$LOGS/14_tlc_crosscheck.txt"
+    if [ "$cc" -ne 0 ]; then echo "FALHA conferência TLC x Haskell (código $cc)"; FAIL=1; fi
+  fi
 else
   echo "04_reach.txt ausente: rode run_all.sh antes para a conferência com o Haskell"
+  FAIL=1
 fi
 [ "$FAIL" -eq 0 ] && echo "TLC: tudo como esperado" || echo "TLC: HÁ DIVERGÊNCIAS"
 exit $FAIL

@@ -1,0 +1,17 @@
+Grounded          -> Grounded           esperado=compila   obtido=compila   ok
+Grounded          -> InFlight           esperado=compila   obtido=compila   ok
+Grounded          -> EmergencyLanding   esperado=rejeitado obtido=rejeitado ok
+Grounded          -> Shutdown           esperado=compila   obtido=compila   ok
+InFlight          -> Grounded           esperado=rejeitado obtido=rejeitado ok
+InFlight          -> InFlight           esperado=compila   obtido=compila   ok
+InFlight          -> EmergencyLanding   esperado=compila   obtido=compila   ok
+InFlight          -> Shutdown           esperado=rejeitado obtido=rejeitado ok
+EmergencyLanding  -> Grounded           esperado=compila   obtido=compila   ok
+EmergencyLanding  -> InFlight           esperado=rejeitado obtido=rejeitado ok
+EmergencyLanding  -> EmergencyLanding   esperado=compila   obtido=compila   ok
+EmergencyLanding  -> Shutdown           esperado=rejeitado obtido=rejeitado ok
+Shutdown          -> Grounded           esperado=rejeitado obtido=rejeitado ok
+Shutdown          -> InFlight           esperado=rejeitado obtido=rejeitado ok
+Shutdown          -> EmergencyLanding   esperado=rejeitado obtido=rejeitado ok
+Shutdown          -> Shutdown           esperado=compila   obtido=compila   ok
+compilaram=8 rejeitados=8 divergencias=0  (relatório: /c/Users/Peterson/Documents/GitHub/IC/Revisao_v5/08_reprodutibilidade/logs/15_typed_matrix.md)

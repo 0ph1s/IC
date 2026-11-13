@@ -17,7 +17,7 @@ O manuscrito (`artigo/main.tex`, classe `elsarticle`, 21 páginas em modo de rev
 ## Sobreposição com o artigo do JFP (decidir antes de enviar qualquer um dos dois)
 
 Os dois manuscritos compartilham **(a)** a matriz de 16 pares do `crem` (JFP Tabela 2; SCP Tabela 4), **(b)** a tabela da função de transição
-(JFP Tabela 1; SCP Tabela 1) e **(c)** a mutação da implementação em `crem` (JFP Tabela 3, 8 mutantes; SCP Seção 4.3, 9 mutantes, resumida
+(JFP Tabela 1; SCP Tabela 1) e **(c)** a mutação da implementação em `crem` (JFP Tabela 3 e SCP Seção 4.3, os mesmos 9 mutantes; no SCP, resumida
 sem a tabela). O SCP exige que o trabalho "não esteja em avaliação em outro lugar" e o JFP exige declarar trabalhos relacionados.
 Opções: (i) enviar um primeiro e só depois o outro, citando-o; (ii) reduzir a Seção 4 do JFP a um resumo que cite o SCP; (iii) declarar a
 sobreposição na carta ao editor de cada um. Qualquer que seja a escolha, **declarar na carta**.

@@ -9,8 +9,12 @@
 -- opaco a ser referenciado entre comandos.
 --
 -- O que se obtém além da enumeração: cenários de comprimento até 60 (a enumeração original parava
--- em 4), geradores reprodutíveis (cada falha imprime a semente) e shrinking (o contraexemplo
--- encolhe para a menor sequência que ainda falha).
+-- em 4), geradores reprodutíveis e shrinking (o contraexemplo encolhe até um mínimo LOCAL: nenhuma
+-- redução de um passo ainda falha; não é necessariamente o menor cenário que falha).
+--
+-- SEMENTE FIXA (`fixedSeed`): sem ela, cada execução sorteia outra semente e os tamanhos dos
+-- contraexemplos reduzidos mudam de um log para outro. Uma HEDGEHOG_SEED definida de fora tem
+-- precedência, para explorar outras sementes; a semente usada é impressa no início do log.
 --
 -- Propriedades marcadas "(falha esperada)" são MUTANTES: a propriedade deve ser REPROVADA, e a
 -- reprovação, com o contraexemplo já reduzido, é o que prova que o teste consegue falhar.
@@ -25,6 +29,8 @@ import Avionics.Sim.Simulate (simulateClosed)
 import Control.Monad (unless)
 import Gen
 import Hedgehog
+import qualified Hedgehog.Internal.Seed as Seed
+import System.Environment (lookupEnv, setEnv)
 import System.Exit (exitFailure)
 import System.IO (hSetEncoding, stdout, utf8)
 import Validation.Boundary
@@ -159,9 +165,24 @@ runMutant name p = do
   putStrLn ((if failed then "  [ok]    mutante detectado: " else "  [FALHA] mutante NÃO detectado: ") ++ name)
   pure failed
 
+-- | Fixa a semente de todas as propriedades (o `check` do Hedgehog lê HEDGEHOG_SEED a cada chamada).
+-- Se HEDGEHOG_SEED já estiver definida, ela é mantida.
+fixedSeed :: IO String
+fixedSeed = do
+  existing <- lookupEnv "HEDGEHOG_SEED"
+  case existing of
+    Just s -> pure s
+    Nothing -> do
+      let Seed.Seed v g = Seed.from 20261113
+          s = show v ++ " " ++ show g
+      setEnv "HEDGEHOG_SEED" s
+      pure s
+
 main :: IO ()
 main = do
   hSetEncoding stdout utf8
+  seed <- fixedSeed
+  putStrLn ("Semente do Hedgehog (HEDGEHOG_SEED): " ++ seed)
   etables <- loadTables "spec/transition_table.csv" "spec/power_table.csv"
   tables <- either (\e -> putStrLn (renderTableError e) >> exitFailure) pure etables
   regrTxt <- readUtf8 "scenarios/regressao_bateria_critica.scn"

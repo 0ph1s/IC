@@ -18,11 +18,13 @@ feito nesta revisão. Onde nada foi testado, está escrito.
 1. **Dependências:** a árvore do Hedgehog resolveu e compilou sem intervenção. Para o QSM isso não foi tentado.
 2. **Natureza do sistema:** a FSM é uma máquina de Mealy pura. O valor do QSM (comandos com referências
    simbólicas e pós-condições sobre estado opaco) é pequeno aqui; a propriedade por lista de eventos basta.
-3. **Reprodutibilidade:** cada falha do Hedgehog imprime a semente (`recheckAt (Seed ...) ...`); os relatórios
-   de falha dos mutantes estão em `08_reprodutibilidade/logs/03_model_hedgehog.txt`.
+3. **Reprodutibilidade:** a semente do Hedgehog é **fixa** (`fixedSeed` em `test/ModelSpec.hs`, impressa no início
+   do log; a variável `HEDGEHOG_SEED` a substitui), de modo que duas execuções dão o mesmo log. Sem isso, cada
+   execução sorteia outra semente e os tamanhos dos contraexemplos reduzidos mudam. Os relatórios de falha dos
+   mutantes estão em `08_reprodutibilidade/logs/03_model_hedgehog.txt`.
 4. **Limite aceito:** o shrinking do Hedgehog encontra um mínimo **local**. No mutante de política (CREM contra
-   `Level`) reduziu a 7 ticks; o mínimo global, obtido por busca em largura, tem 4
-   (`DRAIN, DRAIN, TAKEOFF, IDLE`). Registrar essa diferença evita atribuir ao shrinking o que ele não garante.
+   `Level`), com a semente registrada, chegou a 4 ticks (`DRAIN, DRAIN, TAKEOFF, IDLE`), que é o mínimo global; mas
+   quem garante que não há cenário menor é a busca em largura (`validation-reach-tests`), e não o shrinking.
 
 ## O que o parecer chama de "oráculo independente" e o que aqui se tem
 

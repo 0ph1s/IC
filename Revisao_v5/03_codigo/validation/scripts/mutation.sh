@@ -80,11 +80,18 @@ for m in "${MUTANTS[@]}"; do
   selected "$id" || continue
   total=$((total+1))
   restore
-  args=(-E)
   IFS=$'\n' read -r -d '' -a parts < <(printf '%s' "$exprs" | sed 's/;;/\n/g' && printf '\0')
-  for e in "${parts[@]}"; do args+=(-e "$e"); done
-  sed "${args[@]}" "$CODE/$file" > "$TMP/code/$file"
-  if cmp -s "$CODE/$file" "$TMP/code/$file"; then echo "ERRO: a mutação $id não alterou $file"; exit 2; fi
+  # cada expressão é aplicada e conferida SEPARADAMENTE: se uma delas deixar de casar com o fonte, o
+  # mutante não pode rodar meio aplicado sob a descrição completa
+  cp "$CODE/$file" "$TMP/mut.cur"
+  k=0
+  for e in "${parts[@]}"; do
+    k=$((k+1))
+    sed -E -e "$e" "$TMP/mut.cur" > "$TMP/mut.next"
+    if cmp -s "$TMP/mut.cur" "$TMP/mut.next"; then echo "ERRO: a expressão $k da mutação $id não alterou $file: $e"; exit 2; fi
+    mv "$TMP/mut.next" "$TMP/mut.cur"
+  done
+  cp "$TMP/mut.cur" "$TMP/code/$file"
   echo "[$id] $desc"
   if ! build "$id"; then
     cause=$(grep -m1 -E "Could not deduce|incomplete-patterns|non-exhaustive|error:" "$TMP/logs/$id.build.txt" | sed 's/^ *//' | cut -c1-150)
@@ -111,7 +118,8 @@ done
   echo "Mutantes avaliados: $total. Vivos: $alive."
   echo
   echo "Notas: um mutante recusado na compilação não precisa de teste (é o que se quer da tipagem e de \`-Werror=incomplete-patterns\`)."
-  echo "Um mutante que compila e é morto só por teste mostra a fronteira da garantia dos tipos (H2, H3, H6, H7, H8: o compilador os aceita)."
+  echo "Um mutante que compila e é morto só por teste mostra a fronteira da garantia dos tipos (H1, H2, H3, H6, H7, H8 e H9: o compilador os aceita)."
+  echo "Cada expressão sed de um mutante é aplicada e conferida em separado: nenhum mutante roda meio aplicado."
 } >> "$OUT"
 echo "relatório: $OUT   (vivos: $alive de $total)"
 [ "$KEEP" = 1 ] || rm -rf "$TMP"

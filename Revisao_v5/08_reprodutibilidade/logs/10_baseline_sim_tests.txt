@@ -20,21 +20,21 @@ Test suite avionics-sim-tests: RUNNING...
   [ok]    malha aberta == FSM ingênua (saídas e estado final)  (341 cenários, 0.0 s)
   [ok]    malha aberta: repetição passo a passo na FSM ingênua  (341 cenários, 0.0 s)
   [ok]    malha fechada, só comandos: eventos RECEBIDOS repetidos na ingênua  (341 cenários, 1.0e-2 s)
-  [ok]    malha fechada, alfabeto completo de ticks (20 símbolos): idem  (168421 cenários, 7.76 s)
-  [ok]    observação não altera o comportamento: planta == Compose.uavSystem  (22621 sequências, 0.19 s)
+  [ok]    malha fechada, alfabeto completo de ticks (20 símbolos): idem  (168421 cenários, 7.8 s)
+  [ok]    observação não altera o comportamento: planta == Compose.uavSystem  (22621 sequências, 0.17 s)
 
 === C. Propriedades sobre o traço (enumeração limitada, N = 4) ===
-  [ok]    malha aberta: Shutdown só é alcançado logo depois de Grounded  (168421 cenários, 0.54 s)
-  [ok]    malha aberta: toda entrada em EmergencyLanding vem de InFlight  (168421 cenários, 0.54 s)
-  [ok]    malha aberta: ShedLoad nunca reduz o nível da bateria  (168421 cenários, 0.5 s)
-  [ok]    malha aberta: determinismo (mesma entrada, mesmo traço)  (168421 cenários, 0.74 s)
-  [ok]    malha aberta: causalidade (traço do prefixo é prefixo do traço)  (8421 cenários, 8.0e-2 s)
-  [ok]    malha fechada: Shutdown só é alcançado logo depois de Grounded  (168421 cenários, 7.77 s)
-  [ok]    malha fechada: toda entrada em EmergencyLanding vem de InFlight  (168421 cenários, 7.7 s)
-  [ok]    malha fechada: ShedLoad nunca reduz o nível da bateria  (168421 cenários, 7.43 s)
-  [ok]    malha fechada: determinismo (mesma entrada, mesmo traço)  (168421 cenários, 8.52 s)
+  [ok]    malha aberta: Shutdown só é alcançado logo depois de Grounded  (168421 cenários, 0.53 s)
+  [ok]    malha aberta: toda entrada em EmergencyLanding vem de InFlight  (168421 cenários, 0.53 s)
+  [ok]    malha aberta: ShedLoad nunca reduz o nível da bateria  (168421 cenários, 0.49 s)
+  [ok]    malha aberta: determinismo (mesma entrada, mesmo traço)  (168421 cenários, 0.75 s)
+  [ok]    malha aberta: causalidade (traço do prefixo é prefixo do traço)  (8421 cenários, 9.0e-2 s)
+  [ok]    malha fechada: Shutdown só é alcançado logo depois de Grounded  (168421 cenários, 7.47 s)
+  [ok]    malha fechada: toda entrada em EmergencyLanding vem de InFlight  (168421 cenários, 7.47 s)
+  [ok]    malha fechada: ShedLoad nunca reduz o nível da bateria  (168421 cenários, 7.3 s)
+  [ok]    malha fechada: determinismo (mesma entrada, mesmo traço)  (168421 cenários, 8.37 s)
   [ok]    malha fechada: causalidade (traço do prefixo é prefixo do traço)  (8421 cenários, 0.91 s)
-  [ok]    malha fechada: o Beat libera exatamente o que foi retido no tick anterior  (168421 cenários, 7.54 s)
+  [ok]    malha fechada: o Beat libera exatamente o que foi retido no tick anterior  (168421 cenários, 7.53 s)
 
 === D. As verificações detectam violações (traços corrompidos à mão) ===
   [ok]    Shutdown vindo de InFlight é detectado

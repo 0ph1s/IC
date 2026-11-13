@@ -66,8 +66,8 @@ audit_stack() {
     echo "Fonte: \`05_c-cpp/src/$(basename "$src")\`. Compilador: $("$comp" --version | head -1). Padrão: \`${std:-padrão do compilador}\`."
     echo "A: \`$FLAGS_A\`. B: \`$FLAGS_B\`. W: B com \`-Werror\`. S: \`--analyze\`."
     echo
-    echo "| Id | Defeito injetado | A | B | W (erro) | S (análise) | Harness exaustivo | Primeira mensagem (W) |"
-    echo "|---|---|---|---|---|---|---|---|"
+    echo "| Id | Defeito injetado | A | B | W (erro) | S (análise) | Harness exaustivo | Diagnóstico em A (linhas / bytes) | Primeira mensagem (W) |"
+    echo "|---|---|---|---|---|---|---|---|---|"
   } >> "$MD"
   local v
   for v in "${variants[@]}"; do
@@ -93,8 +93,11 @@ audit_stack() {
     fi
     # o baseline não pode ter aviso nem divergência
     if [ -z "$expr" ] && { [ "$rA" != "silêncio" ] || [ "$rB" != "silêncio" ] || [ "$rW" != "silêncio" ] || [ "$run" != "passa" ]; }; then BAD_BASELINE=1; fi
-    printf '%-7s %-6s | A:%-11s B:%-11s W:%-9s S:%-9s | %s\n' "$id/$name" "" "$rA" "$rB" "$rW" "$rS" "$run"
-    echo "| $name | $desc | $rA | $rB | $rW | $rS | $run | ${msgW//|/\\|} |" >> "$MD"
+    # tamanho do diagnóstico em A (a Figura 2 do artigo do SCP sai daqui); os bytes incluem o caminho do arquivo
+    local sizeA="-"
+    [ -s "$W/$id/$name.logA" ] && sizeA="$(wc -l < "$W/$id/$name.logA" | tr -d ' ') / $(wc -c < "$W/$id/$name.logA" | tr -d ' ')"
+    printf '%-7s %-6s | A:%-11s B:%-11s W:%-9s S:%-9s | %s | diag A: %s\n' "$id/$name" "" "$rA" "$rB" "$rW" "$rS" "$run" "$sizeA"
+    echo "| $name | $desc | $rA | $rB | $rW | $rS | $run | $sizeA | ${msgW//|/\\|} |" >> "$MD"
     { echo "=== $id/$name — $desc"; echo "--- A"; head -4 "$W/$id/$name.logA"; echo "--- B"; head -4 "$W/$id/$name.logB"
       echo "--- W"; head -4 "$W/$id/$name.logW"; echo "--- S"; head -4 "$W/$id/$name.logS"; } >> "$RAW"
   done
@@ -109,6 +112,8 @@ audit_stack() {
   echo
   echo "Legenda: **recusa** = a compilação falha; **aviso(N)** = compila com N avisos; **silêncio** = compila sem aviso."
   echo "O harness imprime os 16 pares e os compara com a tabela: **passa** = igual; **detecta** = diferente."
+  echo "Diagnóstico em A: tamanho da saída do compilador com as opções A (\`wc -l\` / \`wc -c\`); os bytes incluem o caminho absoluto"
+  echo "do arquivo compilado e variam com a pasta onde o repositório está; as linhas não."
 } > "$MD"
 
 # --- C, enum + switch (mesmas expressões sed do pacote base, compare-c/run.sh) ---

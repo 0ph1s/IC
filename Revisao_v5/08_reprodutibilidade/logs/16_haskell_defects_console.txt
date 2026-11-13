@@ -1,0 +1,11 @@
+N0  A:silêncio   W:silêncio passa
+N1  A:aviso(1)    W:recusa    detecta (exceção em execução: Harness.hs: Avionics\Naive.hs:(62,1)-(76,54): Non-exhaustive)
+N2  A:silêncio   W:silêncio passa
+N3  A:silêncio   W:silêncio detecta (1 par)
+N4  A:silêncio   W:silêncio detecta (1 par)
+N5  A:recusa      W:recusa    -
+N6  A:recusa      W:recusa    -
+C0  W:silêncio -
+C5  W:recusa    [GHC-83865] * Couldn't match expected type `SAvionicsVertex finalVertex0' 
+C6  W:recusa    [GHC-39999] * Could not deduce `AllowedTransition 
+relatório: /c/Users/Peterson/Documents/GitHub/IC/Revisao_v5/08_reprodutibilidade/logs/16_haskell_defects.md

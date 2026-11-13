@@ -16,5 +16,6 @@
       -> morto por: sim-tests (N=3), reach, model (Hedgehog)
 [H8] ENERGIA: Low+Drain fica em Low (não desce a Critical)
       -> morto por: sim-tests (N=3), conformance, reach, model (Hedgehog)
-relatório: /c/Users/Peterson/Documents/GitHub/IC/Revisao_v5/08_reprodutibilidade/logs/06_mutation_haskell.md   (vivos: 0 de 8)
-EXIT=0
+[H9] CURINGA: Grounded+TakeoffSignal omitida e cláusula final avionicsAction s _ = pureResult MsgIgnored s (identidade)
+      -> morto por: spec-tests, sim-tests (N=3), conformance, reach, model (Hedgehog)
+relatório: /c/Users/Peterson/Documents/GitHub/IC/Revisao_v5/08_reprodutibilidade/logs/06_mutation_haskell.md   (vivos: 0 de 9)

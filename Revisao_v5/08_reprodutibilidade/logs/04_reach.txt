@@ -1,10 +1,8 @@
 Build profile: -w ghc-9.6.7 -O1
 In order, the following will be built (use -v for more details):
- - avionics-validation-0.1.0.0 (test:validation-reach-tests) (file test\ReachSpec.hs changed)
+ - avionics-validation-0.1.0.0 (test:validation-reach-tests) (ephemeral targets)
 Preprocessing test suite 'validation-reach-tests' for avionics-validation-0.1.0.0...
 Building test suite 'validation-reach-tests' for avionics-validation-0.1.0.0...
-[1 of 1] Compiling Main             ( test\ReachSpec.hs, C:\Users\Peterson\Documents\GitHub\IC\Revisao_v5\03_codigo\dist-newstyle\build\x86_64-windows\ghc-9.6.7\avionics-validation-0.1.0.0\t\validation-reach-tests\build\validation-reach-tests\validation-reach-tests-tmp\Main.o ) [Source file changed]
-[2 of 2] Linking C:\\Users\\Peterson\\Documents\\GitHub\\IC\\Revisao_v5\\03_codigo\\dist-newstyle\\build\\x86_64-windows\\ghc-9.6.7\\avionics-validation-0.1.0.0\\t\\validation-reach-tests\\build\\validation-reach-tests\\validation-reach-tests.exe [Objects changed]
 Running 1 test suites...
 Test suite validation-reach-tests: RUNNING...
 === Espaço de estados do laço fechado: 4 x 3 x 4 = 48 ternos possíveis, alfabeto de 20 ticks ===
@@ -52,7 +50,7 @@ Test suite validation-reach-tests: RUNNING...
   [ok]    mesmas arestas, com os mesmos passos (evento, saída, vértices e ambiente) em cada aresta
 
 === 4. Composição e terminação: a realimentação para dentro de cada tick? ===
-  [ok]    a exploração fechou: todas as 520 combinações (estado, tick) terminaram; no máximo 5 passos por tick
+  [ok]    a exploração fechou (520 combinações (estado, tick)) e nenhum tick passa de 5 passos (máximo observado: 5)
   [ok]    limite de passos por tick igual no oráculo OneSlot
 
 === 5. Política da bateria: reação à BORDA (OneSlot) versus ao NÍVEL (Level) ===
@@ -71,7 +69,7 @@ Test suite validation-reach-tests: RUNNING...
   [achado] Queue  (oráculo): 1 estado(s) nessa situação (a fila sem perda não resolve a lacuna)
   [achado] Level  (oráculo): 0 estado(s) nessa situação
   [ok]    [regressão do achado] OneSlot: existe ao menos um estado preso (a lacuna borda x nível do relatório v4 se reproduz)
-  [ok]    OneSlot: o oráculo e a implementação concordam sobre quantos estados presos existem
+  [ok]    OneSlot: o oráculo e a implementação têm os MESMOS estados presos
   [ok]    Level elimina a lacuna: nenhum estado preso, para TODAS as sequências (não só até N = 8)
   [ok]    [regressão do achado] OneSlot viola NoPermanentBlindness (existe caminho infinito sempre cego) — o que o TLC deve mostrar com Policy = OneSlot
   [ok]    Level satisfaz NoPermanentBlindness: nenhum caminho infinito, com quaisquer entradas, fica cego para sempre — o que o TLC deve confirmar com Policy = Level

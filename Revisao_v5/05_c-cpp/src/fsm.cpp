@@ -1,7 +1,7 @@
 /* Mesma FSM de aviônica em C++ (enum class), com enum e switch (estilo imperativo descrito por
  * Malakhovski e Shalyto). Serve de BASE DE COMPARAÇÃO com a versão em Haskell.
- * Imprime os 16 pares (estado, evento, destino) para ser conferido contra
- * spec/domain_rules.txt por compare-c/run.sh. */
+ * Imprime os 16 pares (estado, evento, destino) para ser conferido contra a tabela
+ * 03_codigo/validation/spec/transition_table.csv por 05_c-cpp/scripts/audit.sh. */
 #include <cstdio>
 
 enum class state_t { GROUNDED, IN_FLIGHT, EMERGENCY_LANDING, SHUTDOWN };

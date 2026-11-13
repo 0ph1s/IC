@@ -44,7 +44,7 @@
 }
 
 \begin{abstract}
-Typed state-machine libraries promise that illegal transitions do not compile. We ask what that guarantee is worth once machines are composed. Using the \crem{} library for Haskell, we study a four-state avionics machine composed with a battery machine and a reactive environment closed by \code{Feedback}. The domain is an illustrative discrete case study; we make no claim about real avionics. A rejection matrix over all 16 vertex pairs and eight mutants of the implementation show that the checker rejects edges outside the topology and omitted cases, but accepts a wrong destination on an allowed edge, swapped events, wrong outputs and faulty environments, which only tests catch. We then describe a validation method that other \crem{} users can reuse: a reviewable transition table with the provenance of each rule, a table-driven oracle, a typed boundary adapter, property-based testing with Hedgehog, and an exhaustive exploration of the closed-loop state graph that runs the real \crem{} machines from any triple of vertices. Under a stated abstraction hypothesis, the exploration establishes equivalence between implementation and oracle for sequences of any length, and exposes a global defect that every edge-level check misses: the environment reacts to the \emph{edge} ``the battery became critical'' and not to the \emph{level}, so the aircraft can stay airborne with a critical battery forever. A TLA+ model checked with TLC independently reproduces the finding. The defect belongs to the environment model, not to \crem{}; the lesson is where the type-level guarantee stops.
+Typed state-machine libraries promise that illegal transitions do not compile. We ask what that guarantee is worth once machines are composed. Using the \crem{} library for Haskell, we study a four-state avionics machine composed with a battery machine and a reactive environment closed by \code{Feedback}. The domain is an illustrative discrete case study; we make no claim about real avionics. A rejection matrix over all 16 vertex pairs and nine mutants of the implementation show that the checker rejects edges outside the topology and omitted cases written without a wildcard, but accepts a wrong destination on an allowed edge, swapped events, wrong outputs, faulty environments and an omission hidden by a catch-all clause, which only tests catch. We then describe a validation method that other \crem{} users can reuse: a reviewable transition table with the provenance of each rule, a table-driven oracle, a typed boundary adapter, property-based testing with Hedgehog, and an exhaustive exploration of the closed-loop state graph that runs the real \crem{} machines from any triple of vertices. Under a stated abstraction hypothesis, the exploration establishes equivalence between implementation and oracle for sequences of any length, and exposes a global defect that every edge-level check misses: the environment reacts to the \emph{edge} ``the battery became critical'' and not to the \emph{level}, so the aircraft can stay airborne with a critical battery forever. A TLA+ model checked with TLC independently reproduces the finding. The defect belongs to the environment model, not to \crem{}; the lesson is where the type-level guarantee stops.
 \end{abstract}
 
 \maketitle
@@ -61,7 +61,7 @@ We answer it with a small, fully worked case study and a method.
 
 \paragraph{Contributions.}
 \begin{enumerate}
-\item A precise delimitation of what the \crem{} type checker enforces in this case study (Sect.~\ref{sec:guarantee}): a rejection matrix over all 16 pairs of vertices with the \emph{cause} of each rejection checked, and eight mutants of the implementation, two refused by the compiler and six accepted and killed only by tests.
+\item A precise delimitation of what the \crem{} type checker enforces in this case study (Sect.~\ref{sec:guarantee}): a rejection matrix over all 16 pairs of vertices with the \emph{cause} of each rejection checked, and nine mutants of the implementation, two refused by the compiler and seven accepted and killed only by tests.
 \item A reusable validation method (Sect.~\ref{sec:method}): a reviewable transition table that records, for each rule, whether it comes from the requirements, from a project convention or from a modelling choice; an oracle driven by that table; a typed adapter for external input; and property-based testing with reproducible seeds and shrinking.
 \item An exhaustive exploration of the closed-loop state graph that executes the \emph{real} \crem{} machines from an arbitrary triple of vertices (Sect.~\ref{sec:reach}). Under a stated hypothesis, it replaces bounded enumeration by a statement about sequences of any length.
 \item A finding that no edge-level check can make: a reachable blind state in which the aircraft stays airborne with a critical battery forever (Sect.~\ref{sec:results}), reproduced independently by a TLA+ model checked with TLC.
@@ -181,11 +181,11 @@ origin $\backslash$ destination & \code{Grounded} & \code{InFlight} & \code{Emer
 \end{tabular}
 \end{table}
 
-This matrix checks the \emph{topology}. It is not the same as the origin-by-event matrix, which also has 16 cells but checks that the transition function covers every pair. That second property is, in GHC, a warning (\code{-Wincomplete-patterns}) and only becomes a compile error if the project asks for it; we compile with \code{-Werror=incomplete-patterns} and write all 16 equations without a wildcard, since a wildcard would hide an omission.
+This matrix checks the \emph{topology}. It is not the same as the origin-by-event matrix, which also has 16 cells but checks that the transition function covers every pair. That second property is, in GHC, a warning (\code{-Wincomplete-patterns}) and only becomes a compile error if the project asks for it; we compile with \code{-Werror=incomplete-patterns} and write all 16 equations without a wildcard, since a wildcard would hide an omission (mutant H9 below).
 
 \subsection{Mutation of the implementation}
 
-To learn which defects the checker \emph{cannot} see, we injected eight defects, one at a time, into a temporary copy of the code and ran every test suite on each (Table~\ref{tab:mutants}).
+To learn which defects the checker \emph{cannot} see, we injected nine defects, one at a time, into a temporary copy of the code and ran every test suite on each (Table~\ref{tab:mutants}).
 
 \begin{table}[t]
 \caption{Mutants of the \crem{} implementation. ``Accepted'' means that the compiler accepts the mutant.}
@@ -203,11 +203,12 @@ H5 & omitted (state, event) pair & \textbf{rejected} (exhaustiveness as error) &
 H6 & wrong output (\code{EmergencyLanding}, \code{LandedSignal} emits \code{MsgIgnored}) & accepted & four suites \\
 H7 & environment: \code{CriticalHeld} releases \code{LandedSignal} & accepted & three suites \\
 H8 & battery: \code{Low} with \code{Drain} stays \code{Low} & accepted & four suites \\
+H9 & omitted pair (\code{Grounded}, \code{TakeoffSignal}) plus a final catch-all clause returning the same vertex & accepted & all five \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-No mutant survived. But only two were stopped by the compiler: the illegal edge when the topology is left alone (H4) and the omitted pair (H5). When the defect is in the topology as well (H1), the compiler cannot tell it from the specification; a wrong destination on an allowed edge (H2), swapped events (H3), wrong outputs (H6) and faulty environment or battery rules (H7, H8) are all accepted. These are exactly the \emph{event--destination} gap: the type fixes which vertices may follow which, not which event leads where. Mutants were chosen by the author from the defect classes that a technical review of the project asked for (illegal edges, wrong destinations, swapped events), plus omission, output, environment and battery; they are not a systematic sample of faults.
+No mutant survived. But only two were stopped by the compiler: the illegal edge when the topology is left alone (H4) and the omitted pair (H5). When the defect is in the topology as well (H1), the compiler cannot tell it from the specification; a wrong destination on an allowed edge (H2), swapped events (H3), wrong outputs (H6) and faulty environment or battery rules (H7, H8) are all accepted. These are exactly the \emph{event--destination} gap: the type fixes which vertices may follow which, not which event leads where. The omission is caught only while it is written without a wildcard: with a final catch-all clause that returns the same vertex (H9), the identity edge is always allowed, the clause type-checks for every vertex, and the omission compiles silently. Mutants were chosen by the author from the defect classes that a technical review of the project asked for (illegal edges, wrong destinations, swapped events), plus omission, catch-all, output, environment and battery; they are not a systematic sample of faults.
 
 \section{A validation method for typed state machines}
 \label{sec:method}
@@ -239,7 +240,7 @@ The adapter guarantees that every value that crosses it is a valid constructor. 
 
 \subsection{Property-based testing}
 
-With Hedgehog \cite{hedgehog} (in the tradition of QuickCheck \cite{claessen2000quickcheck}) the property is ``for every list of ticks, the \crem{} trace equals the oracle's trace''. Lists have up to 40 ticks, against 4 in the earlier exhaustive enumeration; every failure prints the seed that reproduces it, and shrinking reduces the counterexample. The system is a pure Mealy machine with no opaque state to be referenced across commands, so we did not need Hedgehog's state-machine API.
+With Hedgehog \cite{hedgehog} (in the tradition of QuickCheck \cite{claessen2000quickcheck}) the property is ``for every list of ticks, the \crem{} trace equals the oracle's trace''. Lists have up to 40 ticks, against 4 in the earlier exhaustive enumeration; the seed is fixed and printed, so that two runs produce the same log, and shrinking reduces each counterexample to a local minimum. The system is a pure Mealy machine with no opaque state to be referenced across commands, so we did not need Hedgehog's state-machine API.
 
 \subsection{Exhaustive exploration of the closed loop}
 \label{sec:reach}
@@ -266,7 +267,7 @@ An independent specification of the same loop was written in TLA+ \cite{lamport2
 \section{Results}
 \label{sec:results}
 
-All results come from recorded runs with GHC 9.6.7, \code{crem} 0.1.0.0, Hedgehog 1.7 and TLC 2.19 (TLA+ Tools 1.7.4). The code compiles without GHC warnings.
+All results come from recorded runs with GHC 9.6.7, \code{crem} 0.1.0.0, Hedgehog 1.7 and TLC 2.19 (TLA+ Tools 1.7.4). A clean build of all targets produces no GHC warnings; the reproduction script checks this on every run.
 
 \subsection{Equivalence for sequences of any length}
 
@@ -319,7 +320,7 @@ Policy & reachable states & blind under idle ticks & forever blind (any inputs) 
 \end{tabular}
 \end{table}
 
-A loss-free queue does not remove the defect; reacting to the level does, for every sequence and not only up to a bound. This turns an earlier bounded measurement (172 scenarios of up to 8 ticks over a reduced alphabet end in this situation under \code{OneSlot}, 0 under \code{Level}) into a statement about the whole graph. The smallest scenario on which the \crem{} loop diverges step by step from \code{Level} has four ticks: \code{DRAIN}, \code{DRAIN}, \code{TAKEOFF}, \code{IDLE}. The Hedgehog shrinker, started from scenarios of up to 40 ticks, reached a local minimum of seven; the global minimum above comes from the breadth-first search, so shrinking should not be credited with minimality.
+A loss-free queue does not remove the defect; reacting to the level does, for every sequence and not only up to a bound. This turns an earlier bounded measurement (172 scenarios of up to 8 ticks over a reduced alphabet end in this situation under \code{OneSlot}, 0 under \code{Level}) into a statement about the whole graph. The smallest scenario on which the \crem{} loop diverges step by step from \code{Level} has four ticks: \code{DRAIN}, \code{DRAIN}, \code{TAKEOFF}, \code{IDLE}. With the recorded seed, the Hedgehog shrinker, started from scenarios of up to 40 ticks, also reached these four ticks; but shrinking only guarantees a local minimum, so it is the breadth-first search, not the shrinker, that establishes that no shorter scenario exists.
 
 \subsection{A correction to a bounded conclusion}
 
@@ -327,7 +328,7 @@ The earlier bounded runs reported that dropping events when the slot is busy nev
 
 \subsection{Property-based tests and mutants}
 
-Hedgehog found the \crem{} trace equal to the oracle's in 5\,000 random closed-loop scenarios of up to 40 ticks and 3\,000 open-loop ones, and the trace properties of the original suite held in 3\,000 scenarios of up to 60 ticks. To check that the test can fail, five defects were injected into the oracle's table, which is equivalent to a defect in the implementation because the comparison is symmetric. All were detected and shrunk: a wrong destination (1 tick), an illegal edge (2), swapped events (1), a wrong output (3) and the \code{Level} policy against \crem{} (7).
+Hedgehog found the \crem{} trace equal to the oracle's in 5\,000 random closed-loop scenarios of up to 40 ticks and 3\,000 open-loop ones, and the trace properties of the original suite held in 3\,000 scenarios of up to 60 ticks. To check that the test can fail, four defects were injected into the oracle's table, which is equivalent to a defect in the implementation because the comparison is symmetric, and the oracle was also run with the \code{Level} policy against \crem{}. All five were detected and shrunk: a wrong destination (1 tick), an illegal edge (2), swapped events (1), a wrong output (3) and the \code{Level} policy against \crem{} (4).
 
 \subsection{Model checking}
 
@@ -359,7 +360,7 @@ TLC & the same verdicts on an independently written model & anything about the H
 
 \subsection{Lessons for \crem{} users}
 
-\paragraph{Treat the type as a per-edge guarantee.} In our mutation experiment the compiler caught two of eight defects. Writing every equation without a wildcard and compiling exhaustiveness as an error is what makes one of the two work. The wrong destination on an allowed edge is the most dangerous because it is silent; the cheap defence is a table in which events appear, checked exhaustively against the actions.
+\paragraph{Treat the type as a per-edge guarantee.} In our mutation experiment the compiler caught two of nine defects. Writing every equation without a wildcard and compiling exhaustiveness as an error is what makes one of the two work; H9 shows that a catch-all clause undoes it. The wrong destination on an allowed edge is the most dangerous because it is silent; the cheap defence is a table in which events appear, checked exhaustively against the actions.
 
 \paragraph{Keep the provenance of each rule.} Of the 16 rows of the avionics table only four come from the requirements. The distinction between \texttt{REQ}, \texttt{CONV} and \texttt{MODEL} turned a vague worry (``is the specification right?'') into a short list of questions for a reviewer.
 
@@ -395,7 +396,7 @@ Typed finite-state machines in Haskell have been explored through indexed monads
 
 \section{Conclusion}
 
-A type-level topology is a precise and useful guarantee, and it is a guarantee about edges. In a composed, fed-back system with an environment, the properties that matter are about sequences, and they can fail with every edge correct. In our case study the compiler rejected two of eight injected defects, a table-driven oracle and property-based tests caught the rest, and an exhaustive exploration of the real closed loop found a defect no edge-level check can see, which an independent TLA+ model reproduced. The reusable part is the method: a table with provenance, an oracle driven by it, a typed boundary, property-based tests, and closing the state graph by running the real machines from any vertex triple. What remains open is the independence of the specification from its author, other topologies and scales, and a systematic comparison with other approaches to the event--destination gap.
+A type-level topology is a precise and useful guarantee, and it is a guarantee about edges. In a composed, fed-back system with an environment, the properties that matter are about sequences, and they can fail with every edge correct. In our case study the compiler rejected two of nine injected defects, a table-driven oracle and property-based tests caught the rest, and an exhaustive exploration of the real closed loop found a defect no edge-level check can see, which an independent TLA+ model reproduced. The reusable part is the method: a table with provenance, an oracle driven by it, a typed boundary, property-based tests, and closing the state graph by running the real machines from any vertex triple. What remains open is the independence of the specification from its author, other topologies and scales, and a systematic comparison with other approaches to the event--destination gap.
 
 \section*{Data availability statement}
 

@@ -1,7 +1,7 @@
 pdflatex: major issue: So far, you have not checked for MiKTeX updates.
 versões registradas                                       ok
 compilação de todos os alvos (-Wall -Werror=incomplete-patterns) ok
-gerado: cabal.project.freeze
+compilação limpa de todos os alvos: 33 módulos, 0 avisos do GHC ok
 invalid-inflight-shutdown: não compila, com 'Could not deduce AllowedTransition' (esperado) ok
 base: avionics-spec-tests (conformidade, 16 verificações) ok
 base: avionics-sim-tests (simulador, N = 4)                ok
@@ -13,6 +13,10 @@ novo: validation-reach-tests (alcançabilidade exaustiva)  ok
 novo: validation-model-tests (Hedgehog, com mutantes)      ok
 matriz de rejeição: 8 compilam, 8 rejeitados, causa conferida ok
 auditoria C/C++: versões sem defeito sem aviso e iguais à tabela ok
+matriz de 16 pares em C++17 tipado: 8 compilam, 8 recusados por static_assert ok
+defeitos em Haskell: FSM ingênua (N0 a N6) e ação do CREM (C0, C5, C6) ok
+TLC: OneSlot viola NoPermanentBlindness, Level satisfaz; ternos iguais aos do Haskell ok
+mutação do CREM (H1 a H9): nenhum mutante vivo           ok
 
 sumário: /c/Users/Peterson/Documents/GitHub/IC/Revisao_v5/08_reprodutibilidade/logs/SUMARIO.md
 TUDO OK

@@ -127,8 +127,9 @@
 \bibfield{author}{\bibinfo{person}{Marco Perone} {and}
   \bibinfo{person}{Georgios Karachalias}.} \bibinfo{year}{2023}\natexlab{}.
 \newblock \bibinfo{title}{Cr{\`e}me de la Crem: Composable Representable
-  Executable Machines}.
-\newblock \bibinfo{howpublished}{arXiv:2307.09090}.
+  Executable Machines (Architectural Pearl)}.
+\newblock \bibinfo{howpublished}{arXiv:2307.09090 (presented at the FUNARCH
+  workshop, ICFP 2023)}.
 \newblock
 \newblock
 \shownote{Library: \texttt{crem},
