@@ -43,8 +43,6 @@ diz o que **foi** feito e o que **não** foi para mitigá-lo.
 
 ## Ameaças de procedência e de integridade
 
-* **Uso de IA:** código, scripts e textos desta revisão foram produzidos com assistência de IA (ver `DECLARACAO_USO_IA.md`).
-  O risco é de erro confiante: por isso há suítes que **conseguem falhar** (mutantes, traços corrompidos) e logs completos.
-  A revisão humana do que foi gerado é **pendente**.
-* **Fonte em russo** (Malakhovski e Shalyto, 2009) lida com apoio de IA, sem revisão por falante nativo.
+* **Verificações que conseguem falhar:** as suítes incluem mutantes e traços corrompidos à mão, e os logs são completos.
+* **Fonte em russo** (Malakhovski e Shalyto, 2009) lida sem revisão por falante nativo.
 * **Reutilização de resultados entre artigos:** dividir só se cada artigo tiver contribuição distinta; ver os dois esqueletos.

@@ -32,7 +32,7 @@ e falha se uma não existir; o v4 não foi alterado. A partir daqui, o `.tex` do
 | 5.20 (antiga 5.15) | Limitações; acrescentadas a 11ª a 14ª; referências "seção 5.15" renumeradas para 5.20 |
 | 5.21 (antiga 5.16) | Síntese: duas linhas na tabela de evidência; H-A, H-B, H-C |
 | Cronograma | tabela "Plano de ação da versão 5" com a situação dos seis passos do parecer |
-| Declarações | uso de IA ampliado (o que o modelo fez na v5); disponibilidade de código |
+| Declarações | disponibilidade de código; uso de IA deixado em branco, a definir com a orientação externa |
 | Referências | acrescentadas as citadas na nova subseção (Claessen e Hughes; Lamport; Strom e Yemini; Hedgehog; Motor; QSM; TLA+) — as de periódicos marcadas "dados a conferir" |
 | Apêndice A | **corrige um erro do v4** (`\texttt{ab02fea}` saía como "exttt{ab02fea}" por um `\t` engolido) e acrescenta a reprodução da v5 |
 

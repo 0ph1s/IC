@@ -38,7 +38,7 @@ evidência e o que **continua pendente**. Status honesto: só consta "feito" o q
 2. Nomear o revisor de C/C++ (passo 5).
 3. Escolher o destino prioritário. A única janela concreta é o **ICFP 2027 (25/02/2027, Experience Report)**;
    FormaliSE (06/11/2026) e PLDI (12/11/2026) já encerraram (`06_artigos/VENUES_E_PRAZOS.md`).
-4. Confirmar autoria, papéis e a declaração de uso de IA (`06_artigos/DECLARACAO_USO_IA.md`).
+4. Confirmar autoria e papéis; definir com a orientação externa a declaração de uso de IA (`06_artigos/DECLARACAO_USO_IA.md`, hoje em branco).
 5. Tornar público e arquivar o repositório com identificador permanente (o relatório v4 registra que ele era privado).
 
 ## Critério de conclusão sugerido por etapa

@@ -40,8 +40,8 @@ Escolher a revista cujo guia **não se conseguiu ler** seria formatar às cegas.
 
 * **ORCID:** a página do Episciences diz "encorajado, não obrigatório" para submissão e obrigatório só no aceite; o guia da classe diz
   "required for all authors on JFP submissions". Seguiu-se o mais rígido.
-* **Resumo, extensão do resumo e política sobre IA generativa:** **não constam** nas páginas lidas. Incluiu-se uma declaração de uso de IA
-  por honestidade (o texto foi escrito com assistência de IA), mas a política da revista não foi encontrada.
+* **Resumo, extensão do resumo e política sobre IA generativa:** **não constam** nas páginas lidas. A seção de declaração de uso de IA existe, com o conteúdo
+  a definir com a orientação externa; a política da revista não foi encontrada.
 * **Páginas da Cambridge** (autor-instruções antigas): HTTP 429 em duas tentativas; **não lidas**. A página do Episciences afirma
   que o JFP deixou a Cambridge no fim de 2025, então são provavelmente legadas.
 * **Fluxo de submissão** descrito por uma página; o guia de submissão do Episciences não foi lido por completo.

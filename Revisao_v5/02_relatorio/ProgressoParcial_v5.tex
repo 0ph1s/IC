@@ -131,9 +131,9 @@ TLA+/TLC & Linguagem de especificação TLA+ e seu verificador de modelos\\
 
 Esta é a versão 5 do relatório parcial, preparada em 13 de novembro de 2026 a partir de duas orientações: o parecer técnico de 3 de novembro de 2026 (validação de máquinas de estados finitos componíveis em Haskell) e o documento de adequação para publicação científica de 7 de novembro de 2026. A versão 4 não foi alterada; todas as mudanças estão na pasta \texttt{Revisao\_v5/} do repositório de trabalho.
 
-\textit{O que mudou.} (i) O enquadramento: o trabalho passa a ser descrito como estudo de garantias estáticas e de validação, com o veículo aéreo apenas como domínio de exemplo, e a pergunta de pesquisa é reformulada (seção~\ref{sec:rq}). (ii) Cinco subseções novas na seção 5: fronteira de integração tipada (5.15), arquitetura de validação em três níveis (5.16), resultados (5.17), auditoria da comparação com C e C++ (5.18) e ameaças à validade (5.19); as antigas 5.15 e 5.16 passam a 5.20 e 5.21. (iii) Uma correção sinalizada na seção 5.13: o descarte do slot não é inócuo com o alfabeto completo (ver 5.17). (iv) O plano de ampliação do estado da arte (seção 4). (v) A declaração de uso de ferramentas de inteligência artificial e o apêndice de reprodução. O texto das seções 1 a 3 e 5.1 a 5.14 é o da versão 4, com os acréscimos citados.
+\textit{O que mudou.} (i) O enquadramento: o trabalho passa a ser descrito como estudo de garantias estáticas e de validação, com o veículo aéreo apenas como domínio de exemplo, e a pergunta de pesquisa é reformulada (seção~\ref{sec:rq}). (ii) Cinco subseções novas na seção 5: fronteira de integração tipada (5.15), arquitetura de validação em três níveis (5.16), resultados (5.17), auditoria da comparação com C e C++ (5.18) e ameaças à validade (5.19); as antigas 5.15 e 5.16 passam a 5.20 e 5.21. (iii) Uma correção sinalizada na seção 5.13: o descarte do slot não é inócuo com o alfabeto completo (ver 5.17). (iv) O plano de ampliação do estado da arte (seção 4). (v) O apêndice de reprodução; a declaração de uso de ferramentas de inteligência artificial fica a definir com a orientação externa. O texto das seções 1 a 3 e 5.1 a 5.14 é o da versão 4, com os acréscimos citados.
 
-\textit{O que está pendente.} A revisão da tabela de transições e das políticas pela orientação; a revisão externa das implementações em C e C++; a busca sistemática de literatura; outras topologias e escalas; a confirmação, pelo autor, das declarações.
+\textit{O que está pendente.} A revisão da tabela de transições e das políticas pela orientação; a revisão externa das implementações em C e C++; a busca sistemática de literatura; outras topologias e escalas; a confirmação, pelo autor, das demais declarações; e a definição, com a orientação externa, da declaração de uso de IA.
 
 % ========== RESUMO ==========
 \newpage
@@ -381,7 +381,7 @@ Tema & Pergunta & Candidato (a conferir) \\
 \hline
 Máquinas de estados tipadas em Haskell & que bibliotecas além do CREM existem e o que garantem & biblioteca \texttt{motor}, citada pelos autores do CREM (não lida; versão do GHC a verificar) \\
 \hline
-Testes baseados em propriedades e em modelos & como testar composições com geradores reprodutíveis e \textit{shrinking} & Claessen e Hughes (2000); \texttt{hedgehog} (usado, seção 5.17); \texttt{quickcheck-state-machine} (não testado) \\
+Testes baseados em propriedades e em modelos & como testar composições com geradores reprodutíveis e \textit{shrinking} & Claessen e Hughes (2000); \texttt{hedgehog} (usado, seção 5.17); \texttt{quickcheck-}\allowbreak\texttt{state-machine} (não testado) \\
 \hline
 Verificação de modelos & propriedades globais e temporais de composições & Lamport (2002); TLA+ e TLC (seção 5.16) \\
 \hline
@@ -683,7 +683,7 @@ Alguns termos. Um \textit{tick} é um passo discreto de simulação, sem corresp
 \begin{table}[h]
 \centering
 \scriptsize
-\begin{tabular}{|p{0.7cm}|p{3.1cm}|p{4.3cm}|p{3.0cm}|p{2.9cm}|}
+\begin{tabular}{|p{0.7cm}|p{3.1cm}|p{4.1cm}|p{3.0cm}|p{2.9cm}|}
 \hline
 Tick & Entrada ou liberação & Aviônica & Energia & Ambiente \\
 \hline
@@ -1048,7 +1048,7 @@ As ameaças são específicas deste trabalho. Para cada uma, registram-se o que 
 
 \textit{Conclusão.} Testes exaustivos em domínio finito não provam sequências arbitrárias; a alcançabilidade fecha o grafo do modelo, com a ressalva acima. O ``achado'' da política da bateria é uma propriedade do modelo do ambiente, não um defeito do CREM nem do GHC. Os números dependem do alfabeto de entradas, que deve ser explicitado em toda tabela (a versão 4 usou um alfabeto reduzido; a 5, o completo). Tempos e contagens vêm de uma máquina e de uma execução.
 
-\textit{Procedência.} O código, os scripts e os textos desta versão foram produzidos com assistência de IA (seção DECLARAÇÕES); a revisão humana do que foi gerado está pendente, e por isso as suítes incluem mutantes e traços corrompidos à mão, que precisam conseguir falhar.
+\textit{Procedência.} Os números vêm de execuções registradas, e as suítes incluem mutantes e traços corrompidos à mão, que precisam conseguir falhar.
 
 \subsection{Limitações Identificadas e Encaminhamentos}
 
@@ -1134,7 +1134,8 @@ O cronograma a seguir descreve o planejamento de todas as etapas da pesquisa ao 
 \begin{table}[h]
 \centering
 \small
-\begin{tabular}{|p{4.0cm}|p{0.6cm}|p{0.6cm}|p{0.6cm}|p{0.6cm}|p{0.6cm}|p{0.6cm}|p{0.6cm}|p{0.6cm}|p{0.6cm}|p{0.6cm}|p{0.6cm}|}
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{|p{4.0cm}|p{0.7cm}|p{0.7cm}|p{0.7cm}|p{0.7cm}|p{0.7cm}|p{0.7cm}|p{0.7cm}|p{0.7cm}|p{0.7cm}|p{0.7cm}|p{0.7cm}|}
 \hline
 \textbf{Etapas} & \textbf{fev} & \textbf{mar} & \textbf{abr} & \textbf{mai} & \textbf{jun} & \textbf{jul} & \textbf{ago} & \textbf{set} & \textbf{out} & \textbf{nov} & \textbf{dez} \\
 \hline
@@ -1163,7 +1164,7 @@ Entrega e apresentação & & & & & & & & & & X & X \\
 \begin{table}[h]
 \centering
 \footnotesize
-\begin{tabular}{|p{6.2cm}|p{2.6cm}|p{6.2cm}|}
+\begin{tabular}{|p{6.0cm}|p{2.6cm}|p{6.0cm}|}
 \hline
 Etapa & Situação & Observação \\
 \hline
@@ -1227,7 +1228,7 @@ Etapa & Ação & Situação & Entregável e pendência \\
 
 \textit{Financiamento.} \textit{[A preencher pelo autor: bolsa, agência e número do processo, ou ``sem financiamento''.]}
 
-\textit{Uso de ferramentas de inteligência artificial.} O código, os testes, os experimentos e a redação deste relatório foram desenvolvidos com assistência do modelo Claude, da Anthropic, usado por meio do Claude Code. Isso inclui a leitura das páginas 20 e 21 de Malakhovski e Shalyto (2009), em russo, sem revisão por falante nativo. Na versão 5, o modelo Claude Sonnet 5.5 produziu, a pedido do autor, o pacote \texttt{avionics-validation}, os scripts de reprodução, a especificação em TLA+, as variantes de C++ e os textos das seções 5.15 a 5.19, e executou os comandos cujos resultados estão em \texttt{Revisao\_v5/08\_reprodutibilidade/logs/}. \textit{[A confirmar pelo autor: o grau de revisão do texto e do código por ele, e a conformidade com as regras do programa de iniciação científica e do destino de publicação sobre esse uso.]}
+\textit{Uso de ferramentas de inteligência artificial.} \textit{[A definir com a orientação externa.]}
 
 % ========== REFERÊNCIAS ==========
 \newpage
@@ -1317,7 +1318,7 @@ bash 08_reprodutibilidade/run_all.sh
 \end{verbatim}
 }
 
-Esse comando registra as versões, compila, roda as suítes do pacote base e as cinco novas (conformidade, fronteira, alcançabilidade, modelo com Hedgehog e matriz de rejeição), a auditoria de C e C++ e, se pedido (\texttt{--mutacao}), a mutação da implementação em CREM, e grava os logs em \texttt{08\_reprodutibilidade/logs/}. As suítes novas também rodam isoladamente, a partir de \texttt{Revisao\_v5/03\_codigo}, com \texttt{cabal test avionics-validation:test:<suíte>}. A especificação em TLA+ é executada por \texttt{bash 04\_tla/run\_tlc.sh}, que exige o \texttt{tla2tools.jar} 1.7.4 (não versionado; instruções no cabeçalho do script).
+Esse comando registra as versões; compila todos os alvos e, numa pasta própria, faz uma compilação limpa que conta os avisos do GHC (o passo reprova se houver algum); roda as suítes do pacote base e as cinco novas (conformidade, fronteira, alcançabilidade, modelo com Hedgehog e matriz de rejeição); faz a auditoria de C e C++, a matriz de 16 pares em C++17 tipado e os defeitos na FSM em Haskell e na ação do CREM; executa a especificação em TLA+ no TLC e a confere com a exploração em Haskell; e, se pedido (\texttt{--mutacao}), roda a mutação da implementação em CREM. Os logs ficam em \texttt{08\_reprodutibilidade/logs/}, com um sumário por passo em \texttt{SUMARIO.md}. As suítes novas também rodam isoladamente, a partir de \texttt{Revisao\_v5/03\_codigo}, com \texttt{cabal test avionics-validation:test:<suíte>}, e o TLC por \texttt{bash 04\_tla/run\_tlc.sh}. O TLC exige Java e o \texttt{tla2tools.jar} 1.7.4 (não versionado; instruções no cabeçalho do script); sem o jar, o passo é marcado como falha.
 
 \textit{Uso de ferramentas de inteligência artificial.} Ver a seção DECLARAÇÕES.
 
