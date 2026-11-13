@@ -27,7 +27,7 @@ Caminhos abaixo são relativos a `Revisao_v5/`; `logs/` = `08_reprodutibilidade/
 | 5, N1 | Preservar exaustividade com avisos promovidos a erro | `-Werror=incomplete-patterns`; mutante H5; `00_build_baseline.txt` (0 avisos) | **feito** |
 | 5, N1 | Matriz origem × destino (16 pares, 8 aceitos e 8 rejeitados); não confundir com estado × evento | `negative_matrix.sh` (esperado derivado da tabela); relatório 5.16 | **feito** |
 | 5, N1 | Testes que devem compilar e negativos que devem falhar, **conferindo a causa** | `logs/02_negative_matrix.md` (exatamente 1 erro, nomeando o par) | **feito** |
-| 5, N1 | Mutação capaz de acusar arestas ilegais, destinos incorretos e eventos trocados | `validation/scripts/mutation.sh` (H1–H8) | **feito** (ver `logs/06_mutation_haskell.md`) |
+| 5, N1 | Mutação capaz de acusar arestas ilegais, destinos incorretos e eventos trocados | `validation/scripts/mutation.sh` (H1–H9) | **feito** (ver `logs/06_mutation_haskell.md`) |
 | 5, N2 | Tabela de transições e políticas derivada dos requisitos, revisada pela orientação | `spec/transition_table.csv`, `power_table.csv`, `POLITICAS.md` | **em parte** (revisão pendente) |
 | 5, N2 | Versão compacta em TLA+ verificada no TLC | `04_tla/` (TLC 2.19; `logs/14_tlc_*.txt`; `cross_check.py`) | **feito** |
 | 5, N2 | Pressupostos de progresso explícitos (ticks futuros) | `AvionicsLoop.tla`: `WF` de `Step` e `Tick` | **feito** (na especificação) |

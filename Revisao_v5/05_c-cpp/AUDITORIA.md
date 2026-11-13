@@ -31,7 +31,7 @@ Resultados completos e reproduzíveis: `08_reprodutibilidade/logs/05_c_cpp_matri
 | M5/T5 estado confundido com evento | silêncio / silêncio / silêncio / detecta só por coincidência numérica | **recusa** (tipos distintos) | **recusa** | recusa (tipos) |
 | M6 valor fora da enumeração | silêncio / silêncio / silêncio / detecta | silêncio (`static_cast`) / **detecta** | não se aplica | recusa (tipos) |
 
-A coluna Haskell/CREM resume as seções 5.9 e 5.14 do relatório e os mutantes H1 a H8 de
+A coluna Haskell/CREM resume as seções 5.9 e 5.14 do relatório e os mutantes H1 a H9 de
 `08_reprodutibilidade/logs/06_mutation_haskell.md` (ver o relatório v5, seção 5.17).
 
 ## O que isto muda na conclusão comparativa
@@ -52,7 +52,10 @@ A coluna Haskell/CREM resume as seções 5.9 e 5.14 do relatório e os mutantes 
 6. **Custo da recusa em C++ tipado:** o erro de T3 tem 7 linhas, mas o de T1 (par omitido em `std::visit`) tem 236 linhas
    (cerca de 36 KB) de mensagens de gabarito. O erro do CREM para `InFlight -> Shutdown` tem 25 linhas (1,6 KB).
 
-## Proxy de legibilidade dos diagnósticos (tamanho, medido)
+## Proxy de legibilidade dos diagnósticos (tamanho, medido pelos scripts)
+
+Fonte: `08_reprodutibilidade/logs/05_c_cpp_matrix.md` (coluna "Diagnóstico em A") e `02_negative_matrix.md` (par `InFlight -> Shutdown`),
+refeitos a cada `run_all.sh`. Os bytes incluem o caminho dos arquivos compilados e mudam com a pasta do repositório; as linhas, não.
 
 | Diagnóstico | Linhas | Bytes |
 |---|---|---|
@@ -60,7 +63,7 @@ A coluna Haskell/CREM resume as seções 5.9 e 5.14 do relatório e os mutantes 
 | C++ `enum class`, M5 (tipos distintos) | 4 | 276 |
 | C++ tipado, T3 (`static_assert`, transição proibida) | 7 | 642 |
 | C++ tipado, T5 (evento como destino) | 25 | 2 388 |
-| Haskell/CREM, `InFlight -> Shutdown` (`Could not deduce AllowedTransition`) | 25 | 1 637 |
+| Haskell/CREM, `InFlight -> Shutdown` (`Could not deduce AllowedTransition`) | 25 | 1 636 |
 | C++ tipado, T1 (par omitido em `std::visit`) | 236 | 35 863 |
 
 Tamanho **não é** legibilidade: não houve leitura por terceiros nem tarefa de depuração cronometrada. É só um

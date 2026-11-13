@@ -1,11 +1,11 @@
-data: 2026-11-13 08:35:32
+data: 2026-11-13 13:08:59
 sistema: MINGW64_NT-10.0-26300 DESKTOP-823O3S4 3.6.9-b4195d69.x86_64 2026-06-06 17:49 UTC x86_64 Msys
 Microsoft Windows [versão 10.0.26300.9974]
 ghc: 9.6.7
 cabal: 3.12.1.0
 clang: clang version 14.0.6
 pdflatex: MiKTeX-pdfTeX 4.23 (MiKTeX 25.12)
-repositório de trabalho (IC), HEAD: 88e9d2f (a pasta Revisao_v5 pode estar não versionada)
+repositório de trabalho (IC), HEAD: c53befc (a pasta Revisao_v5 pode estar não versionada)
 instantâneo avionics-crem: ver 03_codigo/base/SNAPSHOT.md
 
 --- cabal.project.freeze (versões exatas das dependências) ---

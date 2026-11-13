@@ -19,7 +19,7 @@ diz o que **foi** feito e o que **não** foi para mitigá-lo.
 | **Autor único** escreveu código, tabelas, oráculo, TLA+ e as três implementações C/C++: um erro de interpretação pode estar em todos | tabela revisável com origem `REQ` (4 linhas) × `CONV` (12) × `MODEL` (9); oráculo guiado pela tabela; especificação em TLA+ (executada no TLC) | **revisão pela orientação pendente**; **não existe oráculo de terceiros**; revisor externo de C/C++ pendente |
 | A hipótese da abstração (o futuro depende só do terno de vértices) sustenta a alcançabilidade "para qualquer comprimento" | vale por construção de `closedLoop`; conferida em 8 421 cenários (`faithful`) | não provada formalmente; vale para esta implementação |
 | Mutantes são escolhidos por quem escreve os testes | classes escolhidas pelo parecer (aresta ilegal, destino errado, eventos trocados) mais omissão, saída, ambiente e energia | sem mutação sistemática (por exemplo, operador a operador) |
-| O shrinking do Hedgehog dá mínimo local | mínimo global obtido por busca em largura e registrado (7 contra 4 ticks) | — |
+| O shrinking do Hedgehog dá mínimo local | mínimo global obtido por busca em largura e registrado (4 ticks); com a semente fixa do log, o shrinking chegou a ele, mas em geral só garante mínimo local | — |
 | O TLA+ é do mesmo autor e o TLC verifica o modelo, não a implementação | executado no TLC 2.19; mesmos 26 ternos que o Haskell; conclusões iguais | erro de interpretação comum às três representações; revisão da orientação |
 | A implementação em CREM foi observada por um `Observe` que reconstrói a prova `AllowedTransition` | a suíte confere que observar não muda o comportamento (planta == `uavSystem`) | confiança na própria camada de observação |
 

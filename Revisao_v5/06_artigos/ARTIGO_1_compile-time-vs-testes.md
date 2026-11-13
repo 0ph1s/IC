@@ -46,9 +46,9 @@ de correção da composição. Perone e Karachalias (2023) introduziram o CREM; 
 | Evidência | Onde | Estado |
 |---|---|---|
 | Matriz de rejeição de 16 pares, causa conferida | `08_.../02_negative_matrix.md` | reproduzida (8/8/0) |
-| Mutação do CREM (H1–H8) | `08_.../06_mutation_haskell.md` | executada: 8 mutantes, 0 vivos (2 recusados na compilação: H4 e H5; 6 aceitos pelo compilador e mortos por teste) |
+| Mutação do CREM (H1–H9) | `08_.../06_mutation_haskell.md` | executada: 9 mutantes, 0 vivos (2 recusados na compilação: H4 e H5; 7 aceitos pelo compilador e mortos por teste, entre eles o curinga H9) |
 | Comparação C, C++ enum class, C++17 tipado | `08_.../05_c_cpp_matrix.md` | reproduzida e ampliada |
-| Tamanho dos diagnósticos | `05_c-cpp/AUDITORIA.md` | medido (proxy) |
+| Tamanho dos diagnósticos | `08_.../05_c_cpp_matrix.md` (coluna "Diagnóstico em A") e `08_.../02_negative_matrix.md` | medido pelos scripts (proxy) |
 
 ## O que falta antes de submeter
 

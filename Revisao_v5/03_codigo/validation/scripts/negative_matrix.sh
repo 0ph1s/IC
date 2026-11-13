@@ -62,7 +62,8 @@ HSEOF
     rows="$rows| $from | $to | $kind | $exp | $got | $ok |
 "
     if [ "$got" = rejeitado ]; then
-      errlines="$errlines- \`$from → $to\`: $(echo "$flat" | grep -Eo "Could not deduce .{0,160}$from $to'" | head -1 | sed 's/  */ /g')
+      # tamanho do diagnóstico (a Figura 2 do artigo do SCP usa InFlight -> Shutdown); os bytes incluem o caminho
+      errlines="$errlines- \`$from → $to\` ($(wc -l < "$log" | tr -d ' ') linhas, $(wc -c < "$log" | tr -d ' ') bytes): $(echo "$flat" | grep -Eo "Could not deduce .{0,160}$from $to'" | head -1 | sed 's/  */ /g')
 "
     fi
   done
@@ -81,6 +82,8 @@ done
   echo "Compilaram: $n_comp. Rejeitados: $n_rej. Divergências: $mismatch."
   echo
   echo "## Erro do GHC nos pares rejeitados (trecho)"
+  echo
+  echo "Entre parênteses, o tamanho da saída do GHC (\`wc -l\` / \`wc -c\`); os bytes incluem o caminho do módulo gerado."
   echo
   printf '%s' "$errlines"
 } > "$OUT"

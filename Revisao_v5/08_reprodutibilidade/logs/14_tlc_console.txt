@@ -1,0 +1,19 @@
+ok    OneSlot: código 13 (esperado 13)
+Progress(16) at 2026-11-13 13:23:46: 1.638 states generated, 1.143 distinct states found, 0 states left on queue.
+Error: Temporal properties were violated.
+1638 states generated, 1143 distinct states found, 0 states left on queue.
+ok    OneSlot_sem_cegueira: código 0 (esperado 0)
+Progress(16) at 2026-11-13 13:23:48: 1.638 states generated, 1.143 distinct states found, 0 states left on queue.
+Model checking completed. No error has been found.
+1638 states generated, 1143 distinct states found, 0 states left on queue.
+ok    Level: código 0 (esperado 0)
+Progress(17) at 2026-11-13 13:23:51: 1.638 states generated, 1.143 distinct states found, 0 states left on queue.
+Model checking completed. No error has been found.
+1638 states generated, 1143 distinct states found, 0 states left on queue.
+ok    dumpOneSlot: código 13 (esperado 13)
+Progress(16) at 2026-11-13 13:23:54: 1.638 states generated, 1.143 distinct states found, 0 states left on queue.
+Error: Temporal properties were violated.
+1638 states generated, 1143 distinct states found, 0 states left on queue.
+ternos com fila vazia: TLC = 26, Haskell = 26
+conjuntos iguais: True
+TLC: tudo como esperado

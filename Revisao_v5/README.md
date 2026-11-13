@@ -29,7 +29,7 @@ Nada foi commitado. Para voltar ao estado anterior basta apagar esta pasta.
   que reage ao nível os elimina. O menor cenário tem 3 ticks (`DRAIN, DRAIN, TAKEOFF`).
 * **Correção ao relatório v4:** com o alfabeto completo, o descarte do slot **não é inócuo** (a v4 só mediu o alfabeto reduzido).
 * **TLC (TLA+):** `OneSlot` viola `NoPermanentBlindness` e `Level` satisfaz tudo; o conjunto de estados com a fila vazia é idêntico ao do Haskell.
-* **Hedgehog:** 18 verificações; defeitos injetados detectados e reduzidos (1 a 7 ticks; o mínimo global do caso mais difícil é 4).
+* **Hedgehog:** 18 verificações; defeitos injetados detectados e reduzidos (1 a 4 ticks, com semente fixa; no caso da política, o shrinking chegou ao mínimo global de 4 ticks, que só a busca em largura garante).
 * **C/C++:** reproduzido; **o C++17 com tipos também recusa a transição proibida na compilação**, o que enfraquece qualquer alegação de
   exclusividade do Haskell. Nenhum compilador detecta o destino errado em aresta permitida.
 

@@ -4,8 +4,9 @@
  * `AllowedTransition` / `pureResult` do CREM, e existe para NÃO generalizar a conclusão de que
  * "só o Haskell detecta a transição proibida na compilação".
  *
- * Custo: ~25 linhas de gabarito (templates) além da função de transição, e mensagens de erro de
- * template. Não é uma recomendação de estilo; é uma verificação da fronteira da afirmação.
+ * Custo: cerca de 10 linhas além da função de transição (o traço `Allowed` com as 4 especializações e a
+ * função `go`), e mensagens de erro de template. Não é uma recomendação de estilo; é uma verificação da
+ * fronteira da afirmação.
  *
  * Imprime os 16 pares (estado, evento, destino) para ser conferido contra a tabela
  * 03_codigo/validation/spec/transition_table.csv por scripts/audit.sh.

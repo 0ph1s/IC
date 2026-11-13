@@ -13,8 +13,10 @@ Suítes: spec-tests e sim-tests (N=3) do pacote base; conformance, reach e model
 | H6 | SAÍDA errada (EmergencyLanding+LandedSignal emite MsgIgnored) | compila; **morto** | sim-tests (N=3), conformance, reach, model (Hedgehog) |
 | H7 | AMBIENTE: CriticalHeld libera LandedSignal em vez de CriticalBattery | compila; **morto** | sim-tests (N=3), reach, model (Hedgehog) |
 | H8 | ENERGIA: Low+Drain fica em Low (não desce a Critical) | compila; **morto** | sim-tests (N=3), conformance, reach, model (Hedgehog) |
+| H9 | CURINGA: Grounded+TakeoffSignal omitida e cláusula final avionicsAction s _ = pureResult MsgIgnored s (identidade) | compila; **morto** | spec-tests, sim-tests (N=3), conformance, reach, model (Hedgehog) |
 
-Mutantes avaliados: 8. Vivos: 0. (Um nono mutante, H9, o curinga de identidade, foi executado à parte: `06_mutation_h9.md`.)
+Mutantes avaliados: 9. Vivos: 0.
 
 Notas: um mutante recusado na compilação não precisa de teste (é o que se quer da tipagem e de `-Werror=incomplete-patterns`).
-Um mutante que compila e é morto só por teste mostra a fronteira da garantia dos tipos (H2, H3, H6, H7, H8: o compilador os aceita).
+Um mutante que compila e é morto só por teste mostra a fronteira da garantia dos tipos (H1, H2, H3, H6, H7, H8 e H9: o compilador os aceita).
+Cada expressão sed de um mutante é aplicada e conferida em separado: nenhum mutante roda meio aplicado.

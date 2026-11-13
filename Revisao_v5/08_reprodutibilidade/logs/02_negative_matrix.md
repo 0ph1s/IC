@@ -27,11 +27,13 @@ Compilaram: 8. Rejeitados: 8. Divergências: 0.
 
 ## Erro do GHC nos pares rejeitados (trecho)
 
-- `Grounded → EmergencyLanding`: Could not deduce `Crem.Topology.AllowedTransition (Crem.Topology.Topology '[]) Grounded EmergencyLanding'
-- `InFlight → Grounded`: Could not deduce `Crem.Topology.AllowedTransition (Crem.Topology.Topology '[]) InFlight Grounded'
-- `InFlight → Shutdown`: Could not deduce `Crem.Topology.AllowedTransition (Crem.Topology.Topology '[]) InFlight Shutdown'
-- `EmergencyLanding → InFlight`: Could not deduce `Crem.Topology.AllowedTransition (Crem.Topology.Topology '[]) EmergencyLanding InFlight'
-- `EmergencyLanding → Shutdown`: Could not deduce `Crem.Topology.AllowedTransition (Crem.Topology.Topology '[]) EmergencyLanding Shutdown'
-- `Shutdown → Grounded`: Could not deduce `Crem.Topology.AllowedTransition (Crem.Topology.Topology '[]) Shutdown Grounded'
-- `Shutdown → InFlight`: Could not deduce `Crem.Topology.AllowedTransition (Crem.Topology.Topology '[]) Shutdown InFlight'
-- `Shutdown → EmergencyLanding`: Could not deduce `Crem.Topology.AllowedTransition (Crem.Topology.Topology '[]) Shutdown EmergencyLanding'
+Entre parênteses, o tamanho da saída do GHC (`wc -l` / `wc -c`); os bytes incluem o caminho do módulo gerado.
+
+- `Grounded → EmergencyLanding` (25 linhas, 1709 bytes): Could not deduce `Crem.Topology.AllowedTransition (Crem.Topology.Topology '[]) Grounded EmergencyLanding'
+- `InFlight → Grounded` (25 linhas, 1637 bytes): Could not deduce `Crem.Topology.AllowedTransition (Crem.Topology.Topology '[]) InFlight Grounded'
+- `InFlight → Shutdown` (25 linhas, 1636 bytes): Could not deduce `Crem.Topology.AllowedTransition (Crem.Topology.Topology '[]) InFlight Shutdown'
+- `EmergencyLanding → InFlight` (26 linhas, 1773 bytes): Could not deduce `Crem.Topology.AllowedTransition (Crem.Topology.Topology '[]) EmergencyLanding InFlight'
+- `EmergencyLanding → Shutdown` (26 linhas, 1773 bytes): Could not deduce `Crem.Topology.AllowedTransition (Crem.Topology.Topology '[]) EmergencyLanding Shutdown'
+- `Shutdown → Grounded` (25 linhas, 1637 bytes): Could not deduce `Crem.Topology.AllowedTransition (Crem.Topology.Topology '[]) Shutdown Grounded'
+- `Shutdown → InFlight` (25 linhas, 1637 bytes): Could not deduce `Crem.Topology.AllowedTransition (Crem.Topology.Topology '[]) Shutdown InFlight'
+- `Shutdown → EmergencyLanding` (25 linhas, 1709 bytes): Could not deduce `Crem.Topology.AllowedTransition (Crem.Topology.Topology '[]) Shutdown EmergencyLanding'

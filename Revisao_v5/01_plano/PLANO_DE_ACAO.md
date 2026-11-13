@@ -6,7 +6,7 @@ evidência e o que **continua pendente**. Status honesto: só consta "feito" o q
 
 | # | Ação do parecer | Entregável exigido | Situação | Evidência | Pendência |
 |---|---|---|---|---|---|
-| 1 | Congelar a versão e reproduzir os experimentos atuais | Log de build, lista de testes positivos e negativos, versão do GHC e dependências | **feito** | instantâneo `9689ce8` com `MANIFEST.sha256`; `00_build_baseline.txt` (compilação sem avisos); `run_all.sh`; `cabal.project.freeze` | repetir em outra máquina |
+| 1 | Congelar a versão e reproduzir os experimentos atuais | Log de build, lista de testes positivos e negativos, versão do GHC e dependências | **feito** | instantâneo `9689ce8` com `MANIFEST.sha256`; `01_build_clean.txt` (compilação limpa, 0 avisos do GHC, refeita a cada `run_all.sh`); `run_all.sh`; `cabal.project.freeze` | repetir em outra máquina |
 | 2 | Revisar requisitos e separar o oráculo do código | Tabela de transições e propriedades **aprovada na orientação** | **em parte** | `spec/transition_table.csv` (16 linhas, `REQ`/`CONV`), `power_table.csv`, `POLITICAS.md`; oráculo `Validation.RefModel` guiado por elas; `07_conformance.txt` | **aprovação da orientação** (perguntas Q1 a Q9) |
 | 3 | Adotar QuickCheck State Machine ou Hedgehog | Geradores, casos mínimos e relatório de divergências | **feito com Hedgehog** | `03_model_hedgehog.txt` (18 verificações, mutantes reduzidos pelo shrinking, regressão prioritária) | QuickCheck State Machine não testado |
 | 4 | Criar especificação compacta em TLA+/TLC | Invariantes, estados alcançáveis e contraexemplos, se existirem | **feito** | `04_tla/AvionicsLoop.tla`; `logs/14_tlc_*.txt` (1 143 estados; `OneSlot` viola `NoPermanentBlindness` com contraexemplo; `Level` satisfaz tudo); conferência cruzada com `04_reach.txt`: mesmos 26 ternos | revisão da orientação sobre as propriedades |
@@ -17,10 +17,10 @@ evidência e o que **continua pendente**. Status honesto: só consta "feito" o q
 
 | Pedido | Feito |
 |---|---|
-| preservar testes de exaustividade com avisos promovidos a erro | já em `-Werror=incomplete-patterns`; reproduzido (compilação sem avisos) e testado por mutação (par omitido, H5) |
+| preservar testes de exaustividade com avisos promovidos a erro | já em `-Werror=incomplete-patterns`; reproduzido (compilação limpa sem avisos, `01_build_clean.txt`) e testado por mutação (par omitido, H5; curinga, H9) |
 | registrar testes que devem compilar e testes negativos que devem falhar, **conferindo a causa** | `negative_matrix.sh`: 8 compilam, 8 rejeitados, cada um com exatamente 1 erro `Could not deduce AllowedTransition ... <par>` |
 | não confundir a matriz origem × destino com a matriz estado × evento | explicado na seção 5.16 do relatório v5 |
-| manter mutação capaz de acusar arestas ilegais, destinos incorretos e eventos trocados | `mutation.sh` (H1 a H8) em cópia temporária; `06_mutation_haskell.md` |
+| manter mutação capaz de acusar arestas ilegais, destinos incorretos e eventos trocados | `mutation.sh` (H1 a H9) em cópia temporária; `06_mutation_haskell.md` |
 
 ## Pauta recomendada para a próxima reunião (parecer, seção 8)
 

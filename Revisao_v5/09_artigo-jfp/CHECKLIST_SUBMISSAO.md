@@ -19,7 +19,7 @@ para submissão**: faltam itens que só o autor ou a orientação podem resolver
 ## Sobreposição com o manuscrito do SCP (`10_artigo-scp/`)
 
 Os dois manuscritos compartilham a matriz de 16 pares do `crem`, a tabela da função de transição e a mutação da implementação em `crem`
-(aqui, 8 mutantes; no SCP, 9, resumida). Decidir **antes de enviar qualquer um**: enviar um primeiro e citá-lo, reduzir a Seção 4 deste
+(os mesmos 9 mutantes aqui e no SCP, onde vem resumida). Decidir **antes de enviar qualquer um**: enviar um primeiro e citá-lo, reduzir a Seção 4 deste
 manuscrito, ou declarar a sobreposição na carta ao editor de cada um. Ver `10_artigo-scp/CHECKLIST_SUBMISSAO.md`.
 
 ## Fortemente recomendados (afetam a aceitação)
@@ -51,7 +51,7 @@ manuscrito, ou declarar a sobreposição na carta ao editor de cada um. Ver `10_
 | títulos em *sentence case* | **sim** (conferido nas 29 seções e subseções) |
 | sem palavras-chave e sem classificação ACM | **sim** |
 | estilo de bibliografia `ACM-Reference-Format` | **sim** |
-| números do artigo conferidos com os logs de `08_reprodutibilidade/` | **sim** (26/48 ternos; 520 arestas; 8 mutantes; 1 143 estados no TLC; etc.) |
+| números do artigo conferidos com os logs de `08_reprodutibilidade/` | **sim** (26/48 ternos; 520 arestas; 9 mutantes; 1 143 estados no TLC; etc.) |
 | marcadores `[...]` em negrito no texto | **4 lugares** (e-mail, URL/DOI, declaração de IA, fomento) e 1 comentário `TODO` no fonte (ORCID); nada foi inventado |
 
 ## O que o artigo **não** afirma

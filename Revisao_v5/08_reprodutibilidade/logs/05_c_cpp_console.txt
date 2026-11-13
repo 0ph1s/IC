@@ -1,23 +1,23 @@
-c/M0           | A:silêncio   B:silêncio   W:silêncio S:silêncio | passa
-c/M1           | A:aviso(1)    B:aviso(1)    W:recusa    S:silêncio | passa
-c/M2           | A:silêncio   B:aviso(1)    W:recusa    S:silêncio | passa
-c/M3           | A:silêncio   B:silêncio   W:silêncio S:silêncio | detecta (1 par)
-c/M4           | A:silêncio   B:silêncio   W:silêncio S:silêncio | detecta (1 par)
-c/M5           | A:silêncio   B:silêncio   W:silêncio S:silêncio | detecta (3 par)
-c/M6           | A:silêncio   B:silêncio   W:silêncio S:silêncio | detecta (1 par)
-cpp/M0         | A:silêncio   B:silêncio   W:silêncio S:silêncio | passa
-cpp/M1         | A:aviso(1)    B:aviso(1)    W:recusa    S:silêncio | passa
-cpp/M2         | A:silêncio   B:aviso(1)    W:recusa    S:silêncio | passa
-cpp/M3         | A:silêncio   B:silêncio   W:silêncio S:silêncio | detecta (1 par)
-cpp/M4         | A:silêncio   B:silêncio   W:silêncio S:silêncio | detecta (1 par)
-cpp/M5         | A:recusa      B:recusa      W:recusa    S:recusa    | -
-cpp/M6         | A:silêncio   B:silêncio   W:silêncio S:silêncio | detecta (1 par)
-typed/T0        | A:silêncio   B:silêncio   W:silêncio S:silêncio | passa
-typed/T1        | A:recusa      B:recusa      W:recusa    S:recusa    | -
-typed/T2        | A:silêncio   B:silêncio   W:silêncio S:silêncio | passa
-typed/T3        | A:recusa      B:recusa      W:recusa    S:recusa    | -
-typed/T4        | A:silêncio   B:silêncio   W:silêncio S:silêncio | detecta (1 par)
-typed/T5        | A:recusa      B:recusa      W:recusa    S:recusa    | -
+c/M0           | A:silêncio   B:silêncio   W:silêncio S:silêncio | passa | diag A: -
+c/M1           | A:aviso(1)    B:aviso(1)    W:recusa    S:silêncio | passa | diag A: 4 / 217
+c/M2           | A:silêncio   B:aviso(1)    W:recusa    S:silêncio | passa | diag A: -
+c/M3           | A:silêncio   B:silêncio   W:silêncio S:silêncio | detecta (1 par) | diag A: -
+c/M4           | A:silêncio   B:silêncio   W:silêncio S:silêncio | detecta (1 par) | diag A: -
+c/M5           | A:silêncio   B:silêncio   W:silêncio S:silêncio | detecta (3 par) | diag A: -
+c/M6           | A:silêncio   B:silêncio   W:silêncio S:silêncio | detecta (1 par) | diag A: -
+cpp/M0         | A:silêncio   B:silêncio   W:silêncio S:silêncio | passa | diag A: -
+cpp/M1         | A:aviso(1)    B:aviso(1)    W:recusa    S:silêncio | passa | diag A: 4 / 221
+cpp/M2         | A:silêncio   B:aviso(1)    W:recusa    S:silêncio | passa | diag A: -
+cpp/M3         | A:silêncio   B:silêncio   W:silêncio S:silêncio | detecta (1 par) | diag A: -
+cpp/M4         | A:silêncio   B:silêncio   W:silêncio S:silêncio | detecta (1 par) | diag A: -
+cpp/M5         | A:recusa      B:recusa      W:recusa    S:recusa    | - | diag A: 4 / 276
+cpp/M6         | A:silêncio   B:silêncio   W:silêncio S:silêncio | detecta (1 par) | diag A: -
+typed/T0        | A:silêncio   B:silêncio   W:silêncio S:silêncio | passa | diag A: -
+typed/T1        | A:recusa      B:recusa      W:recusa    S:recusa    | - | diag A: 236 / 35863
+typed/T2        | A:silêncio   B:silêncio   W:silêncio S:silêncio | passa | diag A: -
+typed/T3        | A:recusa      B:recusa      W:recusa    S:recusa    | - | diag A: 7 / 642
+typed/T4        | A:silêncio   B:silêncio   W:silêncio S:silêncio | detecta (1 par) | diag A: -
+typed/T5        | A:recusa      B:recusa      W:recusa    S:recusa    | - | diag A: 25 / 2388
 
 matriz: /c/Users/Peterson/Documents/GitHub/IC/Revisao_v5/08_reprodutibilidade/logs/05_c_cpp_matrix.md
 versões sem defeito: sem aviso e iguais à tabela.

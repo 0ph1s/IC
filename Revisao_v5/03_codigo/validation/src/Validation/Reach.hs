@@ -214,18 +214,20 @@ productTS a b =
          in ((s', t'), (o, p))
     }
 
--- | Confere a hipótese da abstração num cenário: iterar `cremNext` dá os mesmos ternos (ao fim de
--- cada tick) e os mesmos passos que o simulador de cenários. Os números de tick são ignorados.
+-- | Confere a hipótese da abstração num cenário: iterar `cremNext` dá os mesmos passos que o
+-- simulador de cenários (os números de tick são ignorados), e o terno que a iteração carrega de um
+-- tick para o outro é o terno final do simulador.
 faithful :: Scenario -> Bool
-faithful sc = concat stepsPerTick == map zeroTick (cremSteps sc) && lastIs
+faithful sc = concat stepsPerTick == map zeroTick simSteps && sFinal == simFinal
   where
-    (_, stepsPerTick) = foldl' (\(s, acc) inp -> let (s', ss) = cremNext s inp in (s', acc ++ [ss])) (tsStart cremTS, []) sc
+    simSteps = cremSteps sc
+    (sFinal, stepsPerTick) = foldl' (\(s, acc) inp -> let (s', ss) = cremNext s inp in (s', acc ++ [ss])) (tsStart cremTS, []) sc
     zeroTick x = x {ssTick = 0}
-    -- o terno final, lido do último passo do simulador, é o terno final da iteração
-    lastIs = case (reverse (concat stepsPerTick), reverse (cremSteps sc)) of
-      (a : _, b : _) -> a {ssTick = 0} == b {ssTick = 0}
-      ([], []) -> True
-      _ -> False
+    -- terno lido do último passo do simulador (a ordem de `AvState` e de `Pw` é a de `avVs` e `pwVs`)
+    simFinal = case reverse simSteps of
+      s : _ -> AbsState (fromEnum (ssAv s)) (fromEnum (ssPw s)) (maybe (-1) id (lookup (ssMission s) msByName))
+      [] -> tsStart cremTS
+    msByName = [(show v, msIdx v) | v <- msVs]
 
 -- ----------------------------------------------------------------------------
 -- Propriedades sobre o grafo

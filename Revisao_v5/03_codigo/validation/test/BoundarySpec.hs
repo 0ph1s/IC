@@ -19,6 +19,7 @@ import Avionics.Sim.Scenario (TickInput (..), idle)
 import Avionics.Sim.Trace (finalAvVertex, finalPowVertex, significantOutputs)
 import Control.Exception (SomeException, evaluate, try)
 import Control.Monad (unless)
+import Data.List (nub)
 import System.Exit (exitFailure)
 import System.IO (hSetEncoding, stdout, utf8)
 import Validation.Boundary
@@ -67,7 +68,7 @@ main = do
     sequence
       [ check "decodeEvent . encodeEvent == Right nos 4 eventos de comando" (all (\e -> decodeEvent (encodeEvent e) == Right e) allEvents)
       , check "decodePowerEvent . encodePowerEvent == Right nos 3 eventos de energia" (all (\e -> decodePowerEvent (encodePowerEvent e) == Right e) allPower)
-      , check "os 4 tokens de comando são distintos (a codificação é injetiva)" (length (nubOrd (map encodeEvent allEvents)) == 4)
+      , check "os 4 tokens de comando são distintos (a codificação é injetiva)" (length (nub (map encodeEvent allEvents)) == 4)
       , check "exemplo do parecer: TAKEOFF -> TakeoffSignal, CRITICAL -> CriticalBattery, LANDED -> LandedSignal, CUTOFF -> SystemCutoff"
           (map decodeEvent ["TAKEOFF", "CRITICAL", "LANDED", "CUTOFF"] == map Right [TakeoffSignal, CriticalBattery, LandedSignal, SystemCutoff])
       , check "evento desconhecido vira Left (UnknownToken), como no exemplo do parecer" (decodeEvent "EXPLODE" == Left (UnknownToken "EXPLODE"))
@@ -113,6 +114,3 @@ main = do
       failed = length (filter not results)
   putStrLn ("\n" ++ show (length results) ++ " verificações, " ++ show failed ++ " falhas.")
   unless (failed == 0) exitFailure
-  where
-    nubOrd :: Eq a => [a] -> [a]
-    nubOrd = foldr (\x acc -> x : filter (/= x) acc) []

@@ -91,7 +91,10 @@ main = do
   putStrLn "\n=== 4. Composição e terminação: a realimentação para dentro de cada tick? ==="
   s4 <-
     sequence
-      [ check ("a exploração fechou: todas as " ++ show (nStates gC * length allTickInputs) ++ " combinações (estado, tick) terminaram; no máximo " ++ show (maxCascade gC) ++ " passos por tick") (maxCascade gC > 0)
+      -- A terminação em si é mostrada pela exploração ter fechado (uma realimentação sem fim travaria o
+      -- programa, não devolveria False). O que se CONFERE aqui é o limite: Beat + até duas liberações do
+      -- ambiente (TouchdownHeld libera ShedLoad e LandedSignal) + comando + energia = 5 passos.
+      [ check ("a exploração fechou (" ++ show (nStates gC * length allTickInputs) ++ " combinações (estado, tick)) e nenhum tick passa de 5 passos (máximo observado: " ++ show (maxCascade gC) ++ ")") (maxCascade gC <= 5)
       , check "limite de passos por tick igual no oráculo OneSlot" (maxCascade gC == maxCascade gOne)
       ]
   putStrLn "\n=== 5. Política da bateria: reação à BORDA (OneSlot) versus ao NÍVEL (Level) ==="
@@ -112,7 +115,7 @@ main = do
   s5 <-
     sequence
       [ check "[regressão do achado] OneSlot: existe ao menos um estado preso (a lacuna borda x nível do relatório v4 se reproduz)" (not (null trappedC))
-      , check "OneSlot: o oráculo e a implementação concordam sobre quantos estados presos existem" (length trappedC == length trappedOne)
+      , check "OneSlot: o oráculo e a implementação têm os MESMOS estados presos" (sort trappedC == sort (map absOfRef trappedOne))
       , check "Level elimina a lacuna: nenhum estado preso, para TODAS as sequências (não só até N = 8)" (null trappedL)
       , check "[regressão do achado] OneSlot viola NoPermanentBlindness (existe caminho infinito sempre cego) — o que o TLC deve mostrar com Policy = OneSlot" (not (null foreverC))
       , check "Level satisfaz NoPermanentBlindness: nenhum caminho infinito, com quaisquer entradas, fica cego para sempre — o que o TLC deve confirmar com Policy = Level" (null foreverL)
