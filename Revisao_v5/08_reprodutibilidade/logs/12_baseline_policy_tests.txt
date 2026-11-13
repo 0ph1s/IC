@@ -1,0 +1,21 @@
+Build profile: -w ghc-9.6.7 -O1
+In order, the following will be built (use -v for more details):
+ - avionics-crem-0.1.0.0 (test:avionics-policy-tests) (ephemeral targets)
+Preprocessing test suite 'avionics-policy-tests' for avionics-crem-0.1.0.0...
+Building test suite 'avionics-policy-tests' for avionics-crem-0.1.0.0...
+Running 1 test suites...
+Test suite avionics-policy-tests: RUNNING...
+=== Modelo de referência e políticas do ambiente (N = 8, 87381 cenários) ===
+  [ok]    modelo de referência (sem CREM, política OneSlot) == simulador do CREM: vértices a cada tick e saídas
+  [achado] cenários em que Queue e OneSlot diferem em algum tick (vértices; as saídas relevantes coincidem nos demais): 0 de 87381
+  [achado] estado final (aviônica, energia) diferente entre Queue e OneSlot: 0 de 87381
+  [achado] estado final diferente entre Level e OneSlot: 5841 de 87381
+           menor exemplo: ["Drain","Drain","TakeoffSignal","idle"]
+  [achado] cenários que terminam com bateria Critical, aviônica em voo e 2 ticks ociosos:
+           OneSlot: 172
+           Queue: 172
+           Level: 0
+Test suite avionics-policy-tests: PASS
+Test suite logged to:
+C:\Users\Peterson\Documents\GitHub\IC\Revisao_v5\03_codigo\dist-newstyle\build\x86_64-windows\ghc-9.6.7\avionics-crem-0.1.0.0\t\avionics-policy-tests\test\avionics-crem-0.1.0.0-avionics-policy-tests.log
+1 of 1 test suites (1 of 1 test cases) passed.

@@ -1,0 +1,13 @@
+-- Projeto cabal da Revisao_v5.
+--   base/avionics-crem : instantaneo CONGELADO (commit 9689ce8, etiqueta v0.2.0-pic-parcial + README) do
+--                        repositorio avionics-crem. Nenhum arquivo dele foi alterado.
+--   validation         : pacote novo (adaptador de fronteira, tabela, oraculo, Hedgehog, alcancabilidade).
+packages:
+  base/avionics-crem
+  validation
+
+-- Suites de teste sempre habilitadas, para o cabal nao reconfigurar a cada comando.
+-- ATENCAO: por isso `cabal build all` e `cabal test` SEM alvo tentam construir
+-- `invalid-inflight-shutdown`, que NAO compila de proposito. Use sempre alvos explicitos
+-- (ver 08_reprodutibilidade/run_all.sh).
+tests: True

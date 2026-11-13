@@ -1,0 +1,38 @@
+Build profile: -w ghc-9.6.7 -O1
+In order, the following will be built (use -v for more details):
+ - avionics-crem-0.1.0.0 (test:avionics-spec-tests) (ephemeral targets)
+Preprocessing test suite 'avionics-spec-tests' for avionics-crem-0.1.0.0...
+Building test suite 'avionics-spec-tests' for avionics-crem-0.1.0.0...
+Running 1 test suites...
+Test suite avionics-spec-tests: RUNNING...
+=== Especificação lida ===
+  [ok]    a especificação tem as 4 arestas permitidas do texto
+  [ok]    a especificação proíbe explicitamente InFlight -> Shutdown
+  [ok]    nenhuma aresta é ao mesmo tempo permitida e proibida
+  [ok]    todo vértice da especificação existe no tipo de vértices
+
+=== (A) topologia do CREM x especificação ===
+  [ok]    arestas da topologia == arestas permitidas pela especificação
+  [ok]    pares proibidos por omissão: 8 de 16 (esperado 8)
+  [ok]    InFlight -> Shutdown está entre os proibidos e fora da topologia
+  [ok]    toda proibição explícita da especificação está entre os proibidos
+
+=== (B) FSM ingênua x especificação (16 pares estado x evento) ===
+  [ok]    toda mudança de estado da `transition` é permitida pela especificação
+  [ok]    nenhuma aresta permitida fica sem um evento que a realize (sem aresta morta)
+  [ok]    nenhuma transição proibida é realizada por algum evento
+
+=== (C) ação do CREM x ingênua e x especificação ===
+  [ok]    destino da `avionicsAction` == destino da `transition` nos 16 pares
+  [ok]    todo destino da `avionicsAction` é aresta permitida ou identidade
+
+=== (D) evento -> aresta, conforme o texto dos requisitos ===
+  [ok]    ingênua: cada evento do texto leva exatamente ao destino da especificação
+  [ok]    CREM: cada evento do texto leva exatamente ao destino da especificação
+  [ok]    convenção do projeto (não está nos requisitos): pares sem regra não mudam o estado (ingênua e CREM)
+
+16 verificações, 0 falhas.
+Test suite avionics-spec-tests: PASS
+Test suite logged to:
+C:\Users\Peterson\Documents\GitHub\IC\Revisao_v5\03_codigo\dist-newstyle\build\x86_64-windows\ghc-9.6.7\avionics-crem-0.1.0.0\t\avionics-spec-tests\test\avionics-crem-0.1.0.0-avionics-spec-tests.log
+1 of 1 test suites (1 of 1 test cases) passed.

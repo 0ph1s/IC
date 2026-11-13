@@ -1,0 +1,1322 @@
+\documentclass[12pt,a4paper]{article}
+
+% Pacotes essenciais
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{times}
+\usepackage{graphicx}
+\usepackage{indentfirst}
+\usepackage{setspace}
+\usepackage{geometry}
+\usepackage{titlesec}
+\usepackage{tocloft}
+\usepackage[hidelinks]{hyperref}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,fit,backgrounds}
+
+% Configuração das margens (ABNT)
+\geometry{
+    left=3cm,
+    right=2cm,
+    top=3cm,
+    bottom=2cm
+}
+
+% Espaçamento entre linhas
+\onehalfspacing
+\sloppy
+\emergencystretch=5em
+
+% Configuração de seções
+\titleformat{\section}{\normalfont\normalsize\bfseries\MakeUppercase}{\thesection}{1em}{}
+\titleformat{\subsection}{\normalfont\normalsize\bfseries}{\thesubsection}{1em}{}
+\titleformat{\subsubsection}{\normalfont\normalsize}{\thesubsubsection}{1em}{}
+
+% Configuração do sumário
+\renewcommand{\cftsecfont}{\normalfont}
+\renewcommand{\cftsecpagefont}{\normalfont}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+
+% Comandos personalizados
+\newcommand{\nomealuno}{PETERSON CARARA JUNIOR}
+\newcommand{\titulo}{Formalização de Máquinas de Estados Finitos Componíveis em Haskell}
+\newcommand{\subtitulo}{Segurança de Tipos e Completude Funcional com Tipos Algébricos, State Monad e a Biblioteca CREM}
+\newcommand{\curso}{Curso Superior de Tecnologia em Ciência de Dados}
+\newcommand{\orientador}{Prof. Felipe Canarozzo Lourenço}
+\newcommand{\cidade}{Santos - SP}
+\newcommand{\ano}{2025}
+
+\begin{document}
+
+% ========== CAPA ==========
+\begin{titlepage}
+    \begin{center}
+        \MakeUppercase{\textbf{Centro Estadual de Educação Tecnológica Paula Souza}}\\
+        \MakeUppercase{\textbf{Faculdade de Tecnologia da Baixada Santista ``Rubens Lara''}}\\
+        \MakeUppercase{\textbf{\curso}}\\
+        \MakeUppercase{\textbf{Programa de Iniciação Científica}}
+        
+        \vspace{6cm}
+        
+        \MakeUppercase{\textbf{\nomealuno}}
+        
+        \vspace{4cm}
+        
+        \MakeUppercase{\textbf{\titulo: \subtitulo}}
+        
+        \vfill
+        
+        \cidade\\
+        \ano
+    \end{center}
+\end{titlepage}
+
+% ========== FOLHA DE ROSTO ==========
+\begin{titlepage}
+    \begin{center}
+        \MakeUppercase{\textbf{\nomealuno}}
+        
+        \vspace{6cm}
+        
+        \MakeUppercase{\textbf{\titulo: \subtitulo}}
+        
+        \vspace{3cm}
+        
+        \begin{flushright}
+            \begin{minipage}{8cm}
+                \begin{spacing}{1.0}
+                    Projeto de pesquisa apresentado à Faculdade de Tecnologia da Baixada Santista ``Rubens Lara'', do \curso, no Programa de Iniciação Científica.
+                    
+                    \vspace{0.5cm}
+                    
+                    Orientador: \orientador
+                \end{spacing}
+            \end{minipage}
+        \end{flushright}
+        
+        \vfill
+        
+        \cidade\\
+        \ano
+    \end{center}
+\end{titlepage}
+
+% ========== LISTA DE ABREVIATURAS ==========
+\newpage
+\section*{LISTA DE ABREVIATURAS E SIGLAS}
+\addcontentsline{toc}{section}{LISTA DE ABREVIATURAS E SIGLAS}
+
+\begin{tabular}{ll}
+ABNT & Associação Brasileira de Normas Técnicas\\
+ADT & Algebraic Data Type (Tipo de Dados Algébrico)\\
+CREM & Crème de la Crem: Composable Representable Executable Machines\\
+DDD & Domain-Driven Design\\
+DFSM & Deterministic Finite State Machine\\
+FATEC BS & Faculdade de Tecnologia da Baixada Santista Rubens Lara\\
+FSM & Finite State Machine (Máquina de Estados Finitos)\\
+I/O & Input/Output\\
+PBT & Property-Based Testing (teste baseado em propriedades)\\
+PFP & Programação Funcional Pura\\
+PP & Pergunta de pesquisa\\
+TLA+/TLC & Linguagem de especificação TLA+ e seu verificador de modelos\\
+\end{tabular}
+
+% ========== NOTA SOBRE A VERSÃO ==========
+\newpage
+\section*{NOTA SOBRE ESTA VERSÃO (rascunho; remover antes da entrega)}
+\addcontentsline{toc}{section}{NOTA SOBRE ESTA VERSÃO}
+
+Esta é a versão 5 do relatório parcial, preparada em 13 de novembro de 2026 a partir de duas orientações: o parecer técnico de 3 de novembro de 2026 (validação de máquinas de estados finitos componíveis em Haskell) e o documento de adequação para publicação científica de 7 de novembro de 2026. A versão 4 não foi alterada; todas as mudanças estão na pasta \texttt{Revisao\_v5/} do repositório de trabalho.
+
+\textit{O que mudou.} (i) O enquadramento: o trabalho passa a ser descrito como estudo de garantias estáticas e de validação, com o veículo aéreo apenas como domínio de exemplo, e a pergunta de pesquisa é reformulada (seção~\ref{sec:rq}). (ii) Cinco subseções novas na seção 5: fronteira de integração tipada (5.15), arquitetura de validação em três níveis (5.16), resultados (5.17), auditoria da comparação com C e C++ (5.18) e ameaças à validade (5.19); as antigas 5.15 e 5.16 passam a 5.20 e 5.21. (iii) Uma correção sinalizada na seção 5.13: o descarte do slot não é inócuo com o alfabeto completo (ver 5.17). (iv) O plano de ampliação do estado da arte (seção 4). (v) A declaração de uso de ferramentas de inteligência artificial e o apêndice de reprodução. O texto das seções 1 a 3 e 5.1 a 5.14 é o da versão 4, com os acréscimos citados.
+
+\textit{O que está pendente.} A revisão da tabela de transições e das políticas pela orientação; a revisão externa das implementações em C e C++; a busca sistemática de literatura; outras topologias e escalas; a confirmação, pelo autor, das declarações.
+
+% ========== RESUMO ==========
+\newpage
+\section*{RESUMO}
+\addcontentsline{toc}{section}{RESUMO}
+
+Este relatório parcial estuda o que as garantias estáticas de transição da biblioteca CREM asseguram em máquinas de estados finitos componíveis em Haskell, e quais técnicas complementares são necessárias para verificar o comportamento. A máquina de aviônica de um veículo aéreo não tripulado (UAV) é um domínio de exemplo, sem requisitos reais de segurança de voo; o objeto de validação é o comportamento discreto das máquinas e de suas composições, e não a dinâmica de um veículo. Os resultados são os seguintes. A completude da função de transição é verificada pelo compilador como aviso, que o projeto promove a erro. Uma transição fora da topologia do CREM é rejeitada em compilação, o que foi testado nos 16 pares de vértices (8 compilam e 8 são rejeitados, com a causa do erro conferida). A garantia é por aresta: o compilador aceita destino errado em aresta permitida e eventos trocados. As leis de Functor, Applicative e mônada foram demonstradas para a State Monad do projeto. A composição foi realizada com \texttt{Basic}, \texttt{Sequential}, \texttt{Parallel}, \texttt{Alternative} e \texttt{Feedback}, e simulada em malha aberta e fechada. A validação segue três níveis: verificação estática; especificação independente do código (tabelas revisáveis, oráculo guiado por elas e uma especificação em TLA+ verificada no TLC); e testes baseados em modelo com Hedgehog. A exploração exaustiva do grafo de estados do laço fechado (26 de 48 ternos alcançáveis) mostrou, para sequências de qualquer comprimento e sob uma hipótese declarada, que a implementação em CREM é equivalente ao oráculo e que o ambiente reage à entrada da bateria em nível crítico, e não ao nível: há estados alcançáveis em que a aviônica fica em voo com a bateria crítica sem saída, e uma política que reage ao nível os elimina no modelo. O TLC, sobre uma especificação em TLA+ escrita a partir das tabelas, confirma os dois resultados. Uma comparação com C, C++ e C++17 com tipos indica que um teste exaustivo detecta, em domínio finito, os mesmos defeitos que o sistema de tipos; que o C++17 com tipos também recusa a transição proibida em compilação; e que nenhum compilador detecta o destino errado em aresta permitida. A vantagem observada do CREM é antecipar certos diagnósticos. A especificação e o oráculo foram escritos pelo mesmo autor e ainda não foram revisados por terceiros.
+
+\vspace{0.5cm}
+\noindent\textbf{Palavras-chave:} máquinas de estados finitos; Haskell; tipos algébricos; mônadas; CREM; verificação; testes baseados em propriedades.
+
+
+% ========== SUMÁRIO ==========
+\newpage
+\tableofcontents
+
+% ========== CORPO DO TEXTO ==========
+\newpage
+\section{INTRODUÇÃO}
+
+As Máquinas de Estados Finitos (FSMs) constituem uma das abstrações mais duradouras e essenciais da Ciência da Computação. Elas fornecem o formalismo matemático rigoroso para a modelagem de sistemas cujo comportamento é estritamente determinado por um conjunto discreto de estados e regras de transição. O modelo é crucial para a especificação do comportamento de sistemas reativos, abrangendo desde protocolos de rede até a lógica de domínio em arquiteturas de software complexas. Conforme Perone e Karachalias (2023), é possível construir arquiteturas de software a partir da composição de máquinas de estados.
+
+No entanto, a tradução desse modelo abstrato para linguagens de programação de propósito geral do paradigma imperativo, como C++, é frequentemente marcada pela dependência de variáveis mutáveis, tipicamente campos de classe ou variáveis globais, para armazenar o estado atual. Essa prática compromete a pureza do modelo matemático. Segundo Malakhovski e Shalyto (2009), a implementação em linguagens imperativas não permite a aplicação direta dos métodos tradicionais de FSMs em um ambiente funcional. A dependência da mutabilidade e de tipos fracos para o estado expõe o sistema a erros lógicos e transições inválidas, delegando a responsabilidade de verificar a corretude à fase de testes em tempo de execução.
+
+O presente projeto de pesquisa propõe resolver essa discrepância fundamental através da formalização e implementação de FSMs em Haskell. Por ser uma linguagem puramente funcional (Hutton, 2016), Haskell exige que a função de transição seja implementada como uma função pura. O diferencial reside no seu sistema de tipos avançado: a utilização de Tipos de Dados Algébricos (ADTs) é essencial para a modelagem de dados (Milewski, 2020), permitindo que os conjuntos finitos de estados e eventos sejam mapeados diretamente para tipos de dados. Essa correspondência de tipo não é apenas uma convenção, mas uma imposição que, por meio da verificação de exaustividade do \textit{pattern matching}, viabiliza a verificação da correção das funções de transição no estágio de compilação (Malakhovski \& Shalyto, 2009).
+
+Além da segurança de tipos básica, a abordagem em Haskell permite a exploração de conceitos avançados para o tratamento do estado. A capacidade de sequenciar transições e lidar com o estado de forma pura é resolvida através de mônadas. Essa abstração, que expressa de forma concisa programas que manipulam estado (Wadler, 1992), permite o tratamento puro do estado através de estruturas como a \texttt{State Monad} (Milewski, 2020). Esse arcabouço monádico, estruturado pela Categoria Kleisli (Maia, 2022), fornece o formalismo necessário para a composição segura de transições.
+
+A capacidade de composabilidade é o ponto culminante desta abordagem. O \textit{framework} Crem (Crème de la Crem: Composable Representable Executable Machines), desenvolvido por Perone e Karachalias (2023), ilustra como os \textit{advanced type-level features} de Haskell podem ser usados para especificar transições de estado permitidas e proibidas. Essa especificação transforma as regras de domínio em propriedades intrínsecas ao tipo de dados, permitindo a composição de máquinas de estados independentes (Perone e Karachalias, 2023), resultando em um sistema robusto e modular, onde as transições fora da topologia declarada são rejeitadas pelo compilador antes da execução.
+
+\textit{Enquadramento.} Este trabalho é um estudo das garantias estáticas de transição e da validação de máquinas de estados finitos componíveis, e não um trabalho sobre aeronaves não tripuladas: o veículo aéreo é um domínio de exemplo, sem requisitos reais de segurança de voo, e o objeto de validação é o comportamento discreto das máquinas e de suas composições. A contribuição não é um novo sistema de tipos, uma nova semântica formal nem uma prova geral de correção da composição; Perone e Karachalias (2023) introduziram o CREM, e o que este projeto acrescenta está delimitado na seção~\ref{sec:contrib}.
+
+\subsection{PROBLEMA DE PESQUISA}
+
+Considerando o descompasso entre a formalidade matemática das FSMs e a fragilidade de tipos nas implementações tradicionais (Malakhovski \& Shalyto, 2009), o problema de pesquisa é formulado como:
+
+\begin{quote}
+   De que forma a linguagem de programação funcional pura Haskell, explorando seu sistema de tipos avançados (Tipos de Dados Algébricos) e suas abstrações de ordem superior (mônadas e Categoria Kleisli), pode ser utilizada para obter uma formalização de Máquinas de Estados Finitos que ofereça garantias verificáveis de correção (\textit{type safety}) e completude (\textit{completeness}) na especificação das funções de transição, e que suporte a composição de  FSMs complexas  de maneira modular e representável? 
+\end{quote}
+
+\subsection{PERGUNTAS DE PESQUISA (REFORMULAÇÃO NA VERSÃO 5)}
+\label{sec:rq}
+
+O problema de pesquisa acima é o da proposta aprovada. A análise do parecer técnico de 3 de novembro de 2026 e do documento de 7 de novembro de 2026 indicou que a contribuição mais promissora não é a simples implementação de uma FSM em CREM, mas a investigação dos limites de suas garantias locais diante de comportamentos globais da composição. Por isso a pergunta é reformulada, sem substituir o problema aprovado:
+
+\begin{quote}
+   Em que medida as garantias estáticas de transição oferecidas pelo CREM asseguram propriedades globais de máquinas de estados componíveis, e quais técnicas complementares são necessárias para verificar o comportamento?
+\end{quote}
+
+Essa formulação desloca o foco de ``o compilador aceita ou rejeita uma aresta?'' para ``quais propriedades são garantidas pela tipagem, quais exigem contratos de evento--destino e quais dependem de verificação temporal?''. Ela se desdobra em quatro perguntas:
+
+\begin{itemize}
+\item \textbf{PP1.} Que defeitos de uma FSM são recusados na compilação em CREM (garantia por aresta), e quais passam pelo compilador? (seções 5.9, 5.12 e 5.17)
+\item \textbf{PP2.} Que propriedades dependem de um contrato entre evento e destino, e como verificá-lo? (seções 5.12 e 5.16)
+\item \textbf{PP3.} Que propriedades da composição em malha fechada exigem verificação temporal ou de alcançabilidade, e o que a tipagem por aresta diz sobre elas? (seção 5.17)
+\item \textbf{PP4.} O que a antecipação do diagnóstico para a compilação acrescenta ao que testes exaustivos, ferramentas estáticas e outras construções de tipos (C e C++) detectam? (seções 5.14 e 5.18)
+\end{itemize}
+
+Hipóteses falsificáveis associadas. \textbf{H-A:} a tipagem por aresta recusa toda transição fora da topologia, mas aceita destino errado em aresta permitida e eventos trocados. \textbf{H-B:} a tipagem por aresta não implica propriedades globais da composição; uma propriedade como ``o sistema não fica cego para sempre à bateria crítica'' pode ser violada com todas as arestas corretas. \textbf{H-C:} o grafo de estados do laço fechado é finito e pequeno, de modo que a exploração exaustiva verifica as propriedades para sequências de qualquer comprimento, sob a hipótese de que o estado entre ticks é o terno de vértices. O estado de cada hipótese está na seção 5.21.
+
+\subsection{JUSTIFICATIVA DO TEMA}
+
+A relevância do projeto reside em transferir a verificação da corretude da FSM da fase de testes para a fase de compilação. Segundo Malakhovski e Shalyto (2009), uma das vantagens da implementação funcional é a verificação da correção do código das funções de transição já no estágio de compilação, o que é possível pelo uso de Tipos de Dados Algébricos (ADTs) para representar eventos e estados.
+
+Além disso, a estrutura de Haskell é baseada na Teoria das Categorias (Milewski, 2020). Essa base formal permite lidar com o estado de forma pura através de mônadas, que foram originalmente desenvolvidas por teóricos de categorias para expressar concisamente certos aspectos da álgebra universal (Wadler, 1992). Formalmente, uma mônada é definida como um Monóide na Categoria dos Endofuntores (Jahn, 2020) e permite a mudança de estado de forma pura (Milewski, 2020). Essas estruturas possibilitam a composição segura de transições via a Categoria Kleisli (Maia, 2022; Jahn, 2020). Essa composabilidade é crucial, pois permite a construção de arquiteturas de software a partir da composição de máquinas de estados independentes (Perone e Karachalias, 2023), o que contribui para a modularidade e a coerência do domínio do \textit{software}.
+
+\subsubsection{Hipóteses}
+Hipótese de completude funcional: o uso de tipos de dados algébricos e de casamento de padrões exaustivo permite verificar, em compilação, que a função de transição cobre todas as combinações de (Estado $\times$ Evento); o compilador emite um aviso, que o projeto promove a erro. Hipótese de rejeição antecipada: com a topologia promovida ao nível dos tipos (CREM), uma transição fora da topologia é rejeitada em compilação. A vantagem esperada, em comparação com a abordagem imperativa, é antecipar a detecção do defeito e dispensar código de teste; ela será avaliada comparando o que um compilador e um teste exaustivo detectam (seção 5.14). Hipótese de composabilidade e modulação: a composição de máquinas com os construtores do CREM, apoiada em abstrações como as mônadas, permite criar máquinas de estados finitos componíveis de forma puramente funcional, em que cada máquina conserva a garantia de suas transições (Perone e Karachalias, 2023).
+
+\subsubsection{Objetivo Geral}
+O objetivo geral desta Iniciação Científica é formalizar e implementar Máquinas de Estados Finitos Determinísticas (DFSMs) em Haskell, explorando o sistema de tipagem avançado e as estruturas funcionais da linguagem para garantir a segurança e a completude na definição das funções de transição, com ênfase na demonstração de um modelo que suporte a composição de sistemas.
+
+\subsubsection{Objetivos Específicos}
+
+Para alcançar o objetivo geral de formalizar e implementar FSMs de forma segura e componível em Haskell, o projeto se desdobra nos seguintes objetivos específicos. O texto conserva a redação da proposta aprovada, no tempo verbal da época; ao fim de cada objetivo, a frase ``Situação'' registra o que foi feito até agora.
+
+O primeiro objetivo visa o alicerce do projeto: definir modelos de dados em Haskell que traduzam com precisão os elementos formais de uma FSM. Esta formalização será realizada através da criação de Tipos de Dados Algébricos (ADTs), nos quais os conjuntos finitos de Estados ($Q$) e Eventos ($\Sigma$) serão mapeados diretamente para Tipos Soma. Essa técnica visa incorporar o rigor do modelo matemático ao código, seguindo o princípio de que ADTs são o conceito mais importante na modelagem funcional (Milewski, 2020). Situação: cumprido (seção 5.1).
+
+O segundo objetivo trata da validação da lógica interna da máquina: implementar o mecanismo de processamento de sequências de entrada e a função de transição ($\delta$). Serão exploradas as funções de alta ordem e, sobretudo, o \textit{pattern matching} exaustivo para definir a função $\delta: \text{Estado} \times \text{Evento} \to \text{Estado}$. Essa abordagem é fundamental para atingir a Hipótese de Completude Funcional, pois o compilador de Haskell verifica a exaustividade (como aviso, que o projeto promove a erro de compilação), de modo que todo par $(\text{Estado}, \text{Evento})$ seja tratado, transferindo a verificação da correção do código das funções de transição para o estágio de compilação (Malakhovski \& Shalyto, 2009). Situação: cumprido, com a ressalva de que o compilador emite aviso, e o projeto o promove a erro (seções 5.2 e 5.12).
+
+Em seguida, o terceiro objetivo foca na gestão do estado e na composabilidade: explorar a aplicação do \textit{State Monad} e da Categoria Kleisli. Será demonstrado como a \texttt{State Monad} permite gerenciar a sequência de mudanças de estado de forma pura, encapsulando o estado e garantindo a mudança de estado de forma pura (Milewski, 2020). Esta etapa é crítica para lidar com o histórico de transições. Além disso, a Categoria Kleisli será utilizada como base teórica para compor transições monádicas, fornecendo o formalismo para encadear logicamente as transições de estado, como sugerido por Milewski (2020) e Maia (2022). Situação: cumprido para a State Monad; as leis de mônada, Functor e Applicative foram demonstradas (seção 5.7).
+
+Finalmente, o quarto objetivo é a validação prática da abordagem: demonstrar a composabilidade de máquinas de estados por meio de um estudo de caso. Este estudo de caso ilustrará como a tipagem de Haskell pode ser usada para garantir transições válidas e o encapsulamento do domínio, permitindo que a lógica do \textit{software} seja estruturada como uma composição de máquinas de estados modulares (Perone e Karachalias, 2023). O resultado esperado é um sistema onde as regras de transição --- inclusive a especificação de transições de estado permitidas e proibidas (Perone e Karachalias, 2023) --- são validadas pelo compilador, confirmando o potencial das estruturas funcionais para o desenvolvimento de \textit{software} robusto. Situação: parcial; cinco construtores do CREM foram exercitados, e o construtor \texttt{Kleisli} não foi (seções 5.10, 5.11 e 5.13).
+
+
+\subsubsection{Contribuições, escopo e situação dos objetivos}
+\label{sec:contrib}
+
+Esta subseção resume o que o projeto acrescenta ao que já existe nas fontes, os limites do estudo de caso e a situação de cada objetivo. As seções 1 a 3 mantêm a redação da proposta; a situação atual está na Tabela~\ref{tab:objetivos}.
+
+Contribuições deste projeto, em relação a Perone e Karachalias (2023), que apresentam o CREM e um exemplo de carrinho de compras: (i) um estudo de caso de aviônica com teste de rejeição para cada um dos 16 pares de vértices, confrontado com uma especificação escrita a partir dos requisitos; (ii) a demonstração das leis de Functor, Applicative e mônada para a State Monad usada com o CREM; (iii) um simulador puro, em malha aberta e fechada, com o construtor \texttt{Feedback} e validação por enumeração limitada; (iv) a delimitação do alcance da garantia dos tipos, que é por aresta e não cobre a associação entre evento e destino; (v) uma fronteira de integração tipada para entradas externas (seção 5.15); (vi) uma validação em três níveis, com tabela de transições revisável, oráculo guiado por ela, exploração exaustiva do grafo de estados do laço fechado e testes baseados em modelo (seções 5.16 e 5.17); e (vii) uma auditoria reprodutível da comparação com C e C++, que inclui uma versão em C++17 com a topologia nos tipos (seção 5.18). Não são contribuições um novo sistema de tipos, uma nova semântica formal nem uma prova geral de correção da composição, e os 168\,421 cenários da enumeração original, por serem testes exaustivos sobre domínio finito, não provam correção para sequências arbitrariamente longas; a exploração da seção 5.17 trata disso, para o modelo. Não foi feita a busca de literatura que permitiria afirmar ineditismo; ver a seção 4.
+
+Escopo. A máquina de aviônica é um exemplo escolhido pelo projeto, a partir de um enunciado próprio, com quatro estados e quatro eventos. Não há requisitos reais de segurança de voo, e os resultados não devem ser lidos como relativos a sistemas de aviônica reais.
+
+\begin{table}[h]
+\centering
+\footnotesize
+\begin{tabular}{|p{4.3cm}|p{2.1cm}|p{8.0cm}|}
+\hline
+Objetivo específico & Situação & Evidência \\
+\hline
+1. Modelos de dados (tipos algébricos para $Q$ e $\Sigma$) & cumprido & seção 5.1 e módulo \texttt{Avionics.Naive} \\
+\hline
+2. Função de transição $\delta$ por casamento de padrões exaustivo & cumprido, com ressalva & 16 pares escritos um a um, sem curinga; a exaustividade é aviso do GHC, promovido a erro pelo projeto (seções 5.2 e 5.12) \\
+\hline
+3. State Monad e categoria de Kleisli & cumprido para a State Monad & leis de mônada, Functor e Applicative demonstradas e testadas (seção 5.7); \texttt{>=>} usado em \texttt{composeAll} \\
+\hline
+4. Composabilidade por estudo de caso & parcial & \texttt{Basic}, \texttt{Sequential}, \texttt{Parallel}, \texttt{Alternative} e \texttt{Feedback} exercitados (seções 5.10 e 5.11); o construtor \texttt{Kleisli} do CREM não foi \\
+\hline
+Fase 4: comparação com a abordagem imperativa & parcial & uma máquina em C e em C++, sete variantes cada (seção 5.14); sem estudo de esforço de manutenção \\
+\hline
+Validação independente e fronteira tipada (parecer de 3 nov. 2026) & parcial & tabela revisável, oráculo, Hedgehog, alcançabilidade e auditoria de C e C++ (seções 5.15 a 5.18); TLA+ verificado no TLC; revisão da orientação e revisão externa de C e C++ pendentes \\
+\hline
+\end{tabular}
+\caption{Situação dos objetivos.}
+\label{tab:objetivos}
+\end{table}
+
+\section{REFERENCIAL TEÓRICO INICIAL}
+O presente referencial teórico estabelece a base de conhecimento necessária para a formalização das Máquinas de Estados Finitos (FSMs) no ambiente funcional puro. A abordagem é construída sobre a fusão de quatro domínios conceituais: a Teoria de Autômatos, a Programação Funcional Pura (PFP), a Teoria das Categorias e as Arquiteturas de \textit{Software} Componíveis.
+
+\subsection{Máquinas de Estados Finitos e a Questão da Mutabilidade}
+
+As FSMs são o modelo canônico para descrever sistemas sequenciais e reativos, cuja dinâmica é regida por uma quíntupla formal $(Q, \Sigma, \delta, q_0, F)$, onde $Q$ é o conjunto finito de estados, $\Sigma$ é o alfabeto de entrada (eventos), $\delta$ é a rigorosa função de transição, $q_0$ é o estado inicial, e $F$ é o conjunto de estados finais. A função $\delta: Q \times \Sigma \to Q$ é o coração do sistema, definindo como o autômato se move entre os estados.
+
+A implementação tradicional desse modelo em linguagens de programação imperativas, como C++ ou Java, cria uma divergência perigosa entre o modelo e o código. A representação do estado recorre, invariavelmente, a variáveis mutáveis --- tipicamente um campo de classe (se a programação orientada a objetos for usada) ou uma variável global (Malakhovski \& Shalyto, 2009). Além disso, os identificadores de estado são frequentemente representados por abstrações de baixo nível, como \textit{strings} ou inteiros, que carecem de garantias de tipo. Essa dependência de estado mutável e a fragilidade de tipos resultam numa tradução que não consegue aplicar diretamente os métodos utilizados na implementação de máquinas de estados finitos em linguagens de programação imperativas no rigoroso domínio funcional (Malakhovski \& Shalyto, 2009), expondo a FSM a estados logicamente impossíveis ou transições inválidas que só são detectadas em tempo de execução, através de pesados testes unitários.
+
+\subsection{Haskell e a Garantia de Corretude em Tempo de Compilação}
+O projeto propõe a Programação Funcional Pura (PFP) como a solução para este descompasso. Haskell, uma linguagem puramente funcional, baseia-se na imutabilidade e na ausência de efeitos colaterais. Sua filosofia exige que a função de transição ($\delta$) seja implementada como uma função pura, uma transformação que recebe o estado e o evento e retorna, deterministicamente, o novo estado, preservando a imutabilidade do sistema e produzindo \textit{software} claro, conciso e correto (Hutton, 2016).
+
+\subsubsection{Tipos de Dados Algébricos (ADTs)}
+A segurança formal em Haskell é fornecida por seu sistema de tipos avançado, ancorado nos Tipos de Dados Algébricos (ADTs). Os ADTs permitem que os conjuntos finitos $Q$ e $\Sigma$ da FSM sejam mapeados diretamente para Tipos Soma, que são considerados o conceito mais importante para a modelagem em Haskell (Milewski, 2020). Por exemplo, se uma FSM possui estados \textit{Ligado} e \textit{Desligado}, o Tipo Soma data Estado = Ligado | Desligado traduz essa finitude para o sistema de tipos. Essa codificação evita o uso de strings e inteiros como identificadores de estado (Malakhovski \& Shalyto, 2009), garantindo que o compilador imponha a integridade estrutural da máquina.
+
+\subsubsection{Pattern Matching e Completude Funcional}
+A função de transição é escrita por casamento de padrões (\textit{pattern matching}): cada equação diz qual é o resultado para uma forma possível dos argumentos (Hutton, 2016). Como estado e evento são tipos soma com número finito de construtores, o compilador consegue listar todos os pares (Estado $\times$ Evento) e conferir se cada um tem uma equação. O GHC faz essa conferência, mas o resultado é um aviso, não um erro: quando falta um par, emite o aviso \texttt{-Wincomplete-patterns}, que já vem ligado em \texttt{-Wall} e informa qual par ficou sem tratamento. O aviso só impede a compilação se o projeto pedir, com \texttt{-Werror} ou, de forma mais precisa, \texttt{-Werror=incomplete-patterns}. Com GHC 9.6.7, sem a opção o programa compila e o aviso aparece; com a opção, a compilação falha no mesmo ponto.
+
+A completude funcional depende, portanto, de duas condições: a opção de erro deve estar ligada, e a função não pode usar uma equação curinga (\texttt{\_}), que cobre qualquer par restante e esconde as omissões. Malakhovski e Shalyto (2009, p. 21) afirmam que, com tipos algébricos, o compilador verifica a completude e a ausência de contradições na função de transição; no exemplo deles, uma equação supérflua faz o compilador emitir um aviso.
+
+\subsection{Teoria das Categorias: Mônadas, Estado Puro e a Categoria Kleisli}
+Em um ambiente funcional puro, onde as transições de estado devem ser implementadas como funções puras, o desafio inerente é a gestão da sequência de transições ao longo do tempo. O projeto aborda este desafio recorrendo à Teoria das Categorias, que é a disciplina matemática que fornece os fundamentos lógicos para a linguagem Haskell. O princípio orientador é que a composição é a essência da programação (Milewski, 2020), e a Teoria das Categorias define o arcabouço para a composição segura e coerente.
+
+\subsubsection{Mônadas: Origem Categorial, Leis e a Abstração do Efeito de Estado}
+
+As mônadas são o dispositivo arquitetural que permite a Programação Funcional Pura gerenciar efeitos colaterais, como o estado, exceções ou I/O, sem violar a imutabilidade. Segundo Wadler (1992), as mônadas permitem combinar a flexibilidade de recursos impuros com as garantias da pureza, ao encapsular o efeito.
+
+A sua origem é estritamente matemática: mônadas foram inventadas na década de 1960 por teóricos de categorias para expressar concisamente certos aspectos da álgebra universal (Wadler, 1992). A definição categorial formal e mais abstrata estabelece uma Monad como um Monóide na Categoria dos Endofuntores (Jahn, 2020). Toda mônada deve obedecer a três leis, identidade à esquerda, identidade à direita e associatividade (Hutton, 2016, cap. 12). Bocchino (2025, seções 4.4 a 4.6) mostra que elas equivalem a exigir que a composição de Kleisli seja associativa e tenha identidade. O compilador não verifica essas leis; elas precisam ser demonstradas para cada instância, o que é feito para a State Monad na seção 5.7.
+
+Para a FSM, a \texttt{State Monad} é a mônada específica empregada. Ela resolve o dilema do estado ao modelar a transição como uma função de transformação de estado, na qual a função de transição pura $\delta$ é encapsulada. Isto permite que a mudança de estado de forma pura seja realizada (Milewski, 2020), pois a função não \textit{modifica} o estado, mas sim \textit{calcula} o novo estado a partir do antigo, retornando o par (Valor, Novo Estado) e mantendo a imutabilidade fora da abstração monádica.
+
+\subsubsection{A Categoria Kleisli para a Composição de Transições}
+
+Embora as mônadas resolvam o problema do estado encapsulado, a composição dessas funções monádicas (as transições de estado) não pode ser realizada pela composição de funções padrão. É aqui que entra a Categoria Kleisli.
+
+A Kleisli é uma construção categorial específica que é projetada para compor morfismos monádicos, ou seja, funções "sujas" que carregam o efeito do \textit{Monad}. Em vez de funções $A \to B$, a Kleisli compõe morfismos do tipo $A \to MB$ (Maia, 2022), onde $M$ é o Functor Monádico (a \texttt{State Monad} no nosso caso) que carrega o estado. Essa categoria fornece as regras e, mais importante, o operador de composição monádica (\texttt{>=>}) que automatiza a logística da sequenciação.
+
+O uso da Categoria Kleisli é crucial para o projeto, pois ele fornece o formalismo para encadear múltiplas transições de estado da FSM de forma segura e elegante. Com a composição de Kleisli, o estado do autômato passa de uma etapa à seguinte sem que o código o manipule explicitamente; no projeto isso aparece em \texttt{>=>}, \texttt{composeAll} e \texttt{runEvents}. Isso simplifica a sintaxe e, desde que a instância da mônada cumpra as três leis, faz com que a composição de transições monádicas seja associativa e tenha identidade (Bocchino, 2025, seção 7), pré-requisito para compor FSMs complexas em arquiteturas modulares.
+
+\subsection{Composabilidade Arquitetural e o Framework CREM}
+
+A validação final da abordagem reside na sua capacidade de suportar arquiteturas de \textit{software} complexas. O CREM nasce de ideias do \textit{Domain-Driven Design} (DDD), em que partes do domínio de um sistema, como agregados, políticas e projeções, são modeladas como máquinas de estados (Perone e Karachalias, 2023, seção 2). Neste trabalho, o interesse recai sobre a composição dessas máquinas, e não sobre o DDD em si.
+
+O \textit{framework} Crème de la Crem (CREM) é um exemplo prático que demonstra o potencial máximo da PFP nesse contexto. O CREM utiliza os recursos avançados de \textit{type-level} de Haskell para permitir que o \textit{software} seja estruturado como uma composição de máquinas de estados independentes (Perone e Karachalias, 2023). Essa modularidade permite que subsistemas de domínio sejam desenvolvidos de forma isolada e testada, e combinados de forma segura.
+
+A maior contribuição do CREM é a capacidade de codificar regras de negócio como tipos. Ele permite ao usuário especificar transições de estado permitidas e proibidas diretamente na assinatura de tipos (Perone e Karachalias, 2023). Isso significa que as restrições mais complexas da lógica de domínio da FSM são transformadas em restrições de tipo, e uma transição que viole a topologia resulta em erro de compilação, e não em erro de \textit{runtime}; regras que dependem de sequências de eventos ou do evento que dispara a transição não são cobertas (seção 5.20). Além disso, o CREM é representável no sentido dos autores: a implementação de um sistema se mantém sincronizada com a sua representação gráfica, pois o diagrama é gerado a partir do próprio código (Perone e Karachalias, 2023). O termo não se refere ao functor representável da teoria das categorias.
+
+\section{PROCEDIMENTOS METODOLÓGICOS}
+
+Esta seção conserva a redação da proposta aprovada, no tempo verbal da época. Ao fim de cada fase, a frase ``Situação'' registra o que foi feito até agora.
+
+A metodologia deste projeto será de natureza mista, combinando o rigor da pesquisa formal com a validação prática, pautando-se numa abordagem qualitativa para analisar a fundo o fenômeno da formalização de Máquinas de Estados Finitos (FSMs) no contexto da programação funcional pura. O trabalho se desenvolverá em duas vertentes principais: a Pesquisa Bibliográfica e a Pesquisa Aplicada (ou Tecnológica). A Pesquisa Bibliográfica fornecerá a base formal, coletando e analisando o referencial teórico sobre FSMs, Programação Funcional Pura (Haskell), Tipos de Dados Algébricos (ADTs), Teoria das Categorias (mônadas, Categoria Kleisli) e os princípios do \textit{framework} CREM. Esta base teórica é crucial para a construção do modelo computacional.
+
+A Pesquisa Aplicada será a fase de experimentação, focada no desenvolvimento de um artefato de \textit{software} (código em Haskell) para comprovar as hipóteses de segurança e composabilidade. Os procedimentos serão organizados em quatro fases interligadas que visam, em última instância, cumprir todos os objetivos específicos do projeto.
+
+A Fase 1: Revisão Teórica e Formalização Inicial visa estabelecer o alicerce do código. Inicialmente, será concluída a revisão aprofundada dos fundamentos da FSM e de como a imutabilidade da PFP se traduz numa alternativa superior ao modelo imperativo. Em seguida, o primeiro objetivo específico será atendido pela modelagem de ADTs, onde os conjuntos de Estados ($Q$) e Eventos ($\Sigma$) de uma FSM canônica serão declarados como Tipos Soma em Haskell. O segundo objetivo será alcançado com a implementação da função de transição pura $\delta$ utilizando \textit{pattern matching} exaustivo, o que é um procedimento metodológico chave para validar a Hipótese de Completude Funcional, demonstrando que o compilador verifica o tratamento de todas as combinações $(\text{Estado} \times \text{Evento})$. Situação: concluída quanto à modelagem e à função de transição; a revisão da literatura continua em andamento (seção 4).
+
+A Fase 2: Gestão do Estado e Sequenciação Monádica endereçará o desafio da pureza na manipulação de estado, cumprindo o terceiro objetivo específico. O estudo da \texttt{State Monad} será traduzido na implementação, garantindo que a sequência de transições seja realizada através de uma função que calcula o novo estado a partir do antigo, mantendo a mudança de estado de forma pura (Milewski, 2020). Esta fase incluirá a sequenciação de eventos utilizando a notação \textit{do-notation} de Haskell, demonstrando como a Categoria Kleisli fornece o formalismo necessário para a composição segura dessas transições monádicas. Situação: concluída (seção 5.7).
+
+A Fase 3: Demonstração da Composabilidade e Segurança é a fase de validação prática da arquitetura. Será selecionado um Estudo de Caso de Domínio que exija a composição de múltiplas FSMs independentes. O procedimento metodológico aqui será compor as máquinas com os construtores do CREM (\texttt{Sequential}, \texttt{Parallel}, \texttt{Alternative} e \texttt{Feedback}), apoiados na composição de Kleisli, e verificar a modularidade arquitetural, simulando o conjunto em malha aberta e em malha fechada e validando o comportamento por enumeração limitada de cenários. O ponto de maior rigor será o Teste de Invalidez de Tipagem, que envolverá a tentativa intencional de codificar uma transição proibida pela lógica do domínio da FSM. A documentação do erro de compilação resultante comprovará a Hipótese de Segurança de Tipos, validando que o sistema de tipos de Haskell é capaz de especificar transições de estado permitidas e proibidas (Perone e Karachalias, 2023) em tempo de compilação. Situação: concluída para o teste de invalidez (16 pares, seção 5.12) e parcial para a composição (seções 5.10, 5.11 e 5.13).
+
+Por fim, a Fase 4: Análise e Conclusão consistirá na comparação qualitativa dos resultados do modelo funcional puro implementado com o modelo imperativo tradicional, focando na Segurança de Tipos, Completude e Modularidade alcançadas. O código-fonte desenvolvido servirá como a evidência principal para a elaboração final do relatório, que sistematizará o conhecimento adquirido e apresentará a validação conclusiva das hipóteses de pesquisa. Situação: iniciada; a comparação com a abordagem imperativa foi feita em duas linguagens (C e C++), sem estudo de esforço de manutenção (seção 5.14).
+
+\section{ESTADO DA ARTE}
+
+Esta seção compara quatro maneiras de implementar uma máquina de estados finitos, usando apenas as fontes reunidas até aqui. Não se trata de uma revisão sistemática: as fontes permitem descrever e confrontar as abordagens, mas não afirmar que cobrem a fronteira atual do conhecimento. As lacunas estão listadas no final da seção.
+
+\subsection{O problema nas fontes}
+
+Malakhovski e Shalyto (2009) tratam de autômatos que reagem a eventos, em linguagens funcionais puras. Eles observam que, em linguagens imperativas, o estado costuma ficar em um campo de classe ou em uma variável global, o que não existe em uma linguagem pura. Observam também que os identificadores de estado costumam ser inteiros ou cadeias, às vezes agrupados em um \texttt{enum}, o que não oferece verificação satisfatória quando a função de transição é escrita à mão. Perone e Karachalias (2023) partem de outro incômodo, a distância entre o modelo do domínio e a implementação, comparável à de uma documentação desatualizada, e propõem construir arquiteturas como composição de máquinas de estados que possam ser representadas graficamente.
+
+\subsection{Quatro abordagens}
+
+\textit{FSM imperativa.} O exemplo de Malakhovski e Shalyto (2009, p. 21) é um interruptor de lâmpada em C, com dois \texttt{enum}, uma variável global e uma função com \texttt{switch}. Os autores notam que nada impede, por exemplo, comparar o estado com um evento. A conferência fica com os testes em tempo de execução. Não há, na base, fonte que meça a taxa de erros dessa abordagem em comparação com as demais.
+
+\textit{Haskell ingênuo.} Na versão em Haskell do mesmo exemplo, estados e eventos são tipos algébricos e a função de transição é definida por equações. Os autores afirmam que o compilador confere tipos, completude e ausência de contradições; no exemplo deles, uma equação supérflua gera um aviso. A execução sobre uma lista de eventos é uma dobra à esquerda (\texttt{foldl}). Nos experimentos deste projeto (GHC 9.6.7), a omissão de um par produz um aviso que nomeia o par, e só se torna erro com \texttt{-Werror}. Além disso, uma equação curinga escapa dessa verificação, e o compilador confere se a tabela está completa, não se é a pretendida.
+
+\textit{State Monad.} Os mesmos autores constroem uma mônada própria para o autômato, com operações para ler e gravar o estado, de modo que uma sequência de eventos vira um bloco \texttt{do} (2009, pp. 21--22). Wadler (1992) mostra como mônadas permitem escrever em linguagem pura programas que manipulam estado, com ganho de legibilidade e menos erros do tipo passar o contador errado. Hutton (2016, cap. 12) apresenta a State Monad usada neste projeto. Do lado categorial, Milewski (2020, cap. 4) e Maia (2022) apresentam a composição de Kleisli, Bocchino (2025) relaciona as leis da mônada a essa composição e Jahn (2020) formaliza a mônada como monoide na categoria dos endofuntores. O tipo do estado, porém, não diz quais transições são permitidas: qualquer função de estado em par (valor, novo estado) serve.
+
+\textit{CREM.} Perone e Karachalias (2023) definem a máquina de estados como máquina de Mealy, isto é, uma função com estado que, a cada entrada, emite uma saída e atualiza o estado. As transições permitidas formam uma topologia promovida ao nível dos tipos, e o resultado de cada ação só é aceito se o compilador encontrar a aresta correspondente. As máquinas são folhas de uma árvore, combinadas por construtores de composição. Os autores citam o pacote \texttt{motor}, que também gera diagramas, mas para máquinas isoladas, e apontam limitações: a topologia não se liga às entradas que disparam as transições, e a implementação não explora concorrência.
+
+\subsection{Quadro comparativo}
+
+\begin{table}[h]
+\centering
+\footnotesize
+\begin{tabular}{|p{2.5cm}|p{2.7cm}|p{2.7cm}|p{2.7cm}|p{3.0cm}|}
+\hline
+ & Imperativa & Haskell ingênuo & State Monad & CREM \\
+\hline
+Estado & campo ou variável global & argumento e resultado & dentro da computação & dentro da máquina; \texttt{run} devolve a máquina atualizada \\
+\hline
+Identificador de estado & inteiro, cadeia ou \texttt{enum} & tipo algébrico & tipo algébrico & tipo algébrico promovido a tipo \\
+\hline
+Equação ausente & testes & aviso do GHC; erro com \texttt{-Werror} & igual ao ingênuo & igual ao ingênuo \\
+\hline
+Aresta fora do modelo & testes & não detectada & não detectada & rejeitada na compilação \\
+\hline
+Evento e aresta & código & código & código & só no código \\
+\hline
+Composição & manual & manual & Kleisli, com leis a provar & construtores do CREM \\
+\hline
+Diagrama & não previsto & não previsto & não previsto & módulo \texttt{Render} \\
+\hline
+\end{tabular}
+\caption{Comparação das quatro abordagens. As linhas sobre avisos, rejeição de arestas e composição vêm de experimentos deste projeto; as demais, das fontes citadas no texto.}
+\end{table}
+
+\subsection{Lacunas}
+
+Faltam fontes, e portanto não há afirmação, sobre: artigos de conferência e periódicos que unam máquinas de estados, Haskell com tipos avançados e teoria das categorias; outras bibliotecas de máquinas de estados em Haskell além das que Perone e Karachalias apenas mencionam; tipos dependentes como alternativa; \textit{statecharts}; verificação de modelos para propriedades de alcançabilidade (os autores do CREM citam TLA+ e Alloy apenas como trabalho futuro); comparações empíricas entre implementações imperativas e funcionais; e requisitos de segurança do domínio de aviônica, que aqui é apenas um domínio de exemplo escolhido pelo projeto. A fonte de Malakhovski e Shalyto está em russo; as páginas 20 e 21 foram lidas no original com apoio de uma ferramenta de inteligência artificial, sem revisão por falante nativo, e as paráfrases devem ser conferidas. O restante do levantamento será feito junto com o desenvolvimento, conforme o cronograma.
+
+\subsection{Ampliação prevista e delimitação da contribuição}
+
+O documento de adequação de 7 de novembro de 2026 aponta como primeira melhoria a ampliação do estado da arte, com sistemas de tipos, máquinas de estados tipadas, \textit{typestate}, técnicas de verificação e comparação com outras bibliotecas, e reconhece que a revisão atual não é sistemática. Um protocolo de busca foi escrito (perguntas, bases, cadeias de busca, critérios de inclusão e exclusão, extração e ameaças à própria revisão; \texttt{Revisao\_v5/07\_estado-da-arte/PROTOCOLO\_REVISAO.md}), mas \textbf{a busca não foi executada}. Enquanto isso não ocorrer, não se afirma ineditismo, e a contribuição é delimitada em relação a Perone e Karachalias (2023): não há novo sistema de tipos, nova semântica formal nem prova geral de correção da composição.
+
+A Tabela~\ref{tab:ampliacao} lista os temas e os candidatos a leitura. São candidatos citados de memória e de menções nos dois documentos; os dados bibliográficos precisam ser conferidos nas fontes antes de qualquer uso.
+
+\begin{table}[h]
+\centering
+\footnotesize
+\begin{tabular}{|p{3.4cm}|p{5.6cm}|p{5.0cm}|}
+\hline
+Tema & Pergunta & Candidato (a conferir) \\
+\hline
+\textit{Typestate} & que garantias de protocolo existem em linguagens, e quais exigem verificação externa & Strom e Yemini (1986) \\
+\hline
+Máquinas de estados tipadas em Haskell & que bibliotecas além do CREM existem e o que garantem & biblioteca \texttt{motor}, citada pelos autores do CREM (não lida; versão do GHC a verificar) \\
+\hline
+Testes baseados em propriedades e em modelos & como testar composições com geradores reprodutíveis e \textit{shrinking} & Claessen e Hughes (2000); \texttt{hedgehog} (usado, seção 5.17); \texttt{quickcheck-state-machine} (não testado) \\
+\hline
+Verificação de modelos & propriedades globais e temporais de composições & Lamport (2002); TLA+ e TLC (seção 5.16) \\
+\hline
+Domínio & requisitos reais para um segundo estudo de caso & PX4 Autopilot e sua documentação de segurança (requisitos não reconciliados) \\
+\hline
+\end{tabular}
+\caption{Ampliação prevista do estado da arte. Nenhum dos itens foi lido integralmente.}
+\label{tab:ampliacao}
+\end{table}
+
+\section{PROGRESSO PARCIAL}
+
+Esta seção apresenta os resultados obtidos até o momento, na ordem cronológica do trabalho, relacionando cada trecho de código ao referencial teórico. Os exemplos iniciais usam uma catraca (\texttt{stateMachine.hs} e \texttt{crem-example}); a partir da seção 5.8, o estudo de caso é a máquina de aviônica de um veículo aéreo não tripulado (UAV), implementada no projeto \texttt{avionics-crem} (repositório Git, versão \texttt{ab02fea}, etiqueta \texttt{v0.2.0-pic-parcial}; Apêndice A). Todo código e toda saída de compilador citados foram produzidos com GHC 9.6.7 e cabal 3.12.1.0, sobre o pacote \texttt{crem} 0.1.0.0. As seções 5.15 a 5.19 foram acrescentadas na versão 5 e usam o pacote \texttt{avionics-validation}, do diretório \texttt{Revisao\_v5/03\_codigo} (Apêndice A), sobre um instantâneo congelado do repositório \texttt{avionics-crem}.
+
+\subsection{Correspondência entre Tipos de Dados Algébricos e os Conjuntos Q e Sigma}
+
+O primeiro resultado é a tradução direta dos conjuntos finitos de estados ($Q$) e eventos ($\Sigma$) da quíntupla da FSM para tipos soma em Haskell, no arquivo \texttt{stateMachine.hs}:
+
+\begin{verbatim}
+data State = Locked | Unlocked deriving (Show, Eq)
+data Input = Coin | Push deriving (Show, Eq)
+\end{verbatim}
+
+Do ponto de vista categorial, essa codificação instancia um resultado conhecido. Milewski (2020, cap. 5) mostra que o tipo \texttt{Bool}, com dois construtores, corresponde ao número $2$, entendido como o coproduto de duas cópias do objeto terminal ($2 = 1 + 1$). Coproduto é a construção que reúne dois tipos em um só, de modo que cada valor pertence a um ou ao outro; o objeto terminal é o tipo com um único valor. Assim, \texttt{State} e \texttt{Input} são isomorfos a \texttt{Bool}, na categoria Hask, cujos objetos são os tipos de Haskell e cujos morfismos são as funções entre eles. A finitude exigida para $Q$ e $\Sigma$ fica, desse modo, preservada pelo próprio tipo, e não apenas por convenção de nomes.
+
+Uso no trabalho. A leitura categorial de coproduto e objeto terminal explica por que o tipo tem exatamente tantos valores quanto construtores, mas nenhum resultado posterior do projeto depende dela; é contexto, e não ferramenta.
+
+\subsection{A Função de Transição delta como Morfismo em Hask}
+
+O segundo resultado é a função de transição $\delta: Q \times \Sigma \to Q$, escrita por casamento de padrões:
+
+\begin{verbatim}
+transition :: State -> Input -> State
+transition Locked   Coin  = Unlocked
+transition Locked   Push  = Locked
+transition Unlocked Coin  = Unlocked
+transition Unlocked Push  = Locked
+\end{verbatim}
+
+A assinatura \texttt{State -> Input -> State} é a forma \textit{curried} de uma função cujo domínio é o par \texttt{(State, Input)}. \textit{Currying} é a equivalência entre uma função de dois argumentos, \texttt{(a, b) -> c}, e uma função que recebe um argumento e devolve outra, \texttt{a -> b -> c}; Milewski (2020, cap. 9, seção 9.2) a explica e a liga ao objeto exponencial, e Hutton (2016, seção 3.6) trata o mesmo assunto como funções \textit{curried}. O domínio é o produto categorial de \texttt{State} e \texttt{Input}, construído por Milewski (2020, cap. 5) para pares. A assinatura em Haskell corresponde, portanto, diretamente à definição matemática de $\delta$.
+
+Quanto à completude, o GHC examina as equações e avisa se algum par (estado, evento) ficou sem tratamento. Esse aviso (\texttt{-Wincomplete-patterns}, incluído em \texttt{-Wall}) não impede a compilação por si só; para isso é preciso promovê-lo a erro com \texttt{-Werror=incomplete-patterns}, como faz o projeto \texttt{avionics-crem}. Hutton (2016, seção 3.1) lembra que a inferência de tipos acontece antes da execução, de modo que erros de tipo não ocorrem durante a avaliação; a verificação de exaustividade é uma checagem adicional, também feita em compilação, mas de natureza diferente. Ela confere que cada par tem uma equação, não que a equação seja a correta: trocar \texttt{= Locked} por \texttt{= Unlocked} na segunda linha compila sem aviso.
+
+\subsection{Sequenciação Inicial e Validação Empírica}
+
+A composição de várias transições foi resolvida inicialmente com a função de ordem superior \texttt{foldl}, que aplica $\delta$ repetidamente sobre uma lista de entradas:
+
+\begin{verbatim}
+run :: State -> [Input] -> State
+run = foldl transition
+\end{verbatim}
+
+A execução sobre \texttt{[Coin, Push, Push, Coin, Coin, Push]}, a partir de \texttt{Locked}, produziu o estado final \texttt{Locked}. A função \texttt{transition} é pura no sentido de Milewski (2020): dado o mesmo argumento, devolve sempre o mesmo resultado e não tem efeitos colaterais. Essa pureza, somada à ausência de estado mutável, descrita por Malakhovski e Shalyto (2009), é o que permite aplicar a verificação de tipos e de exaustividade como mecanismos de corretude.
+
+\subsection{Da Composição Ingênua à Necessidade de uma Abstração Monádica}
+
+A composição por \texttt{foldl} basta enquanto o resultado de cada passo é só o novo estado. Quando se quer também uma saída por transição, por exemplo uma mensagem de telemetria, há duas formulações equivalentes.
+
+A primeira não usa mônada. É a máquina de Mealy, em que cada passo tem o tipo $(Q, \Sigma) \to (Q, \text{Saída})$ e a execução sobre uma lista usa \texttt{mapAccumL}, que carrega o estado como acumulador e coleta as saídas. No projeto, essa é a função \texttt{runMealy}.
+
+A segunda é a State Monad, em que o passo é uma função $\Sigma \to ST\;Q\;\text{Saída}$. Nos testes do projeto, as duas formulações foram executadas sobre as mesmas sequências de eventos, a partir dos quatro estados iniciais, e produziram os mesmos pares (saídas, estado final). Logo, produzir saída por transição não exige mônada.
+
+O que a formulação monádica acrescenta é composição. Milewski (2020, cap. 4) chama de funções embelezadas as funções do tipo $A \to M\,B$, em que $M$ é um functor que carrega o efeito (um functor é um construtor de tipos que também sabe aplicar funções a seus conteúdos). A categoria de Kleisli tem os tipos como objetos, essas funções como morfismos e um operador \texttt{>=>}, chamado \textit{fish}, para compô-las; Maia (2022) apresenta o mesmo desenvolvimento a partir do \textit{Writer}. Com ele, um passo posterior pode depender da saída de um anterior sem que o estado seja passado à mão, e o mesmo molde serve para outros efeitos além do estado. A justificativa para a State Monad é, portanto, composição e generalidade, e não necessidade.
+
+\subsection{Reformulação Teórica da FSM sobre a State Monad}
+
+Para tratar do estado, e não apenas de um registro, a FSM foi mapeada sobre a State Monad de Hutton (2016, cap. 12): um \texttt{newtype} que embrulha uma função de estado em par (valor, novo estado). O projeto usa a mesma definição, com o tipo do estado como parâmetro:
+
+\begin{verbatim}
+newtype ST s a = ST { runST :: s -> (a, s) }
+
+instance Monad (ST s) where
+  st >>= f = ST $ \s ->
+    let (x, s') = runST st s
+     in runST (f x) s'
+\end{verbatim}
+
+As instâncias de \texttt{Functor} e \texttt{Applicative} seguem Hutton e estão em \texttt{Avionics/StateMonad.hs}. Um passo da máquina de aviônica é então:
+
+\begin{verbatim}
+avionicsStep :: AvEvent -> ST AvState Output
+avionicsStep e = ST $ \q -> (outputOf q e, transition q e)
+\end{verbatim}
+
+Esse passo tem o mesmo molde do exemplo de Hutton (2016) para gerar valores frescos, \texttt{fresh = S (\textbackslash n -> (n, n+1))}: um valor interno é passado de forma pura de uma aplicação à seguinte, sem mutabilidade.
+
+\subsection{Sequenciação via Notação do e a Função mapM}
+
+Para generalizar a composição de \texttt{foldl} ao contexto monádico, Hutton (2016, cap. 12) define \texttt{mapM}, que aplica uma função monádica a cada elemento de uma lista e reúne os resultados. No projeto, a função \texttt{runEvents} faz o mesmo para a lista de eventos:
+
+\begin{verbatim}
+runEvents :: [AvEvent] -> ST AvState [Output]
+runEvents []       = pure []
+runEvents (e : es) = do
+  o  <- avionicsStep e
+  os <- runEvents es
+  pure (o : os)
+\end{verbatim}
+
+A execução \texttt{runST (runEvents eventos) Grounded} devolve ao mesmo tempo a lista de saídas e o estado final. A notação \texttt{do} é uma forma de escrever expressões com o operador \texttt{>>=} de maneira próxima à das linguagens imperativas, preservando a pureza (Oliveira, 2017).
+
+\subsection{Fundamentação Categorial: a Mônada como Monoide na Categoria dos Endofuntores}
+
+Um endofuntor é um functor de uma categoria nela mesma; em Haskell, é um construtor de tipos \texttt{m} com \texttt{fmap}. Uma mônada é um endofuntor $T$ com duas transformações naturais, $\mu : T \circ T \to T$ (achatar) e $\eta : I \to T$ (injetar), cujas leis de associatividade e de unidade têm a forma das leis de um monoide. É a leitura ``monoide na categoria dos endofuntores'', presente em Milewski (2020, cap. 22) e em Jahn (2020, cap. 2).
+
+A consequência prática é que a composição de Kleisli \texttt{>=>} é associativa e tem \texttt{return} como identidade. Isso, porém, só vale se a instância cumprir as leis, e o GHC não as verifica: uma instância que as violasse compilaria normalmente. Por isso as leis foram demonstradas para a instância \texttt{ST}, por raciocínio equacional (Hutton, 2016, seção 16.1; as leis aparecem na seção 12.3), em comentário no arquivo \texttt{Avionics/StateMonad.hs}. Em resumo:
+
+\begin{itemize}
+\item identidade à esquerda, \texttt{return a >>= f = f a}: basta substituir as definições e simplificar o \texttt{let} sobre um par conhecido;
+\item identidade à direita, \texttt{m >>= return = m}: o \texttt{let} devolve o par \texttt{(fst p, snd p)}, que é igual a \texttt{p};
+\item associatividade, \texttt{(m >>= f) >>= g = m >>= (\textbackslash x -> f x >>= g)}: expandem-se os dois lados e achatam-se os \texttt{let} aninhados, obtendo-se expressões idênticas.
+\end{itemize}
+
+As demonstrações supõem computações totais e ausência de \texttt{seq}, hipótese análoga à de Hutton (2016, seção 12.4). Bocchino (2025, seções 4.4 a 4.6 e 6.4) mostra que as três leis de Haskell equivalem à associatividade e às identidades da composição de Kleisli, e (seção 7) que, com elas, os tipos e as funções \texttt{a -> M b} formam uma categoria. Além da prova, as leis foram conferidas por exemplo, para os quatro estados e os quatro eventos (dezessete verificações em \texttt{lawChecks}: sete sobre mônada e Kleisli, oito sobre Functor e Applicative e duas de consistência com \texttt{runMealy} e \texttt{foldr (>=>)}; todas aprovadas).
+
+As leis de Functor e de Applicative, que Hutton (2016, seções 12.1 e 12.2) enuncia à parte, também foram demonstradas para \texttt{ST}. Como as instâncias de \texttt{Functor} e \texttt{Applicative} foram escritas à mão, mostrou-se que \texttt{fmap f m} é igual a \texttt{m >>= pure . f} e que \texttt{mf <*> mx} é igual a \texttt{mf >>= (\textbackslash f -> mx >>= pure . f)}; as quatro leis de Applicative decorrem dessa coincidência e das leis da mônada. A demonstração da lei de composição do Applicative está resumida, e é a menos detalhada das quatro.
+
+Uso no trabalho. A leitura da mônada como monoide na categoria dos endofuntores é contexto: nenhum resultado do projeto depende dela. O que tem consequência no código é a composição de Kleisli, usada em \texttt{>=>}, em \texttt{composeAll} e nos testes de associatividade.
+
+Uma observação sobre o CREM: no código do pacote, a função \texttt{pureResult} exige \texttt{Applicative m}, enquanto \texttt{run} e o sinônimo \texttt{StateMachine} exigem \texttt{Monad m}. \texttt{Applicative} é uma interface mais fraca que \texttt{Monad}, pois oferece \texttt{pure} e \texttt{<*>}, mas não \texttt{>>=}. O CREM é, portanto, parametrizado por um efeito \texttt{m}, o que não implica que a State Monad seja pré-requisito: o CREM nem a usa, e guarda o estado dentro da própria máquina, devolvendo a máquina atualizada a cada \texttt{run}. A relação com a seção anterior é de analogia, não de dependência.
+
+\subsection{Estudo de Caso: Topologia Promovida ao Nível de Tipos}
+
+O framework CREM (Perone e Karachalias, 2023) descreve as transições permitidas por uma topologia: para cada vértice, a lista dos vértices a que ele pode ir. A topologia é um valor comum de Haskell, depois promovido ao nível dos tipos com a biblioteca \texttt{singletons}. Um \textit{singleton} é um tipo que dá, a cada valor de um tipo enumerado, um tipo correspondente no nível dos tipos, de modo que o compilador possa raciocinar sobre ele. A geração desses tipos é feita por Template Haskell, mecanismo de geração de código em compilação.
+
+No estudo de caso de aviônica, os vértices e a topologia são declarados juntos:
+
+\begin{verbatim}
+$(singletons [d|
+  data AvionicsVertex
+    = Grounded | InFlight | EmergencyLanding | Shutdown
+    deriving (Show, Eq)
+
+  avionicsTopology :: Topology AvionicsVertex
+  avionicsTopology = Topology
+    [ (Grounded,         [InFlight, Shutdown])
+    , (InFlight,         [EmergencyLanding])
+    , (EmergencyLanding, [Grounded])
+    ]
+  |])
+\end{verbatim}
+
+A regra de domínio é que um UAV em voo (\texttt{InFlight}) não pode ser desligado diretamente (\texttt{Shutdown}); por isso não existe essa aresta. A analogia com as classes de tipos de Hutton (2016), como \texttt{Eq} e \texttt{Ord}, vale em parte: ambas expressam restrições que o compilador resolve. A diferença é que uma classe restringe tipos, enquanto a topologia restringe valores (os vértices) promovidos a tipos pela biblioteca \texttt{singletons}, o que permite ao compilador raciocinar sobre eles.
+
+A Figura~\ref{fig:topologias} mostra as duas topologias do estudo de caso. As auto-transições (aresta identidade) não foram desenhadas.
+
+\begin{figure}[h]
+\centering
+\footnotesize
+\begin{tikzpicture}[
+    st/.style={draw, rounded corners=2pt, minimum height=0.8cm, inner sep=4pt, font=\ttfamily\footnotesize},
+    ar/.style={-{Stealth[length=2.2mm]}, thick},
+    lb/.style={font=\scriptsize, fill=white, inner sep=1pt}
+]
+\node[st] (g) at (0,0) {Grounded};
+\node[st] (f) at (5,0) {InFlight};
+\node[st] (e) at (2.5,-2.4) {EmergencyLanding};
+\node[st] (s) at (9.5,0) {Shutdown};
+\draw[ar] (g) -- node[lb, above] {TakeoffSignal} (f);
+\draw[ar] (f) -- node[lb, right, xshift=2pt] {CriticalBattery} (e);
+\draw[ar] (e) -- node[lb, left, xshift=-2pt] {LandedSignal} (g);
+\draw[ar] (g) to[out=50, in=130, looseness=0.9] node[lb, above] {SystemCutoff} (s);
+\draw[ar, dashed] (f) -- node[lb, above] {proibida} node[midway, below=1pt] {$\times$} (s);
+\node[font=\scriptsize\bfseries] at (-0.3,1.35) {(a) Aviônica};
+\end{tikzpicture}
+
+\vspace{0.8cm}
+
+\begin{tikzpicture}[
+    st/.style={draw, rounded corners=2pt, minimum height=0.8cm, inner sep=4pt, font=\ttfamily\footnotesize},
+    ar/.style={-{Stealth[length=2.2mm]}, thick},
+    lb/.style={font=\scriptsize, fill=white, inner sep=1pt}
+]
+\node[st] (c) at (0,0) {Charged};
+\node[st] (l) at (4.5,0) {Low};
+\node[st] (k) at (9,0) {Critical};
+\draw[ar] (c) to[bend left=20] node[lb, above] {Drain} (l);
+\draw[ar] (l) to[bend left=20] node[lb, below] {Recharge} (c);
+\draw[ar] (l) to[bend left=20] node[lb, above] {Drain} (k);
+\draw[ar] (k) to[bend left=20] node[lb, below] {Recharge, ShedLoad} (l);
+\node[font=\scriptsize\bfseries] at (0,1.0) {(b) Energia};
+\end{tikzpicture}
+\caption{Topologias do estudo de caso. A aresta tracejada de \texttt{InFlight} a \texttt{Shutdown} não existe: é a transição proibida pela regra de domínio e rejeitada pelo compilador. \texttt{ShedLoad} foi acrescentado pelo simulador (seção 5.11) e usa a aresta \texttt{Critical} para \texttt{Low} que já existia.}
+\label{fig:topologias}
+\end{figure}
+
+A catraca, usada nas seções anteriores, tem a topologia com as arestas \texttt{Locked} para \texttt{Unlocked} e o inverso. O CREM admite sempre a aresta identidade (um vértice para ele mesmo), por uma instância da classe \texttt{AllowedTransition} (Perone e Karachalias, 2023, Fig. 4); logo, as auto-transições são sempre permitidas. Com dois vértices, as quatro arestas resultantes cobrem todos os pares, e a topologia da catraca é um grafo completo. Por isso ela não serve para demonstrar rejeição.
+
+Também foram escritas, no mesmo projeto, a máquina \texttt{PowerFSM} (subsistema de energia, com os vértices \texttt{Charged}, \texttt{Low} e \texttt{Critical}) e as composições da seção 5.10.
+
+\subsection{Verificação Formal de Segurança de Tipos em Tempo de Compilação}
+
+As ações da máquina de aviônica têm a forma:
+
+\begin{verbatim}
+avionicsAction
+  :: Applicative m
+  => SAvionicsVertex v -> AvEvent
+  -> ActionResult m AvionicsTopology SAvionicsVertex v Output
+avionicsAction SGrounded TakeoffSignal =
+  pureResult MsgTakeoff SInFlight
+avionicsAction SInFlight CriticalBattery =
+  pureResult MsgEmergency SEmergencyLanding
+avionicsAction SInFlight TakeoffSignal =
+  pureResult MsgIgnored SInFlight
+-- ... (16 pares escritos um a um)
+\end{verbatim}
+
+O primeiro argumento de \texttt{pureResult} é a saída; o segundo é o vértice de destino. A função exige a restrição \texttt{AllowedTransition topologia origem destino}, uma classe de tipos que o GHC resolve procurando a aresta na lista da topologia. Eventos que não provocam transição devolvem o mesmo vértice, o que a aresta identidade permite.
+
+Para o teste de invalidez, o módulo \texttt{InvalidInFlightShutdown.hs} tenta a transição proibida, e fica fora do build principal (é um alvo de teste do cabal, construído com \texttt{cabal build invalid-inflight-shutdown --enable-tests}):
+
+\begin{verbatim}
+invalidInFlightShutdown SInFlight _ =
+  pureResult MsgShutdown SShutdown
+\end{verbatim}
+
+A compilação falha. Esta é a mensagem do GHC 9.6.7, sem edição, exceto pelo trecho central omitido, indicado por reticências (o texto integral está no arquivo \texttt{erro\_invalidez\_inflight\_shutdown.txt}):
+
+\begin{verbatim}
+invalid\InvalidInFlightShutdown.hs:23:39: error: [GHC-39999]
+    * Could not deduce `Crem.Topology.AllowedTransition
+                          (Crem.Topology.Topology '[])
+                          InFlight Shutdown'
+        arising from a use of `pureResult'
+      from the context: Applicative m
+        bound by the type signature for:
+                   invalidInFlightShutdown :: ...
+      or from: ()
+        bound by a pattern with constructor:
+                   SInFlight :: SAvionicsVertex InFlight,
+                 in an equation for `invalidInFlightShutdown'
+    * In the expression: pureResult MsgShutdown SShutdown
+      In an equation for `invalidInFlightShutdown':
+          invalidInFlightShutdown SInFlight _
+            = pureResult MsgShutdown SShutdown
+\end{verbatim}
+
+O trecho \texttt{Topology '[]} mostra como a busca termina: as instâncias de \texttt{AllowedTransition} descartam as arestas da topologia uma a uma e, ao chegar à lista vazia sem encontrar \texttt{InFlight} para \texttt{Shutdown}, o GHC fica sem evidência e rejeita a expressão. A regra de negócio foi, portanto, verificada antes de o programa existir. Isso estende o princípio de segurança de tipos de Hutton (2016) do nível sintático para o nível do domínio, que é a proposta de Perone e Karachalias (2023) de especificar transições permitidas e proibidas no tipo.
+
+Há um limite que precisa constar. A garantia vale para uma transição isolada. O caminho \texttt{InFlight} para \texttt{EmergencyLanding} para \texttt{Grounded} para \texttt{Shutdown} existe na topologia, e é aceito. A regra de que o UAV não se desliga em voo vale para a aresta direta, mas não é propriedade de todas as sequências de eventos; provar propriedades desse tipo exigiria outra técnica.
+
+Esse teste exercita um único par de vértices; a matriz completa, com os 16 pares, está na seção 5.12.
+
+Como o GHC resolve a restrição. No código do pacote \texttt{crem} 0.1.0.0, a classe \texttt{AllowedTransition} tem quatro instâncias, todas marcadas como incoerentes (\texttt{INCOHERENT}): uma encontra a aresta quando ela é a primeira da lista do vértice; outra descarta a primeira aresta do vértice e continua; outra descarta o primeiro vértice da topologia e continua; e a última, de aresta identidade, vale quando origem e destino são o mesmo vértice. A marcação de incoerência faz o GHC aceitar uma instância que casa sem exigir que seja a mais específica, o que torna a resolução uma busca por qualquer caminho que feche a prova. Se nenhum caminho fecha, sobra a restrição residual com a lista vazia, que é o \texttt{Topology '[]} da mensagem acima. A correção geral dessa resolução é responsabilidade da biblioteca e não foi provada aqui; verificou-se que, para esta topologia, o resultado coincide com a especificação nos 16 pares (seção 5.12).
+
+\subsection{Execução, Validação Cruzada e Composição}
+
+A execução do projeto (\texttt{cabal run avionics-crem}) sobre a sequência de eventos de decolagem, bateria crítica, pouso e corte do sistema produziu a mesma lista de saídas, \texttt{[MsgTakeoff, MsgEmergency, MsgLanded, MsgShutdown]}, e o mesmo estado final, \texttt{Shutdown}, nas três formulações: ingênua, State Monad e CREM. Além disso, as versões ingênua e CREM foram comparadas em todas as 85 sequências de até três eventos a partir de \texttt{Grounded}, e as saídas coincidiram em todas. Essa comparação é uma validação cruzada entre formalizações estruturalmente distintas da mesma máquina, mas não é independente quanto à tabela, que foi escrita uma só vez; a seção 5.12 a confronta com uma especificação separada.
+
+A composição foi realizada com os construtores do CREM, em \texttt{Avionics/Compose.hs}. Cada folha (\texttt{Basic}) mantém seu próprio estado e sua própria topologia.
+
+\begin{itemize}
+\item \texttt{Parallel}: aviônica e energia rodam lado a lado, cada uma com sua entrada e sua saída. Na execução, a entrada \texttt{(TakeoffSignal, Drain)} produziu \texttt{(MsgTakeoff, ReportLow)}.
+\item \texttt{Sequential} com \texttt{Alternative}: a saída de energia passa por uma máquina sem estado que a traduz em evento de aviônica, e a aviônica só é acionada quando há evento. Com a aviônica iniciada em \texttt{InFlight} e a bateria em \texttt{Charged}, o segundo \texttt{Drain} levou a bateria ao nível crítico, gerou o evento \texttt{CriticalBattery} e produziu a saída \texttt{MsgEmergency}, isto é, a aviônica passou a \texttt{EmergencyLanding}.
+\end{itemize}
+
+O construtor \texttt{Kleisli} não foi exercitado. O \texttt{Feedback} é usado no simulador da seção 5.11.
+
+Os diagramas foram gerados com o módulo \texttt{Render} do CREM, em formato Mermaid (linguagem textual para diagramas): o das topologias de aviônica e de energia e o do fluxo da composição acoplada. Os arquivos estão em \texttt{Obsidian/documentation/} (\texttt{avionics\_topology.mmd}, \texttt{power\_topology.mmd}, \texttt{coupled\_flow.mmd}). Conferiu-se o texto gerado; os diagramas não foram renderizados por uma ferramenta Mermaid.
+
+\subsection{Simulador em Malha Aberta e Fechada e Robustez dos Testes}
+
+Até a seção 5.10, a verificação de comportamento se apoiava em uma sequência fixa de eventos e em 85 sequências curtas. Para tornar o teste mais robusto, foi escrito um simulador em Haskell puro da composição de máquinas (módulos \texttt{Avionics.Sim.*}, sem IO, sem estado mutável e sem aleatoriedade), com uma suíte de testes que percorre todos os cenários até um comprimento dado. Ele valida o comportamento discreto das máquinas e da composição; não modela a física de voo.
+
+Alguns termos. Um \textit{tick} é um passo discreto de simulação, sem correspondência com segundos. Um \textit{traço} é o registro, por tick, da entrada recebida e dos passos de cada máquina (evento, saída e vértice em que ficou). Em malha aberta, cada máquina só recebe o que o cenário manda. Em malha fechada, o ambiente observa a telemetria e realimenta as máquinas, de modo que a saída de uma influencia a entrada da outra.
+
+\textit{Arquitetura.} A planta é a composição em paralelo da aviônica e da energia, com as ações \texttt{avionicsAction} e \texttt{powerAction} originais. O ambiente é uma terceira máquina, \texttt{Mission}, com quatro vértices (\texttt{Standby}, \texttt{CriticalHeld}, \texttt{TouchdownHeld} e \texttt{CutoffHeld}), topologia tipada e 20 equações, sem curinga. Ela é ligada à planta pelo construtor \texttt{Feedback} do CREM: o caminho direto contém a planta e o ambiente, e o caminho de retorno reinjeta os sinais que o ambiente liberou. A State Monad do projeto carrega, de passo em passo, a própria máquina composta como estado. Para relatar em que vértice cada máquina ficou, o simulador observa o vértice de destino dentro da ação, sem reescrever nenhuma regra de transição; o resultado é reconstruído com a mesma prova \texttt{AllowedTransition}, e a garantia por aresta continua valendo. A Figura~\ref{fig:laco} resume o laço.
+
+\begin{figure}[h]
+\centering
+\footnotesize
+\begin{tikzpicture}[
+    box/.style={draw, rounded corners=2pt, minimum height=0.9cm, align=center, inner sep=5pt},
+    ar/.style={-{Stealth[length=2.2mm]}, thick},
+    lb/.style={font=\scriptsize, align=center}
+]
+\node[box] (av) at (0,0.7) {Aviônica\\{\scriptsize\texttt{avionicsAction}}};
+\node[box] (pw) at (0,-0.9) {Energia\\{\scriptsize\texttt{powerAction}}};
+\begin{scope}[on background layer]
+\node[draw, dashed, rounded corners=3pt, fit=(av)(pw), inner sep=8pt, label={[font=\scriptsize]above:Planta (\texttt{Parallel})}] (planta) {};
+\end{scope}
+\node[box] (mis) at (7.4,0) {Ambiente\\{\scriptsize\texttt{Mission}, 1 slot}};
+\node[lb] (ext) at (-4.6,0) {sinais externos\\{\scriptsize\texttt{Beat}, comando,}\\{\scriptsize energia}};
+\draw[ar] (ext) -- (planta.west);
+\draw[ar] (planta.east) -- node[lb, above] {telemetria\\classificada} (mis.west);
+\draw[ar] (mis.south) -- ++(0,-1.5) -| node[lb, pos=0.25, below] {\texttt{ToAvionics}, \texttt{ToPower}, liberados\\no \texttt{Beat} do tick seguinte (caminho de retorno)} (planta.south);
+\end{tikzpicture}
+\caption{Laço fechado com o \texttt{Feedback} do CREM. O ambiente retém a telemetria relevante e só a libera no \texttt{Beat} do tick seguinte, o que produz o atraso de um tick.}
+\label{fig:laco}
+\end{figure}
+
+\textit{Duas decisões de modelagem.} Primeira, o \texttt{Feedback} do CREM é instantâneo: o laço é repetido dentro do mesmo tick até o caminho de retorno parar de emitir. O efeito desejado era influenciar o tick seguinte; ele foi obtido no próprio modelo, com a \texttt{Mission} funcionando como um registrador de um slot: a telemetria relevante a faz reter um evento, e o sinal de relógio (\texttt{Beat}) do tick seguinte a faz liberá-lo. Como o \texttt{Beat} vem só do cenário e a máquina só emite ao recebê-lo, o laço termina; esse argumento está no código, e não há guarda de terminação em execução. Segunda, para que a emergência também afete a energia, foi acrescentado um evento \texttt{ShedLoad} (corte de cargas não essenciais) a \texttt{PowerEvent}. Ele usa apenas a aresta \texttt{Critical} para \texttt{Low}, que já existia, de modo que a topologia de energia não mudou. O atraso de um tick, o próprio \texttt{ShedLoad} e a ordem em que o ambiente libera \texttt{ShedLoad} e \texttt{LandedSignal} são escolhas de modelagem do autor, sem justificativa em requisitos de um domínio real (seção 5.20).
+
+\textit{Resultado de compilação.} \texttt{cabal build}, com todos os avisos ligados e a exaustividade promovida a erro, terminou com código 0 e sem avisos do GHC. O teste de invalidez continua falhando com a mesma mensagem (\texttt{Could not deduce AllowedTransition} para \texttt{InFlight} e \texttt{Shutdown}, código de saída 1).
+
+\textit{Traço em malha fechada, cenário de emergência}, obtido com \texttt{cabal run avionics-sim}, na Tabela 2.
+
+\begin{table}[h]
+\centering
+\scriptsize
+\begin{tabular}{|p{0.7cm}|p{3.1cm}|p{4.3cm}|p{3.0cm}|p{2.9cm}|}
+\hline
+Tick & Entrada ou liberação & Aviônica & Energia & Ambiente \\
+\hline
+0 & \texttt{TakeoffSignal} & \texttt{MsgTakeoff}, vai a \texttt{InFlight} & \texttt{Charged} & \texttt{Standby} \\
+\hline
+1 & \texttt{Drain} & \texttt{InFlight} & \texttt{ReportLow}, \texttt{Low} & \texttt{Standby} \\
+\hline
+2 & \texttt{Drain} & \texttt{InFlight} & \texttt{ReportCritical}, \texttt{Critical} & retém \texttt{CriticalHeld} \\
+\hline
+3 & libera \texttt{CriticalBattery} & \texttt{MsgEmergency}, vai a \texttt{EmergencyLanding} & \texttt{Critical} & retém \texttt{TouchdownHeld} \\
+\hline
+4 & libera \texttt{ShedLoad} e \texttt{LandedSignal} & \texttt{MsgLanded}, vai a \texttt{Grounded} & \texttt{ReportLow}, \texttt{Low} & retém \texttt{CutoffHeld} \\
+\hline
+5 & libera \texttt{SystemCutoff} & \texttt{MsgShutdown}, vai a \texttt{Shutdown} & \texttt{Low} & \texttt{Standby} \\
+\hline
+\end{tabular}
+\caption{Traço do cenário de emergência em malha fechada. As saídas da aviônica são, em ordem, as mesmas quatro da execução em malha aberta.}
+\end{table}
+
+O mesmo cenário em malha aberta termina com a bateria em \texttt{Critical} e a aviônica ainda em \texttt{InFlight}: sem realimentação, nada liga uma máquina à outra. Em malha fechada, a bateria termina em \texttt{Low}, porque a emergência dispara o \texttt{ShedLoad}.
+
+\textit{Suíte de testes.} O comando \texttt{cabal test avionics-sim-tests} (comprimento máximo $N = 4$) executou 32 verificações, com 0 falhas. Os cenários de validação cruzada são as sequências de até 4 comandos, isto é, $1 + 4 + 16 + 64 + 256 = 341$; nas verificações com o alfabeto completo de entradas de um tick (20 símbolos), são $1 + 20 + 20^2 + 20^3 + 20^4 = 168\,421$ cenários.
+
+\begin{table}[h]
+\centering
+\footnotesize
+\begin{tabular}{|p{8.3cm}|p{2.6cm}|p{2.2cm}|}
+\hline
+Verificação & Cenários & Tempo \\
+\hline
+malha aberta igual à FSM ingênua (saídas e estado final) & 341 & 0,0 s \\
+\hline
+malha fechada igual à FSM ingênua, com os eventos que a aviônica recebeu de fato & 341 e 168\,421 & 0,01 s e 7,5 s \\
+\hline
+planta observada igual a \texttt{uavSystem} (Seção 5.10) & 22\,621 & 0,15 s \\
+\hline
+\texttt{Shutdown} só depois de \texttt{Grounded} (aberta e fechada) & 168\,421 & 0,5 s e 7,5 s \\
+\hline
+\texttt{EmergencyLanding} só a partir de \texttt{InFlight} (aberta e fechada) & 168\,421 & 0,5 s e 7,4 s \\
+\hline
+\texttt{ShedLoad} nunca reduz o nível da bateria (aberta e fechada) & 168\,421 & 0,5 s e 7,4 s \\
+\hline
+determinismo (aberta e fechada) & 168\,421 & 0,7 s e 8,5 s \\
+\hline
+causalidade: o traço de um prefixo é prefixo do traço (aberta e fechada) & 8\,421 & 0,08 s e 0,9 s \\
+\hline
+o \texttt{Beat} libera exatamente o que foi retido no tick anterior & 168\,421 & 7,4 s \\
+\hline
+\end{tabular}
+\caption{Verificações da suíte (execução desta revisão; os tempos valem como ordem de grandeza). Em malha fechada compara-se a FSM ingênua com os eventos efetivamente recebidos pela aviônica, porque o ambiente injeta eventos extras.}
+\end{table}
+
+\textit{Sanidade das próprias verificações.} Uma propriedade que nunca falha pode ser vacuamente verdadeira. Por isso a suíte inclui um bloco que as aplica a traços corrompidos à mão (por exemplo, um \texttt{Shutdown} vindo de \texttt{InFlight}), e as sete verificações desse bloco confirmam que os defeitos são detectados e que os casos válidos são aceitos. Além disso, nesta revisão foi feito um teste de mutação: trocar, em \texttt{Mission}, o evento liberado por \texttt{CriticalHeld} (\texttt{CriticalBattery} por \texttt{LandedSignal}) fez 6 das 32 verificações falharem; o arquivo foi restaurado em seguida pelo controle de versão. A documentação do repositório registra mutações anteriores, feitas com uma versão anterior da suíte (27 verificações), nas quais 4 e 9 verificações falharam; essas não foram repetidas aqui.
+
+\subsection{Conformidade com a Especificação do Domínio e Matriz de Rejeição}
+
+As validações anteriores tinham duas fraquezas. Primeira, a FSM ingênua, as ações do CREM e o ambiente do simulador foram escritos a partir da mesma tabela, de modo que compará-los entre si mostra que o CREM executa a tabela, não que a tabela está certa. Segunda, a rejeição em compilação era exercitada em um único par de vértices.
+
+\textit{Especificação separada.} As regras do domínio foram escritas em um arquivo próprio, \texttt{spec/domain\_rules.txt}, a partir do texto do enunciado do estudo de caso e não do código: quatro arestas permitidas, cada uma com o evento que a dispara (\texttt{Grounded} para \texttt{InFlight} por \texttt{TakeoffSignal}; \texttt{InFlight} para \texttt{EmergencyLanding} por \texttt{CriticalBattery}; \texttt{EmergencyLanding} para \texttt{Grounded} por \texttt{LandedSignal}; \texttt{Grounded} para \texttt{Shutdown} por \texttt{SystemCutoff}) e uma proibição explícita (\texttt{InFlight} para \texttt{Shutdown}). Vale a convenção de mundo fechado: o que não é permitido nem identidade é proibido. Duas escolhas não vêm do enunciado e estão marcadas no arquivo: aceitar a aresta identidade, e deixar o estado inalterado nos pares (estado, evento) sem regra. A especificação foi escrita pela mesma pessoa que escreveu o código; é um artefato distinto, derivado de um texto anterior, mas não é um oráculo de terceiros. Na versão 5, ela foi ampliada para uma tabela de 16 linhas (estado, evento, destino e saída) com a origem de cada regra, \texttt{REQ} ou \texttt{CONV}, e confrontada de forma exaustiva (seções 5.16 e 5.17).
+
+\textit{Teste exaustivo.} O comando \texttt{cabal test avionics-spec-tests} executa 16 verificações sobre todo o domínio (4 vértices e 4 eventos, sem amostragem). Elas confrontam a especificação com (A) o valor da topologia do CREM, (B) a função de transição ingênua, (C) o destino que a ação do CREM realmente devolve, lido do tipo singleton do resultado, e (D) a associação de cada evento ao destino previsto no enunciado. Todas passam.
+
+\textit{Matriz de rejeição.} O programa \texttt{scripts/negative\_matrix.sh} gera um módulo mínimo para cada um dos 16 pares (origem, destino), com \texttt{act SOrigem = pureResult MsgIgnored SDestino}, e o compila. O esperado, segundo a especificação, é que compilem as quatro arestas e as quatro identidades, e que os outros oito pares sejam rejeitados com \texttt{Could not deduce AllowedTransition} nomeando o par e nenhum outro erro. Resultado: 8 compilaram, 8 foram rejeitados, 0 divergências.
+
+\begin{table}[h]
+\centering
+\scriptsize
+\begin{tabular}{|p{3.0cm}|p{2.5cm}|p{2.3cm}|p{3.0cm}|p{2.5cm}|}
+\hline
+origem $\backslash$ destino & \texttt{Grounded} & \texttt{InFlight} & \texttt{EmergencyLanding} & \texttt{Shutdown} \\
+\hline
+\texttt{Grounded} & compila (identidade) & compila & rejeitado & compila \\
+\hline
+\texttt{InFlight} & rejeitado & compila (identidade) & compila & rejeitado \\
+\hline
+\texttt{EmergencyLanding} & compila & rejeitado & compila (identidade) & rejeitado \\
+\hline
+\texttt{Shutdown} & rejeitado & rejeitado & rejeitado & compila (identidade) \\
+\hline
+\end{tabular}
+\caption{Resultado da compilação de \texttt{pureResult} para os 16 pares de vértices (GHC 9.6.7).}
+\end{table}
+
+\textit{As verificações conseguem falhar?} Defeitos foram injetados um a um, e o arquivo restaurado pelo controle de versão após cada teste. A aresta \texttt{InFlight} para \texttt{Shutdown} acrescentada à topologia e à ação fez o teste de especificação falhar em quatro verificações (versão de 13 verificações do teste) e a matriz acusar uma divergência: o par passou a compilar. Uma alteração só na FSM ingênua (\texttt{InFlight} com \texttt{SystemCutoff} indo a \texttt{Shutdown}) fez o teste falhar em três verificações e a matriz continuou passando, como esperado, porque ela não olha a FSM ingênua. Uma ação do CREM com destino errado em uma aresta permitida (\texttt{Grounded} com \texttt{TakeoffSignal} indo a \texttt{Shutdown}) é aceita pelo compilador e pela matriz; só o teste de especificação a detecta, e apenas por causa do bloco (D), que associa o evento ao destino. Esse último caso mostra o limite da garantia dos tipos: o compilador aceita qualquer destino que seja aresta da topologia.
+
+\subsection{Cadeia da Bateria e Descarte do Registrador de um Slot}
+
+A suíte do simulador, com comprimento máximo $N = 4$, não alcança a cadeia de emergência induzida pela bateria (decolagem, dois \texttt{Drain} e três ticks de liberação, seis ticks no total). Foi escrita uma enumeração em malha fechada sobre um alfabeto reduzido de quatro ticks (ocioso, \texttt{TakeoffSignal}, \texttt{Drain} e \texttt{Recharge}) com $N = 8$, isto é, 87\,381 cenários, executada em cerca de 33 s (\texttt{cabal test avionics-chain-tests}).
+
+\begin{table}[h]
+\centering
+\footnotesize
+\begin{tabular}{|p{10.4cm}|p{3.3cm}|}
+\hline
+Resultado & Valor \\
+\hline
+invariante: toda entrada da bateria em \texttt{Critical}, com a aviônica em voo, leva a \texttt{EmergencyLanding} no tick seguinte & vale nos 87\,381 cenários \\
+\hline
+cenários que alcançam \texttt{EmergencyLanding} & 22\,172 \\
+\hline
+cenários que terminam em \texttt{Shutdown} tendo recebido ao menos um \texttt{Drain} & 8\,160 \\
+\hline
+achado: terminam com a bateria em \texttt{Critical}, a aviônica em voo e dois ticks ociosos & 172 \\
+\hline
+achado: cenários em que o ambiente descartou telemetria & 8\,726 de 87\,381 \\
+\hline
+\end{tabular}
+\caption{Enumeração da cadeia da bateria (malha fechada, $N = 8$).}
+\end{table}
+
+O primeiro achado é uma lacuna do modelo do ambiente, não do CREM. A máquina \texttt{Mission} reage à borda \textit{a bateria entrou em nível crítico}, e não ao nível \textit{a bateria está em nível crítico}. O menor exemplo é \texttt{Drain, Drain, TakeoffSignal, ocioso, ocioso}: a bateria chega a \texttt{Critical} em solo, o sinal é consumido ali (a aviônica o ignora), e a decolagem posterior ocorre com a bateria já crítica, sem que nada leve a aviônica à emergência. A \texttt{Mission} não foi alterada: reagir ao nível é uma decisão de modelagem que cabe ao autor; a política alternativa foi avaliada em um modelo de referência (abaixo).
+
+O descarte de telemetria ocorre só quando o ambiente está retendo um evento de pouso ou de corte (\texttt{TouchdownHeld} ou \texttt{CutoffHeld}) e chega a notícia de bateria crítica (5\,651 e 4\,144 ocorrências). Pela estrutura do modelo, o ambiente só retém esses dois eventos depois de a aviônica ter passado por emergência ou pouso, de modo que a notícia perdida diz respeito a uma bateria cuja emergência já foi tratada; o efeito do descarte sobre o estado final foi medido com o modelo de referência descrito a seguir. Uma nova decolagem com a bateria ainda crítica recai na lacuna descrita acima. Fila ou prioridade são alternativas não avaliadas.
+
+\textit{Modelo de referência independente e políticas do ambiente.} Para que o ambiente não seja validado só contra o próprio simulador, o programa \texttt{cabal test avionics-policy-tests} reimplementa o laço fechado em Haskell comum, sem o CREM: a planta usa a função de transição ingênua e uma tabela de energia escrita à parte, e o ambiente segue a descrição do laço. Nos mesmos 87\,381 cenários, esse modelo coincidiu com o simulador do CREM nos vértices de cada tick e nas saídas da aviônica; uma mutação (\texttt{CriticalHeld} liberando \texttt{LandedSignal}) faz a verificação falhar. O modelo foi escrito pela mesma pessoa que escreveu o simulador, mas a implementação não passa pelo CREM.
+
+Com o mesmo modelo, três políticas para o ambiente foram comparadas: a do projeto (um slot, quem chega primeiro fica), uma fila sem perda (cada tipo de retenção entra uma vez) e uma política que, além disso, reage ao nível da bateria (a cada \texttt{Beat}, com o slot livre, bateria em \texttt{Critical} e aviônica em voo, libera \texttt{CriticalBattery}).
+
+\begin{table}[h]
+\centering
+\footnotesize
+\begin{tabular}{|p{5.2cm}|p{4.6cm}|p{4.6cm}|}
+\hline
+Política & Estado final diferente da política do projeto & Terminam com bateria \texttt{Critical}, aviônica em voo e dois ticks ociosos \\
+\hline
+um slot (do projeto) & --- & 172 \\
+\hline
+fila sem perda & 0 de 87\,381 & 172 \\
+\hline
+reação ao nível & 5\,841 de 87\,381 & 0 \\
+\hline
+\end{tabular}
+\caption{Comparação de políticas do ambiente no modelo de referência (malha fechada, $N = 8$).}
+\end{table}
+
+A fila sem perda não mudou nenhum estado final: a notícia descartada (bateria crítica durante o pouso ou o corte) chegaria a uma aviônica que já não está em voo, e \texttt{CriticalBattery} é ignorado fora de \texttt{InFlight}. Portanto, no recorte enumerado, o descarte do slot é inócuo. \textbf{Correção da versão 5:} essa conclusão vale só para o alfabeto reduzido; com o alfabeto completo de entradas de um tick o descarte altera o estado final em muitos casos (seção 5.17). Já a lacuna entre borda e nível só desaparece com a reação ao nível (172 para 0 cenários), ao custo de mudar o estado final em 5\,841 cenários, que são, em princípio, aqueles em que a aviônica está em voo com a bateria crítica sem que a política do projeto reaja; essa caracterização dos 5\,841 casos não foi verificada caso a caso. Essas políticas existem só no modelo de referência; a \texttt{Mission} do projeto não foi alterada, e a escolha entre elas depende de requisitos que o projeto não tem.
+
+\textit{A invariante consegue falhar?} Ao fazer \texttt{CriticalHeld} deixar de liberar \texttt{CriticalBattery}, a invariante falhou com contraexemplo e o número de cenários que alcançam \texttt{EmergencyLanding} caiu a zero; o arquivo foi restaurado em seguida.
+
+\subsection{Comparação com a Mesma Máquina em C}
+
+Para avaliar a premissa do trabalho, a mesma máquina foi escrita em C (tipos \texttt{enum} e instruções \texttt{switch}, o estilo descrito por Malakhovski e Shalyto, 2009), e compilada com o \textit{clang} 14.0.6, que acompanha o GHC. Sete variantes (M0 a M6) foram produzidas, cada uma com um defeito, e comparadas com a mesma especificação por um programa que imprime os 16 pares (estado, evento, destino). O compilador foi usado com dois conjuntos de opções: A (\texttt{-Wall -Wextra}) e B (A mais \texttt{-Wswitch-enum}, \texttt{-Wenum-compare} e \texttt{-Wassign-enum}).
+
+\begin{table}[h]
+\centering
+\scriptsize
+\begin{tabular}{|p{3.4cm}|p{1.6cm}|p{1.6cm}|p{2.2cm}|p{4.3cm}|}
+\hline
+Defeito & C, opções A & C, opções B & Teste exaustivo em C & Haskell com CREM \\
+\hline
+M1: caso omitido no \texttt{switch} & 1 aviso & 1 aviso & passa (o retorno final equivale a não mudar de estado) & aviso do GHC; erro com a opção de promoção \\
+\hline
+M2: caso omitido e \texttt{default} & sem aviso & 1 aviso & passa & sem aviso: o curinga esconde \\
+\hline
+M3: transição proibida \texttt{InFlight} para \texttt{Shutdown} & sem aviso & sem aviso & detecta & rejeitada na compilação \\
+\hline
+M4: aresta permitida, destino errado & sem aviso & sem aviso & detecta & aceita pelo compilador; o teste de especificação detecta \\
+\hline
+M5: compara estado com constante de evento & sem aviso & sem aviso & detecta só por coincidência numérica & erro de tipo \\
+\hline
+M6: valor fora da enumeração (42) & sem aviso & sem aviso & detecta & erro de tipo \\
+\hline
+\end{tabular}
+\caption{Defeitos injetados na máquina em C e o que cada mecanismo detecta.}
+\end{table}
+
+A mesma comparação foi repetida em C++ com \texttt{enum class}, compilado com o \textit{clang++} da mesma distribuição. Os resultados para M1 a M4 coincidem com os de C. Muda M5: comparar o estado com uma constante de evento não compila em C++ com \texttt{enum class}, como em Haskell, ao passo que em C o \texttt{enum} comum aceita a comparação sem aviso. M6 (converter o valor 42 para o tipo do estado) compila sem aviso em C++, por meio de \texttt{static\_cast}, e é impedido apenas em Haskell.
+
+O que a comparação sustenta. Primeiro, o compilador de C, com as opções adequadas, também avisa de caso omitido; a diferença, nesse ponto, é que o aviso do GHC já está em \texttt{-Wall}, enquanto em C a variante com \texttt{default} só é acusada com \texttt{-Wswitch-enum}. Segundo, em domínio finito, um teste exaustivo detecta os mesmos defeitos M3 a M6 que o sistema de tipos; o que o CREM acrescenta, para M3, é detectá-lo na compilação, sem que seja preciso escrever o teste. Terceiro, nenhum compilador detecta M4, o destino errado em aresta permitida; é preciso uma especificação com eventos. Quarto, M5 é impedido pelo sistema de tipos de Haskell e pelo \texttt{enum class} de C++, mas não pelo \texttt{enum} de C, e M6 só é impedido em Haskell. Esses resultados dão forma mensurável à hipótese central: a vantagem é antecipação e ausência de código de teste, não uma garantia que um teste exaustivo não ofereça.
+
+Limites. Foi comparada uma só máquina, em duas linguagens imperativas (C e C++) e com um só compilador (\textit{clang}). Não se mediu esforço de escrita ou de manutenção, nem o custo dos módulos de Template Haskell e das mensagens de erro. A comparação com outras linguagens imperativas fica para a continuidade do trabalho. A auditoria da seção 5.18 reproduz a comparação com opções e versões registradas, trata \texttt{enum} e \texttt{enum class} separadamente, acrescenta uma versão em C++17 com tipos e promove os avisos a erro; ela modifica a conclusão, pois o C++17 com tipos também recusa a transição proibida em compilação.
+
+\subsection{Fronteira de Integração Tipada}
+
+O parecer técnico de 3 de novembro de 2026 observa que um dado recebido de uma interface externa não tem, automaticamente, o tipo estático esperado em Haskell. Isso não elimina a garantia interna de uma ação do CREM corretamente tipada, mas exige um limite de confiança explícito: receber texto ou mensagens, validar, converter em tipos algébricos, executar a máquina e comparar as saídas. A Figura~\ref{fig:fronteira} mostra o desenho adotado, implementado no módulo \texttt{Validation.Boundary}.
+
+\begin{figure}[h]
+\centering
+\footnotesize
+\begin{tikzpicture}[
+    box/.style={draw, rounded corners=2pt, minimum height=0.9cm, text width=10.2cm, align=center, inner sep=4pt},
+    ar/.style={-{Stealth[length=2.2mm]}, thick}
+]
+\node[box] (a) at (0,0) {Gerador de entradas, oráculo ou arquivo de cenários\\{\scriptsize texto, não tipado em Haskell}};
+\node[box] (b) at (0,-1.7) {Adaptador de fronteira (\texttt{Validation.Boundary})\\{\scriptsize decodifica e valida; devolve \texttt{Either BoundaryError AvEvent}}};
+\node[box] (c) at (0,-3.4) {FSM em CREM\\{\scriptsize recebe \texttt{AvEvent}; restrições de topologia por aresta}};
+\node[box] (d) at (0,-5.1) {Comparador de traços (\texttt{Validation.Compare})\\{\scriptsize confronta passos, saídas, estado final e propriedades}};
+\draw[ar] (a) -- (b);
+\draw[ar] (b) -- (c);
+\draw[ar] (c) -- (d);
+\end{tikzpicture}
+\caption{Fronteira de integração tipada. Só o que sai do adaptador é um valor de tipo algébrico.}
+\label{fig:fronteira}
+\end{figure}
+
+O formato de cenário tem um tick por linha, com um comando para a aviônica (\texttt{TAKEOFF}, \texttt{CRITICAL}, \texttt{LANDED} ou \texttt{CUTOFF}) e, opcionalmente, um evento de energia (\texttt{DRAIN}, \texttt{RECHARGE} ou \texttt{SHEDLOAD}); \texttt{IDLE} é um tick sem entrada. A decodificação é estrita (só maiúsculas, só esse vocabulário). O núcleo é o exemplo do parecer, com erro tipado:
+
+\begin{verbatim}
+decodeEvent :: String -> Either BoundaryError AvEvent
+decodeEvent "TAKEOFF"  = Right TakeoffSignal
+decodeEvent "CRITICAL" = Right CriticalBattery
+decodeEvent "LANDED"   = Right LandedSignal
+decodeEvent "CUTOFF"   = Right SystemCutoff
+decodeEvent other      = Left (UnknownToken other)
+\end{verbatim}
+
+\textit{O que o adaptador garante e o que não garante.} Todo valor \texttt{AvEvent}, \texttt{PowerEvent} ou \texttt{TickInput} que sai do adaptador é um construtor válido; entrada fora do vocabulário vira \texttt{Left}, com o número da linha, e nunca exceção. A conversão correta restringe o formato e a enumeração dos eventos. Ela \textbf{não} demonstra que o evento determina a transição correta: isso depende da especificação e da verificação próprias (seções 5.16 e 5.17).
+
+\textit{Testes de contrato.} A suíte \texttt{validation-boundary-tests} executa 21 verificações: ida e volta nos quatro comandos e nos três eventos de energia; treze cadeias hostis (vazia, minúsculas, o nome do construtor, ponto e vírgula, caractere nulo, 10\,000 caracteres) que nunca lançam exceção e são todas recusadas; os erros de cenário com a linha certa; fim de linha do Windows; e o caminho completo do arquivo de cenário ao CREM, com o traço de regressão e o cenário de emergência da seção 5.11. Três propriedades do Hedgehog (5.17) repetem a ida e volta, a totalidade e a decodificação estrita com geradores aleatórios.
+
+\subsection{Arquitetura de Validação em Três Níveis e Especificação Independente}
+
+O parecer técnico recomenda manter o simulador em Haskell, que é uma escolha metodológica defensável porque o objeto de validação é o comportamento discreto, e acrescentar uma especificação independente, testes baseados em modelos e, se viável, verificação de propriedades globais. A questão central passa a ser: \textit{como verificar que o simulador executa a especificação pretendida?} A Tabela~\ref{tab:niveis} resume os três níveis e o que cada um pode estabelecer.
+
+\begin{table}[h]
+\centering
+\footnotesize
+\begin{tabular}{|p{2.3cm}|p{5.2cm}|p{3.4cm}|p{3.0cm}|}
+\hline
+Nível & Mecanismo & Pode estabelecer & Não estabelece \\
+\hline
+1. Verificação estática & exaustividade promovida a erro; matriz de rejeição de 16 pares com a causa do erro conferida; mutação da implementação & arestas fora da topologia e pares omitidos são recusados na compilação & destino errado em aresta permitida; sequências \\
+\hline
+2. Especificação independente & tabelas \texttt{CSV} revisáveis; oráculo guiado por elas; alcançabilidade exaustiva do laço (Haskell); especificação em TLA+ (verificada no TLC) & equivalência com a implementação para sequências de qualquer comprimento, sob a hipótese da abstração; propriedades globais do modelo & que a tabela reflete requisitos reais; correção do CREM \\
+\hline
+3. Testes baseados em modelo & Hedgehog: geradores reprodutíveis, shrinking, mutantes do oráculo, traço de regressão & divergências em cenários de até 60 ticks, com o menor contraexemplo local & ausência de divergência fora da amostra \\
+\hline
+\end{tabular}
+\caption{Arquitetura de validação em três níveis.}
+\label{tab:niveis}
+\end{table}
+
+\textit{Duas matrizes que não se confundem.} A matriz \textit{origem $\times$ destino} (seção 5.12) tem 16 pares de vértices: 8 aceitos, incluindo as 4 identidades, e 8 rejeitados; ela verifica a \textbf{topologia}. A matriz \textit{estado $\times$ evento} também tem 16 combinações, mas verifica outra propriedade, a cobertura da função de transição (a completude da seção 5.2). Na versão 5, a matriz de rejeição deriva o resultado esperado da tabela de transições, e não de uma lista escrita no próprio programa, e confere que o erro tem exatamente a causa esperada (\texttt{Could not deduce AllowedTransition} para o par).
+
+\textit{A tabela revisável.} O arquivo \texttt{spec/transition\_table.csv} reúne as 16 linhas da função $\delta$ e da função de saída $\lambda$, derivadas do texto dos requisitos e não do código. Cada linha tem uma origem: \texttt{REQ}, se a regra está escrita no texto dos requisitos (são 4 linhas, as quatro arestas permitidas); \texttt{CONV}, se é convenção do projeto para um par que o texto não trata (são 12 linhas: o estado não muda); e, na tabela de energia (9 linhas), \texttt{MODEL}, porque os requisitos não dão regra alguma para a bateria. Os nomes das mensagens de saída também são convenção. A tabela traz as perguntas que a orientação precisa responder, por exemplo se \texttt{InFlight} com \texttt{SystemCutoff} deve ser ignorado ou rejeitado explicitamente, e o status da revisão é \textbf{pendente}.
+
+\textit{O oráculo.} O módulo \texttt{Validation.RefModel} reimplementa o laço fechado em Haskell comum, sem o CREM e sem a função de transição ingênua: a planta lê as tabelas. O ambiente segue a descrição de \texttt{spec/POLITICAS.md}, com as três políticas (um slot, fila sem perda, reação ao nível). O oráculo é independente do \textbf{código} em teste, mas não de sua \textbf{autoria}: foi escrito pela mesma pessoa, de modo que um erro de interpretação dos requisitos pode estar nos dois lados. Só a revisão da orientação, ou de uma segunda pessoa, fecha essa lacuna.
+
+\textit{A especificação em TLA+.} O arquivo \texttt{04\_tla/AvionicsLoop.tla} descreve as mesmas regras, a partir das tabelas, com as propriedades candidatas do parecer: segurança da topologia, evento e destino, terminação da realimentação e a política da bateria (\texttt{NoPermanentBlindness}), com pressupostos de justiça explícitos. Ela foi executada no TLC 2.19 (TLA+ Tools 1.7.4, Java 8), com resultados na seção 5.17. O TLC verifica o \textbf{modelo}, e não a implementação em Haskell.
+
+\subsection{Resultados da Validação em Três Níveis}
+
+Todos os resultados desta seção vêm de execuções registradas em \texttt{Revisao\_v5/08\_reprodutibilidade/logs/} (GHC 9.6.7, \texttt{crem} 0.1.0.0, \texttt{hedgehog} 1.7). A Tabela~\ref{tab:suites} lista as suítes novas.
+
+\begin{table}[h]
+\centering
+\footnotesize
+\begin{tabular}{|p{5.5cm}|p{5.5cm}|p{2.9cm}|}
+\hline
+Suíte ou programa & O que confronta & Resultado \\
+\hline
+\texttt{negative\_matrix.sh} & 16 pares de vértices; esperado derivado da tabela; causa do erro conferida & 8 compilam, 8 rejeitados, 0 divergências \\
+\hline
+\texttt{validation-\allowbreak conformance-tests} & tabelas \texttt{CSV} $\times$ ação do CREM, FSM ingênua, topologia e regras do pacote base; o validador de tabelas consegue falhar & 20 verificações, 0 falhas \\
+\hline
+\texttt{validation-\allowbreak boundary-tests} & contrato do adaptador de fronteira (seção 5.15) & 21 verificações, 0 falhas \\
+\hline
+\texttt{validation-\allowbreak reach-tests} & alcançabilidade exaustiva do laço fechado; equivalência implementação $\times$ oráculo; política da bateria & 12 verificações, 0 falhas \\
+\hline
+\texttt{validation-\allowbreak model-tests} (Hedgehog) & traços do CREM $\times$ oráculo em até 40 ticks; propriedades de traço em até 60; fronteira; regressão; 5 mutantes & 18 verificações, 0 falhas \\
+\hline
+\end{tabular}
+\caption{Suítes acrescentadas na versão 5.}
+\label{tab:suites}
+\end{table}
+
+\textit{Alcançabilidade exaustiva.} O estado do laço entre dois ticks é o terno de vértices (aviônica, energia, ambiente), com no máximo $4 \times 3 \times 4 = 48$ valores. A exploração em largura, com o alfabeto completo de 20 entradas de um tick, fecha em 26 ternos alcançáveis e 520 arestas. Em cada passo da exploração a \textbf{própria implementação} é usada: o laço \texttt{closedLoop}, com o \texttt{Feedback}, é construído em um terno qualquer com \texttt{withSomeSing} e executado sobre um tick. A hipótese da abstração (o comportamento futuro depende só do terno) vale por construção e foi conferida em 8\,421 cenários de até 3 ticks, nos quais iterar o passo coincide com o simulador de cenários em todos os passos. Sob essa hipótese, três resultados valem para sequências de \textbf{qualquer} comprimento, e não só até $N = 4$ ou $N = 8$:
+
+\begin{itemize}
+\item nenhuma aresta do grafo viola a segurança da topologia (nenhum passo vai de \texttt{InFlight} a \texttt{Shutdown}; \texttt{Shutdown} só vem de \texttt{Grounded}; \texttt{EmergencyLanding} só vem de \texttt{InFlight});
+\item a implementação em CREM e o oráculo da política do projeto têm os mesmos estados alcançáveis e as mesmas arestas, com os mesmos passos (evento, saída, vértices e ambiente) em cada aresta;
+\item a realimentação termina em todas as 520 combinações de estado e tick, com no máximo 5 passos por tick (o \texttt{Beat}, até duas liberações do ambiente, o comando e a energia).
+\end{itemize}
+
+\textit{Política da bateria, para todas as sequências.} Com a política do projeto, existem dois estados alcançáveis em que a aviônica está em voo com a bateria em \texttt{Critical} e, aplicando-se só ticks ociosos, dele nunca se sai: \texttt{(InFlight, Critical, Standby)}, alcançado em 3 ticks (\texttt{DRAIN}, \texttt{DRAIN}, \texttt{TAKEOFF}), e \texttt{(InFlight, Critical, CutoffHeld)}, também em 3 ticks (\texttt{TAKEOFF}; \texttt{CRITICAL DRAIN}; \texttt{TAKEOFF DRAIN}). O primeiro é a lacuna da seção 5.13 (o ambiente reage à entrada da bateria em nível crítico, não ao nível): o traço de regressão \texttt{Drain}, \texttt{Drain}, \texttt{TakeoffSignal}, ocioso, ocioso termina com a aviônica em \texttt{InFlight}, a bateria em \texttt{Critical} e a única saída significativa \texttt{MsgTakeoff}. O segundo é um caminho diferente até o mesmo efeito: a notícia de bateria crítica chega com o slot ocupado e é descartada. Medida como propriedade temporal (a negação de ``infinitas vezes, a aviônica não está em voo com a bateria crítica'', a \texttt{NoPermanentBlindness} do TLA+), a política do projeto a viola; a política que reage ao nível a satisfaz, com nenhum caminho infinito, sob quaisquer entradas, que permaneça nesses estados. A fila sem perda não resolve a lacuna (1 estado). Isso transforma a medida da seção 5.13 (172 cenários contra 0, até $N = 8$ e alfabeto reduzido) em um resultado sobre o grafo inteiro, \textbf{no modelo}. O menor cenário em que a implementação diverge, passo a passo, da política que reage ao nível tem 4 ticks (\texttt{DRAIN}, \texttt{DRAIN}, \texttt{TAKEOFF}, \texttt{IDLE}).
+
+\textit{Correção da seção 5.13: o descarte do slot.} A seção 5.13 concluiu que o descarte do slot é inócuo, mas no recorte de um alfabeto reduzido (ocioso, \texttt{TakeoffSignal}, \texttt{Drain}, \texttt{Recharge}) com $N = 8$, que não contém ticks com comando e energia ao mesmo tempo nem o comando \texttt{LandedSignal}. Com o alfabeto completo, o produto das políticas de um slot e de fila sem perda tem 282 pares alcançáveis, dos quais 232 diferem no par (aviônica, energia) ao fim de um tick. O menor exemplo tem 4 ticks (\texttt{DRAIN}; \texttt{TAKEOFF DRAIN}; \texttt{LANDED}; \texttt{RECHARGE}) e termina com a aviônica em \texttt{Grounded} no modelo do projeto e em \texttt{Shutdown} na fila: com o slot ocupado pela retenção de pouso, a notícia de pouso é descartada e o corte do sistema nunca é liberado. A afirmação da seção 5.13 vale, portanto, só para o alfabeto reduzido; a verificação revela uma sensibilidade do estado final ao descarte que aquele recorte não podia mostrar. Isso é propriedade do modelo do ambiente, que é escolha de modelagem do autor, e não do CREM.
+
+\textit{Conferência no TLC.} A especificação em TLA+ foi escrita a partir das tabelas, sem olhar o código Haskell, e executada no TLC 2.19. O espaço de estados fechou em 1\,143 estados distintos (1\,638 gerados; profundidade 16 com a política do projeto e 17 com a outra, nas duas com os mesmos 1\,143 estados), contando os estados intermediários da fila de sinais de cada tick. Com a política do projeto, o TLC viola \texttt{NoPermanentBlindness} e devolve um contraexemplo em laço: \texttt{Drain}, \texttt{Drain}, \texttt{TakeoffSignal} e depois ticks sem efeito, com a aviônica em \texttt{InFlight} e a bateria em \texttt{Critical}. Sem essa propriedade, todas as outras valem (os invariantes \texttt{TypeOK} e \texttt{QueueBounded}; segurança da topologia; \texttt{ShutdownOnlyFromGrounded} e \texttt{EmergencyOnlyFromFlight}; \texttt{EventDestination}; \texttt{LoopTerminates}). Com a política que reage ao nível, \emph{todas} as propriedades valem. O conjunto de ternos (aviônica, energia, ambiente) com a fila vazia é \textbf{idêntico} ao da exploração em Haskell: os mesmos 26. Dois caminhos independentes (a implementação em CREM e uma especificação em TLA+ escrita a partir das tabelas) chegam, portanto, ao mesmo espaço de estados e à mesma conclusão sobre a política da bateria; isso reduz o risco de erro em um dos lados, mas não o de um erro de interpretação comum aos dois, pois ambos foram escritos pelo mesmo autor.
+
+\textit{Testes baseados em modelo.} Com o Hedgehog, o traço do CREM em malha fechada coincide com o do oráculo, passo a passo, em 5\,000 cenários aleatórios de até 40 ticks, e em malha aberta em 3\,000; as propriedades de traço do pacote base valem em 3\,000 cenários de até 60 ticks (a enumeração original parava em 4). Cada falha imprime a semente que a reproduz. O traço de regressão prioritário é verificado nos dois lados: com a política do projeto termina em \texttt{InFlight} com a bateria \texttt{Critical}; com a política que reage ao nível, a aviônica vai a \texttt{EmergencyLanding}, pousa e a bateria alivia a \texttt{Low}.
+
+\textit{Os testes conseguem falhar?} Cinco defeitos foram injetados no oráculo (equivale a um defeito na implementação, pois a comparação é simétrica), e a propriedade de equivalência foi reprovada em todos, com o contraexemplo reduzido pelo shrinking: destino errado em aresta permitida (1 tick, \texttt{TAKEOFF}); aresta ilegal \texttt{InFlight} para \texttt{Shutdown} (2 ticks); eventos trocados em \texttt{Grounded} (1 tick); saída errada (3 ticks); e a política \texttt{Level} contra o CREM (7 ticks). O shrinking garante um mínimo \textbf{local}: o último caso reduziu de até 40 para 7 ticks, mas o mínimo global, obtido pela busca em largura, tem 4.
+
+\textit{Mutação da implementação em CREM.} Oito defeitos foram injetados, um por vez, no código do CREM e do ambiente, em uma cópia temporária do projeto (\texttt{validation/scripts/mutation.sh}); cada mutante é compilado e confrontado com cinco suítes: \texttt{avionics-spec-tests} e \texttt{avionics-sim-tests} ($N = 3$), do pacote base, e as de conformidade, alcançabilidade e Hedgehog, da versão 5. A Tabela~\ref{tab:mutacao} mostra o resultado. Nenhum mutante sobreviveu.
+
+\begin{table}[h]
+\centering
+\footnotesize
+\begin{tabular}{|p{0.8cm}|p{6.2cm}|p{3.0cm}|p{4.2cm}|}
+\hline
+Id & Defeito injetado & Compilador & Suítes que reprovaram \\
+\hline
+H1 & aresta ilegal \texttt{InFlight} para \texttt{Shutdown}, na topologia e na ação & aceita & as cinco \\
+\hline
+H2 & destino errado em aresta permitida (\texttt{Grounded} com \texttt{TakeoffSignal} vai a \texttt{Shutdown}) & aceita & as cinco \\
+\hline
+H3 & eventos trocados em \texttt{Grounded} (\texttt{TakeoffSignal} e \texttt{SystemCutoff}) & aceita & as cinco \\
+\hline
+H4 & ação ilegal \texttt{InFlight} para \texttt{Shutdown} \textbf{sem} tocar na topologia & \textbf{recusa} (falta a prova de aresta permitida) & --- \\
+\hline
+H5 & par (estado, evento) omitido & \textbf{recusa} (exaustividade promovida a erro) & --- \\
+\hline
+H6 & saída errada (\texttt{EmergencyLanding} com \texttt{LandedSignal} emite \texttt{MsgIgnored}) & aceita & simulador, conformidade, alcançabilidade, Hedgehog \\
+\hline
+H7 & ambiente: \texttt{CriticalHeld} libera \texttt{LandedSignal} em vez de \texttt{CriticalBattery} & aceita & simulador, alcançabilidade, Hedgehog \\
+\hline
+H8 & energia: \texttt{Low} com \texttt{Drain} fica em \texttt{Low} & aceita & simulador, conformidade, alcançabilidade, Hedgehog \\
+\hline
+\end{tabular}
+\caption{Mutação da implementação em CREM: 8 mutantes, 0 vivos.}
+\label{tab:mutacao}
+\end{table}
+
+O resultado confirma o alcance da garantia por aresta: o compilador recusa a aresta ilegal quando a topologia não é alterada (H4) e o par omitido (H5), mas \textbf{aceita} a aresta ilegal quando o defeito está também na topologia (H1), o destino errado em aresta permitida (H2), os eventos trocados (H3), a saída errada (H6) e os defeitos do ambiente e da energia (H7, H8), que só os testes detectam. As suítes que conseguem falhar são o que dá sentido a um teste verde. Os mutantes foram escolhidos pelo autor a partir das classes pedidas no parecer (arestas ilegais, destinos incorretos e eventos trocados), e não são uma amostra sistemática de defeitos.
+
+
+\subsection{Auditoria da Comparação com C e C++}
+
+O parecer técnico observa que a pouca experiência do discente com C e C++ é uma ameaça à validade da comparação (seção 5.14): o experimento precisa de revisão externa para evitar equivalências incorretas ou implementações injustamente fracas. A auditoria desta versão reproduz a comparação com um script (\texttt{05\_c-cpp/scripts/audit.sh}), que registra a versão do compilador e as saídas, usa como esperado os 16 triplos da tabela de transições e trata separadamente três pilhas: C com \texttt{enum} e \texttt{switch}; C++17 com \texttt{enum class} e \texttt{switch}; e C++17 moderno, com \texttt{std::variant}, \texttt{std::visit} e a topologia no nível dos tipos, em um traço \texttt{Allowed} com \texttt{static\_assert}, análogo de \texttt{AllowedTransition} do CREM. Cada versão é compilada com as opções A (\texttt{-Wall -Wextra}), B (A mais \texttt{-Wswitch-enum}, \texttt{-Wenum-compare} e \texttt{-Wassign-enum}) e W (B com \texttt{-Werror}, que é a comparação justa com a promoção do aviso de exaustividade a erro), e passa pelo analisador estático do clang (\texttt{--analyze}); o harness exaustivo imprime os 16 pares.
+
+\begin{table}[h]
+\centering
+\scriptsize
+\begin{tabular}{|p{3.2cm}|p{2.9cm}|p{2.9cm}|p{2.4cm}|p{2.2cm}|}
+\hline
+Defeito & C (\texttt{enum}) & C++ (\texttt{enum class}) & C++17 tipado & Haskell com CREM \\
+\hline
+par omitido, sem curinga & aviso (A, B); \textbf{recusa} com \texttt{-Werror} & idem & \textbf{recusa} & recusa (exaustividade promovida a erro) \\
+\hline
+par omitido, com curinga & aviso só em B; recusa com \texttt{-Werror} & idem & \textbf{sem aviso} & curinga esconde (v4) \\
+\hline
+transição \textbf{proibida} & só o teste exaustivo detecta & idem & \textbf{recusa} (\texttt{static\_assert}) & \textbf{recusa} \\
+\hline
+destino errado em aresta \textbf{permitida} & só o teste & só o teste & só o teste & compila; só o teste \\
+\hline
+estado confundido com evento & sem aviso; o teste detecta por coincidência numérica & \textbf{recusa} (tipos distintos) & \textbf{recusa} & recusa (tipos) \\
+\hline
+valor fora da enumeração & só o teste & só o teste (\texttt{static\_cast}) & não se aplica & recusa (tipos) \\
+\hline
+\end{tabular}
+\caption{O que cada mecanismo detecta. As colunas de C, C++ e C++17 vêm de \texttt{audit.sh} (clang 14.0.6); a do CREM, das seções 5.9 e 5.12 e da mutação da seção 5.17. O analisador estático \texttt{--analyze} não acusou nenhum dos defeitos que compilam.}
+\end{table}
+
+\textit{O que muda na conclusão comparativa.} Primeiro, a generalização de que só o Haskell antecipa a transição proibida para a compilação \textbf{não se sustenta}: com cerca de dez linhas de gabarito, o C++17 com tipos recusa a transição proibida na compilação, como o CREM. A conclusão defensável é a do parecer: nos experimentos apresentados, certas restrições de topologia são verificadas na compilação em CREM; isso antecipa a detecção e dispensa testes específicos para essas arestas, mas não torna equivalentes a correção comportamental e a segurança de tipos, e um teste exaustivo pode encontrar erros sem que o compilador os rejeite. Segundo, promover os avisos a erro aproxima o C do GHC no caso do par omitido; a diferença reportada na versão 4 (o aviso do GHC já vem em \texttt{-Wall}) é de configuração padrão. Terceiro, nenhum compilador, em nenhuma das linguagens, detecta o destino errado em aresta permitida: é a fronteira da garantia por aresta. Quarto, o curinga é o ponto fraco comum às quatro construções.
+
+\textit{Legibilidade dos diagnósticos (proxy de tamanho).} A mensagem do \texttt{-Wswitch} do C tem 4 linhas (217 bytes); a do \texttt{static\_assert} que recusa a transição proibida em C++17, 7 linhas (642 bytes); a do CREM para \texttt{InFlight} e \texttt{Shutdown}, 25 linhas (1\,637 bytes); e a de um par omitido em \texttt{std::visit}, 236 linhas (35\,863 bytes) de mensagens de gabarito. Tamanho não é legibilidade: não houve leitura por terceiros. O esforço de manutenção e o custo de compilação (Template Haskell e gabaritos) não foram medidos.
+
+\textit{Limites e revisão externa.} A auditoria cobre uma máquina de 4 estados, um compilador (clang 14.0.6) e um sistema (Windows 11); os defeitos foram injetados pelo autor, e a versão C++ tipada é uma escolha do autor. GCC, MSVC, \texttt{clang-tidy} e outros analisadores não foram usados. A auditoria reduz o risco apontado pelo parecer, mas \textbf{não o elimina}: o revisor de C e C++ ainda não foi definido, e a lista de itens a conferir está em \texttt{05\_c-cpp/REVISAO\_EXTERNA\_CHECKLIST.md}.
+
+\subsection{Ameaças à Validade}
+
+As ameaças são específicas deste trabalho. Para cada uma, registram-se o que foi feito e o que falta; a versão completa, em forma de tabelas, está em \texttt{06\_artigos/AMEACAS\_A\_VALIDADE.md}.
+
+\textit{Construto.} ``Segurança de tipos'' é tratada como \textbf{rejeição antecipada, em compilação, de transições fora da topologia}, e não como segurança comportamental; o evento--destino e o temporal são tratados à parte. O domínio de aviônica é um exemplo escolhido, sem requisitos reais, de modo que os achados valem para o modelo. Esforço e legibilidade foram medidos só por proxies (tamanho de diagnósticos).
+
+\textit{Interna.} O autor escreveu o código, as tabelas, o oráculo, a especificação em TLA+ e as implementações em C e C++, e um erro de interpretação pode estar em todos. As tabelas separam a origem das regras (\texttt{REQ}, \texttt{CONV}, \texttt{MODEL}) e o oráculo é guiado por elas, mas a \textbf{revisão pela orientação está pendente} e \textbf{não existe oráculo de terceiros}. A alcançabilidade ``para qualquer comprimento'' depende da hipótese da abstração (o futuro depende só do terno de vértices), conferida em 8\,421 cenários e válida por construção, mas não provada formalmente. Os defeitos injetados são escolhidos por quem escreve os testes. O shrinking dá mínimo local. O TLC verifica o modelo e não a implementação, e a especificação em TLA+ é do mesmo autor.
+
+\textit{Externa.} Há uma topologia de 4 vértices e um ambiente de um slot: outras topologias e escalas (a melhoria 3 do documento de adequação) não foram avaliadas, e o resultado é um estudo de caso, não uma regra geral. Há um compilador por linguagem, um sistema e uma versão do CREM. A literatura não foi levantada de forma sistemática, e portanto não se pode alegar ineditismo.
+
+\textit{Conclusão.} Testes exaustivos em domínio finito não provam sequências arbitrárias; a alcançabilidade fecha o grafo do modelo, com a ressalva acima. O ``achado'' da política da bateria é uma propriedade do modelo do ambiente, não um defeito do CREM nem do GHC. Os números dependem do alfabeto de entradas, que deve ser explicitado em toda tabela (a versão 4 usou um alfabeto reduzido; a 5, o completo). Tempos e contagens vêm de uma máquina e de uma execução.
+
+\textit{Procedência.} O código, os scripts e os textos desta versão foram produzidos com assistência de IA (seção DECLARAÇÕES); a revisão humana do que foi gerado está pendente, e por isso as suítes incluem mutantes e traços corrompidos à mão, que precisam conseguir falhar.
+
+\subsection{Limitações Identificadas e Encaminhamentos}
+
+Registram-se as seguintes limitações.
+
+Primeira, a garantia dos tipos é por aresta (seção 5.9). O caminho \texttt{InFlight}, \texttt{EmergencyLanding}, \texttt{Grounded}, \texttt{Shutdown} é aceito, aresta a aresta. As propriedades de sequência são verificadas por enumeração limitada (seções 5.11 e 5.13), e ausência de contraexemplo nesse recorte não é prova.
+
+Segunda, o evento não faz parte do vértice. A topologia restringe quais vértices podem suceder quais, e não qual evento causa cada transição; essa relação fica no casamento de padrões da ação e é conferida, por teste, contra a especificação (seção 5.12). Perone e Karachalias (2023, seção 6) registram a mesma limitação como trabalho futuro.
+
+Terceira, a especificação do domínio e o código foram escritos pela mesma pessoa. A especificação é um artefato derivado de um texto anterior, não de terceiros, e cobre apenas o que o enunciado diz; os pares sem regra seguem uma convenção do projeto. O mesmo vale para o modelo de referência da seção 5.13.
+
+Quarta, o simulador é discreto: não há física, tempo contínuo nem duração de tick. A semântica do ambiente (bateria crítica vira sensor, emergência vira toque no solo, pouso vira corte), o atraso de um tick, o evento \texttt{ShedLoad} e a ordem de liberação entre \texttt{ShedLoad} e \texttt{LandedSignal} são escolhas de modelagem do autor, sem justificativa em requisitos de um domínio real. Elas foram validadas contra a FSM ingênua e contra propriedades descritas, não contra requisitos de aviônica.
+
+Quinta, a enumeração da seção 5.13 revelou que o ambiente reage à borda, e não ao nível, da bateria crítica. O modelo do projeto não foi alterado; no modelo de referência, a política que reage ao nível elimina o achado (172 para 0 cenários) e muda o estado final em 5\,841 cenários. O descarte do slot não alterou nenhum estado final no recorte de 87\,381 cenários, mas esse recorte usa quatro tipos de tick e $N = 8$; a seção 5.17 mostra que, com o alfabeto completo, o descarte altera o estado final.
+
+Sexta, o laço não tem guarda de terminação em execução. Depende do argumento descrito na seção 5.11, e uma edição futura de \texttt{Mission} que emitisse em resposta a um sinal realimentado poderia travar o \texttt{Feedback}.
+
+Sétima, a resolução da restrição \texttt{AllowedTransition} depende de instâncias marcadas como incoerentes (seção 5.9). Sua correção geral é responsabilidade da biblioteca e não foi provada aqui; verificou-se que, para esta topologia, o resultado coincide com a especificação nos 16 pares.
+
+Oitava, o termo ``representável''. No título e no resumo de Perone e Karachalias (2023), uma máquina representável é aquela cuja implementação se mantém sincronizada com sua representação gráfica, da qual se gera um diagrama automaticamente. Isso é diferente do functor representável de Milewski (2020, cap. 14): um functor isomorfo ao functor de morfismos $\mathrm{Hom}(a, -)$, isto é, um contêiner indexado por chaves do tipo $a$. A ideia de usar o functor representável para indexar a topologia pelo alfabeto $\Sigma$ é uma hipótese de trabalho do projeto, sem sustentação nas fontes da base.
+
+Nona, o determinismo é trivial em código puro e a verificação existe como regressão; a causalidade é a verificação mais informativa dessa família. Os tempos citados são de uma máquina e de uma execução. Os diagramas Mermaid gerados nesta revisão não foram renderizados por uma ferramenta Mermaid.
+
+Décima, a comparação com a abordagem imperativa (seção 5.14) cobre uma máquina, duas linguagens imperativas e um compilador. O estudo de esforço de manutenção, o custo do Template Haskell e a leitura das mensagens de erro não foram avaliados. O construtor \texttt{Kleisli} do CREM não foi exercitado. A literatura que falta (seção 4) permanece como lacuna.
+
+Décima primeira, a especificação em TLA+ foi escrita pelo mesmo autor, a partir das mesmas tabelas, e o TLC verifica o modelo, e não a implementação em Haskell. A coincidência com a exploração em Haskell (os mesmos 26 ternos e as mesmas conclusões, seção 5.17) reduz o risco de erro em um dos lados, mas não o de um erro de interpretação comum aos dois. A versão do TLC usada é a estável 1.7.4; a prerelease 1.8.0 não foi usada.
+
+Décima segunda, a exploração exaustiva do grafo de estados vale sob a hipótese de que o estado do laço entre dois ticks é o terno de vértices. Ela vale por construção de \texttt{closedLoop} e foi conferida em 8\,421 cenários, mas não foi provada, e se refere a um modelo de uma topologia de 4 vértices e um ambiente de um slot.
+
+Décima terceira, a tabela de transições, o oráculo e a especificação em TLA+ foram escritos pelo mesmo autor, e a revisão pela orientação está pendente. A independência obtida é do código, não da autoria; não existe oráculo de terceiros. Doze das 16 linhas da tabela da aviônica e todas as da energia são convenção ou escolha de modelagem, e não decorrem dos requisitos.
+
+Décima quarta, a auditoria da comparação com C e C++ (seção 5.18) foi feita pelo autor, com um compilador e um sistema; a revisão externa de C e C++ está pendente. Não foram avaliadas outras topologias, escalas nem implementações, nem o esforço de manutenção.
+
+\subsection{Síntese Geral e Validação Preliminar das Hipóteses}
+
+Na implementação ingênua, a verificação de corretude é a exaustividade do casamento de padrões, que o GHC executa como aviso e que o projeto promove a erro. Na etapa monádica, a State Monad e a composição de Kleisli organizam a passagem de estado e saída, e as leis de mônada, Functor e Applicative foram demonstradas para a instância usada. Na etapa do CREM, a prova \texttt{AllowedTransition} é exigida pelo compilador, e uma transição fora da topologia é rejeitada em compilação, o que foi testado nos 16 pares de vértices. A composição foi realizada com \texttt{Parallel}, \texttt{Sequential}, \texttt{Alternative} e \texttt{Feedback}, e o conjunto foi simulado em malha aberta e fechada.
+
+A Tabela~\ref{tab:evidencia} separa o que foi demonstrado, o que o compilador rejeita e o que foi testado até um comprimento limitado.
+
+\begin{table}[h]
+\centering
+\footnotesize
+\begin{tabular}{|p{3.0cm}|p{3.4cm}|p{3.4cm}|p{4.0cm}|}
+\hline
+Afirmação & Demonstrado & Rejeitado em compilação & Testado até comprimento limitado ou por enumeração \\
+\hline
+Leis de mônada, Functor e Applicative para \texttt{ST} & prova equacional, com hipóteses explícitas (sem \texttt{seq}, computações totais); a de composição do Applicative está resumida & --- & 17 verificações em exemplos (4 estados, 4 eventos) \\
+\hline
+Completude de $\delta$ e das ações & --- & só se o aviso for promovido a erro; sem isso, apenas aviso & 16 pares escritos um a um, sem curinga \\
+\hline
+Transição fora da topologia & --- & 8 dos 16 pares de vértices rejeitados; 8 compilam & teste de especificação, exaustivo no domínio de 16 pares \\
+\hline
+Destino correto de cada evento & --- & não detectado pelo compilador & teste de especificação (bloco D) \\
+\hline
+Propriedades de sequência (\texttt{Shutdown} só depois de \texttt{Grounded}, etc.) & --- & não aplicável & $N = 4$ (168\,421 cenários); cadeia da bateria e ambiente conferido contra um modelo de referência sem CREM até $N = 8$ em alfabeto reduzido (87\,381) \\
+\hline
+Composição preserva as garantias de cada máquina & não formalizado & por construção, em cada folha & observada em malha aberta e fechada \\
+\hline
+Equivalência do CREM com o oráculo e segurança da topologia, para qualquer comprimento & --- & --- & exploração exaustiva do grafo de estados (26 ternos, 520 arestas), sob a hipótese da abstração (seção 5.17) \\
+\hline
+Política da bateria: o sistema não fica cego para sempre & --- & não coberta pela tipagem por aresta & violada pela política do projeto e satisfeita pela que reage ao nível, no modelo (seção 5.17); confirmada no TLC \\
+\hline
+\end{tabular}
+\caption{O que cada tipo de evidência sustenta.}
+\label{tab:evidencia}
+\end{table}
+
+Quanto às hipóteses:
+
+\begin{itemize}
+\item Completude funcional: confirmada para as funções de transição e de ação da aviônica, da energia e do ambiente, escritas caso a caso e sem equação curinga, com a ressalva de que depende de promover o aviso a erro.
+\item Segurança de tipos: reformulada como \textit{rejeição antecipada, em compilação, de transições fora da topologia}. Confirmada nesse sentido, nos 16 pares. A comparação com C mostra que um teste exaustivo detecta os mesmos defeitos em domínio finito; a vantagem observada é a antecipação e a ausência de código de teste. Não cobre sequências de transições nem a associação evento-destino.
+\item Composabilidade e modulação: demonstrada para \texttt{Basic}, \texttt{Sequential}, \texttt{Parallel}, \texttt{Alternative} e \texttt{Feedback}. Falta \texttt{Kleisli}. A propriedade de que a composição preserva as garantias de cada folha foi observada, não formalizada.
+\item H-A (versão 5): confirmada nos 16 pares e por mutação da implementação: o compilador recusa a aresta ilegal sem toque na topologia e o par omitido, mas aceita destino errado em aresta permitida, eventos trocados e saída errada, que só os testes detectam (seção 5.17).
+\item H-B (versão 5): confirmada no modelo: com todas as arestas corretas, há estados alcançáveis em que a aviônica fica em voo com a bateria crítica sem saída (seção 5.17). É propriedade do ambiente do modelo, e não do CREM.
+\item H-C (versão 5): confirmada para o modelo, sob a hipótese da abstração; o TLC, sobre a especificação em TLA+, confirma os mesmos resultados (seção 5.17).
+\end{itemize}
+
+\section{CRONOGRAMA}
+
+O cronograma a seguir descreve o planejamento de todas as etapas da pesquisa ao longo do período de desenvolvimento do projeto de Iniciação Científica.
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{|p{4.0cm}|p{0.6cm}|p{0.6cm}|p{0.6cm}|p{0.6cm}|p{0.6cm}|p{0.6cm}|p{0.6cm}|p{0.6cm}|p{0.6cm}|p{0.6cm}|p{0.6cm}|}
+\hline
+\textbf{Etapas} & \textbf{fev} & \textbf{mar} & \textbf{abr} & \textbf{mai} & \textbf{jun} & \textbf{jul} & \textbf{ago} & \textbf{set} & \textbf{out} & \textbf{nov} & \textbf{dez} \\
+\hline
+Revisão bibliográfica aprofundada & X & X & & & & & & & & & \\
+\hline
+Modelagem de ADTs e função de transição & & X & X & & & & & & & & \\
+\hline
+Implementação de State Monad e Kleisli & & & X & X & & & & & & & \\
+\hline
+Estudo de caso e composição de FSMs & & & & X & X & & & & & & \\
+\hline
+Testes de invalidez de tipagem & & & & & X & X & & & & & \\
+\hline
+Análise comparativa e documentação & & & & & & X & X & & & & \\
+\hline
+Elaboração do relatório final & & & & & & & X & X & X & & \\
+\hline
+Entrega e apresentação & & & & & & & & & & X & X \\
+\hline
+\end{tabular}
+\end{table}
+
+
+\subsection*{Situação das etapas}
+
+\begin{table}[h]
+\centering
+\footnotesize
+\begin{tabular}{|p{6.2cm}|p{2.6cm}|p{6.2cm}|}
+\hline
+Etapa & Situação & Observação \\
+\hline
+Revisão bibliográfica aprofundada & em andamento & lacunas listadas na seção 4 \\
+\hline
+Modelagem de ADTs e função de transição & concluída & seções 5.1 e 5.2 \\
+\hline
+Implementação de State Monad e Kleisli & concluída & leis demonstradas (seção 5.7) \\
+\hline
+Estudo de caso e composição de FSMs & em parte & falta o construtor \texttt{Kleisli}; seções 5.10 e 5.11 \\
+\hline
+Testes de invalidez de tipagem & concluída & matriz de 16 pares (seção 5.12) \\
+\hline
+Análise comparativa e documentação & em andamento & comparação com C feita (seção 5.14); sem estudo de manutenção \\
+\hline
+Elaboração do relatório final & não iniciada & --- \\
+\hline
+Entrega e apresentação & não iniciada & --- \\
+\hline
+\end{tabular}
+\caption{Situação de cada etapa do cronograma.}
+\end{table}
+
+\subsection*{Plano de ação da versão 5 (parecer de 3 de novembro de 2026)}
+
+\begin{table}[h]
+\centering
+\footnotesize
+\begin{tabular}{|p{1.0cm}|p{4.2cm}|p{2.2cm}|p{6.5cm}|}
+\hline
+Etapa & Ação & Situação & Entregável e pendência \\
+\hline
+1 & Congelar a versão e reproduzir os experimentos & feita & instantâneo \texttt{9689ce8}, compilação sem avisos, versões e logs em \texttt{08\_reprodutibilidade}; \texttt{cabal.project.freeze} \\
+\hline
+2 & Revisar requisitos e separar o oráculo do código & em parte & tabelas \texttt{CSV} e oráculo feitos; \textbf{revisão da orientação pendente} \\
+\hline
+3 & Adotar QuickCheck State Machine ou Hedgehog & feita com Hedgehog & geradores, mutantes, menores contraexemplos; \texttt{quickcheck-state-machine} não testado \\
+\hline
+4 & Especificação compacta em TLA+/TLC & feita & executada no TLC (1\,143 estados; \texttt{OneSlot} viola \texttt{NoPermanentBlindness}, \texttt{Level} satisfaz); mesmos 26 ternos que o Haskell \\
+\hline
+5 & Auditar versões em C e C++ & em parte & reproduzida e ampliada; \textbf{revisão externa pendente} \\
+\hline
+6 & Reescrever a contribuição do artigo & em parte & perguntas de pesquisa, ameaças à validade e esqueletos dos dois artigos; busca de literatura e outras topologias pendentes \\
+\hline
+\end{tabular}
+\caption{Plano de ação da versão 5.}
+\end{table}
+
+
+
+\section*{DECLARAÇÕES}
+\addcontentsline{toc}{section}{DECLARAÇÕES}
+
+\textit{Disponibilidade de dados e código.} Todo o código, os testes, a especificação do domínio e os arquivos de resultado estão no repositório descrito no Apêndice A; a versão 5 acrescenta a pasta \texttt{Revisao\_v5/} do repositório de trabalho. Não há conjunto de dados externo: os cenários são gerados por enumeração e por geradores com semente.
+
+\textit{Ética.} O trabalho não envolve seres humanos nem dados pessoais.
+
+\textit{Contribuições dos autores (CRediT).} Autor: Peterson Carara Junior. Orientação: Prof. Felipe Canarozzo Lourenço. \textit{[A confirmar pelo autor: papéis de cada pessoa na taxonomia CRediT.]}
+
+\textit{Conflito de interesses.} \textit{[A confirmar pelo autor.]}
+
+\textit{Financiamento.} \textit{[A preencher pelo autor: bolsa, agência e número do processo, ou ``sem financiamento''.]}
+
+\textit{Uso de ferramentas de inteligência artificial.} O código, os testes, os experimentos e a redação deste relatório foram desenvolvidos com assistência do modelo Claude, da Anthropic, usado por meio do Claude Code. Isso inclui a leitura das páginas 20 e 21 de Malakhovski e Shalyto (2009), em russo, sem revisão por falante nativo. Na versão 5, o modelo Claude Sonnet 5.5 produziu, a pedido do autor, o pacote \texttt{avionics-validation}, os scripts de reprodução, a especificação em TLA+, as variantes de C++ e os textos das seções 5.15 a 5.19, e executou os comandos cujos resultados estão em \texttt{Revisao\_v5/08\_reprodutibilidade/logs/}. \textit{[A confirmar pelo autor: o grau de revisão do texto e do código por ele, e a conformidade com as regras do programa de iniciação científica e do destino de publicação sobre esse uso.]}
+
+% ========== REFERÊNCIAS ==========
+\newpage
+\section{REFERÊNCIAS}
+
+\begingroup
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.6em}
+\begin{spacing}{1.0}
+
+ASSOCIAÇÃO BRASILEIRA DE NORMAS TÉCNICAS - ABNT. \textbf{NBR 6023}: Informação e documentação - Referências - Elaboração. Rio de Janeiro, 2018.
+
+ASSOCIAÇÃO BRASILEIRA DE NORMAS TÉCNICAS - ABNT. \textbf{NBR 10520}: Informação e documentação - Citações em documentos - Apresentação. Rio de Janeiro, 2023.
+
+BOCCHINO JR., R. L. \textbf{Monads, Categories, and Computation}. [S.l.]: [s.n.], 2025.
+
+CLAESSEN, K.; HUGHES, J. QuickCheck: a lightweight tool for random testing of Haskell programs. In: ACM SIGPLAN INTERNATIONAL CONFERENCE ON FUNCTIONAL PROGRAMMING, 2000. \textit{Proceedings}\ldots{} New York: ACM, 2000. p. 268--279. \textit{[dados bibliográficos a conferir]}
+
+HEDGEHOG. \textbf{Hedgehog}: testes baseados em propriedades para Haskell. Disponível em: \url{https://github.com/hedgehogqa/haskell-hedgehog}. Endereço citado no parecer técnico de 3 nov. 2026; acesso a conferir.
+
+HUTTON, G. \textbf{Programming in Haskell}. 2. ed. Cambridge: Cambridge University Press, 2016.
+
+JAHN, M. \textbf{Monads and their Applications in Haskell}. 2020. Trabalho de Conclusão de Curso (Bachelor's Thesis) -- Department of Mathematics, Technische Universität München, Munich, 2020.
+
+LAMPORT, L. \textbf{Specifying Systems}: the TLA+ language and tools for hardware and software engineers. Boston: Addison-Wesley, 2002.
+
+MAIA, D. \textbf{Applied Category Theory: Monads and Haskell}. 2022.
+
+MALAKHOVSKI, Y. M.; SHALYTO, A. A. Konechnye avtomaty v chistykh funktsionalnykh yazykakh programmirovaniya [Máquinas de estados finitos em linguagens de programação funcional pura]. \textit{RSDN Magazine}, São Petersburgo, n. 1, 2009.
+
+MILEWSKI, B. \textbf{Category Theory for Programmers}. [S.l.]: [s.n.], 2020. E-book.
+
+MOTOR. \textbf{Motor}: máquinas de estados finitos tipadas em Haskell. Disponível em: \url{https://github.com/owickstrom/motor}. Endereço citado no parecer técnico de 3 nov. 2026; acesso a conferir.
+
+OLIVEIRA, A. G. de. \textbf{Haskell: Uma introdução à programação funcional}. São Paulo: Casa do Código, 2017.
+
+PERONE, M.; KARACHALIAS, G. \textbf{Crème de la Crem: Composable Representable Executable Machines}. 2023. (arXiv:2307.09090).
+
+QUICKCHECK STATE MACHINE. \textbf{quickcheck-state-machine}: testes baseados em modelos de máquinas de estados. Disponível em: \url{https://github.com/stevana/quickcheck-state-machine}. Endereço citado no parecer técnico de 3 nov. 2026; acesso a conferir; biblioteca não testada nesta versão.
+
+STROM, R. E.; YEMINI, S. Typestate: a programming language concept for enhancing software reliability. \textit{IEEE Transactions on Software Engineering}, v. SE-12, n. 1, p. 157--171, 1986. \textit{[dados bibliográficos a conferir]}
+
+TLA+. \textbf{TLA+ e TLC}: ferramentas de especificação e de verificação de modelos. Disponível em: \url{https://github.com/tlaplus/tlaplus}. Endereço citado no parecer técnico de 3 nov. 2026; versão estável 1.7.4 baixada e executada nesta versão.
+
+WADLER, P. Comprehending Monads. \textit{Mathematical Structures in Computer Science}, v. 2, n. 4, p. 461-493, 1992.
+
+\end{spacing}
+\endgroup
+
+
+\newpage
+\section*{APÊNDICE A --- REPRODUÇÃO DOS RESULTADOS}
+\addcontentsline{toc}{section}{APÊNDICE A --- REPRODUÇÃO DOS RESULTADOS}
+
+Todos os resultados deste relatório foram obtidos com GHC 9.6.7, cabal 3.12.1.0, \texttt{crem} 0.1.0.0, \texttt{singletons-base} 3.2 e, para a comparação, o \textit{clang} 14.0.6 que acompanha o GHC, em Windows 11.
+
+\textit{Código.} Repositório \texttt{https://github.com/0ph1s/avionics-crem}, versão \texttt{ab02fea} (etiqueta \texttt{v0.2.0-pic-parcial}). A versão anterior, \texttt{c97981a}, contém a FSM de aviônica, a composição e o simulador; a atual acrescenta as extensões das seções 5.7 (leis de Functor e Applicative), 5.12 (especificação, teste de conformidade e matriz de rejeição), 5.13 (cadeia da bateria, modelo de referência e políticas) e 5.14 (comparação com C e C++). A versão \texttt{ab02fea} e a etiqueta foram enviadas ao repositório remoto. Porém, uma consulta sem autenticação à página do repositório devolve erro 404, o que indica que ele é privado; os avaliadores não conseguiriam acessá-lo. Também não há arquivamento com identificador permanente. Antes da entrega, convém tornar o repositório público (ou compartilhá-lo com a banca) e arquivar a versão em um serviço que emita identificador permanente.
+
+\textit{Comandos}, na raiz do pacote:
+
+{\footnotesize
+\begin{verbatim}
+cabal build
+cabal run avionics-crem
+cabal test avionics-sim-tests
+cabal test avionics-spec-tests
+cabal test avionics-chain-tests
+cabal test avionics-policy-tests
+bash scripts/negative_matrix.sh
+bash compare-c/run.sh
+bash compare-c/run_cpp.sh
+cabal build invalid-inflight-shutdown --enable-tests
+\end{verbatim}
+}
+
+Em ordem: biblioteca e executáveis; seções 1 a 4 e as 17 verificações de leis; simulador (32 verificações); conformidade com a especificação (16); cadeia da bateria ($N = 8$); modelo de referência e políticas ($N = 8$); matriz de 16 pares (8 compilam, 8 rejeitados); mesma máquina em C e em C++ (7 variantes cada); teste de invalidez, que falha de propósito.
+
+O comando \texttt{cabal test} sem alvo falha, porque também tenta construir o teste de invalidez, que não compila de propósito; use sempre o alvo explícito.
+
+\textit{Arquivos de resultado} em \texttt{output/}: \texttt{negative\_matrix.md}, \texttt{cadeia\_bateria.txt}, \texttt{politicas\_ambiente.txt}, \texttt{comparacao\_c.md}, \texttt{comparacao\_cpp.md} e \texttt{comparacao\_haskell\_tipos.txt}. A especificação do domínio está em \texttt{spec/domain\_rules.txt}.
+
+\textit{Versão 5.} O instantâneo congelado do repositório \texttt{avionics-crem} (commit \texttt{9689ce8}, que contém a etiqueta \texttt{v0.2.0-pic-parcial} e o desenvolvimento do README) e o pacote novo \texttt{avionics-validation} estão em \texttt{Revisao\_v5/03\_codigo}. O diretório \texttt{Projects/avionics-crem} do repositório de trabalho (commit \texttt{c97981a}) está desatualizado em relação a esse instantâneo e não foi usado. Além do GHC e do cabal, a versão 5 usa \texttt{hedgehog} 1.7 (baixado do Hackage pelo cabal) e o \textit{clang}/\textit{clang++} 14.0.6 que acompanham o GHC. A partir de \texttt{Revisao\_v5/}:
+
+{\footnotesize
+\begin{verbatim}
+bash 08_reprodutibilidade/run_all.sh
+\end{verbatim}
+}
+
+Esse comando registra as versões, compila, roda as suítes do pacote base e as cinco novas (conformidade, fronteira, alcançabilidade, modelo com Hedgehog e matriz de rejeição), a auditoria de C e C++ e, se pedido (\texttt{--mutacao}), a mutação da implementação em CREM, e grava os logs em \texttt{08\_reprodutibilidade/logs/}. As suítes novas também rodam isoladamente, a partir de \texttt{Revisao\_v5/03\_codigo}, com \texttt{cabal test avionics-validation:test:<suíte>}. A especificação em TLA+ é executada por \texttt{bash 04\_tla/run\_tlc.sh}, que exige o \texttt{tla2tools.jar} 1.7.4 (não versionado; instruções no cabeçalho do script).
+
+\textit{Uso de ferramentas de inteligência artificial.} Ver a seção DECLARAÇÕES.
+
+\end{document}

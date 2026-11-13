@@ -1,0 +1,76 @@
+\begin{thebibliography}{10}
+\expandafter\ifx\csname url\endcsname\relax
+  \def\url#1{\texttt{#1}}\fi
+\expandafter\ifx\csname urlprefix\endcsname\relax\def\urlprefix{URL }\fi
+\expandafter\ifx\csname href\endcsname\relax
+  \def\href#1#2{#2} \def\path#1{#1}\fi
+
+\bibitem{hutton2016haskell}
+G.~Hutton, Programming in {Haskell}, 2nd Edition, Cambridge University Press,
+  Cambridge, UK, 2016.
+
+\bibitem{perone2023crem}
+M.~Perone, G.~Karachalias, Cr{\`e}me de la crem: Composable representable
+  executable machines (architectural pearl), preprint, arXiv:2307.09090.
+  Presented at the FUNARCH workshop, ICFP 2023. Library: crem 0.1.0.0,
+  \url{https://hackage.haskell.org/package/crem-0.1.0.0} (2023).
+
+\bibitem{eisenberg2012singletons}
+R.~A. Eisenberg, S.~Weirich, Dependently typed programming with singletons, in:
+  Proceedings of the 2012 Haskell Symposium (Haskell '12), ACM, New York, NY,
+  USA, 2012, pp. 117--130.
+
+\bibitem{strom1986typestate}
+R.~E. Strom, S.~Yemini, Typestate: A programming language concept for enhancing
+  software reliability, IEEE Trans. Softw. Eng. SE-12~(1) (1986) 157--171.
+\newblock \href {https://doi.org/10.1109/TSE.1986.6312929}
+  {\path{doi:10.1109/TSE.1986.6312929}}.
+
+\bibitem{iso14882}
+{ISO/IEC}, {ISO/IEC} 14882:2017, Programming languages -- {C++}, 5th Edition,
+  International Organization for Standardization, Geneva, Switzerland, 2017.
+
+\bibitem{clang}
+{The LLVM Project}, Clang: a {C} language family frontend for {LLVM}, version
+  14.0.6, \url{https://clang.llvm.org/}, version 14.0.6, as shipped with GHC
+  9.6.7 for Windows.
+
+\bibitem{clanganalyzer}
+{The LLVM Project}, Clang static analyzer,
+  \url{https://clang-analyzer.llvm.org/}, used through \texttt{clang
+  --{}-analyze}, version 14.0.6.
+
+\bibitem{ghc}
+{The GHC Team}, The {Glasgow} {Haskell} {Compiler}, version 9.6.7,
+  \url{https://www.haskell.org/ghc/}.
+
+\bibitem{demillo1978hints}
+R.~A. DeMillo, R.~J. Lipton, F.~G. Sayward, Hints on test data selection: help
+  for the practicing programmer, Computer 11~(4) (1978) 34--41.
+\newblock \href {https://doi.org/10.1109/C-M.1978.218136}
+  {\path{doi:10.1109/C-M.1978.218136}}.
+
+\bibitem{jia2011mutation}
+Y.~Jia, M.~Harman, An analysis and survey of the development of mutation
+  testing, IEEE Trans. Softw. Eng. 37~(5) (2011) 649--678.
+\newblock \href {https://doi.org/10.1109/TSE.2010.62}
+  {\path{doi:10.1109/TSE.2010.62}}.
+
+\bibitem{atkey2009parameterised}
+R.~Atkey, Parameterised notions of computation, J. Funct. Program. 19~(3--4)
+  (2009) 335--376.
+\newblock \href {https://doi.org/10.1017/S095679680900728X}
+  {\path{doi:10.1017/S095679680900728X}}.
+
+\bibitem{brady2013idris}
+E.~Brady, Idris, a general-purpose dependently typed programming language:
+  design and implementation, J. Funct. Program. 23~(5) (2013) 552--593.
+\newblock \href {https://doi.org/10.1017/S095679681300018X}
+  {\path{doi:10.1017/S095679681300018X}}.
+
+\bibitem{malakhovski2009fsm}
+Y.~M. Malakhovski, A.~A. Shalyto, Konechnye avtomaty v chistykh funktsionalnykh
+  yazykakh programmirovaniya [finite state machines in pure functional
+  programming languages] (in russian), RSDN Magazine~(1) (2009).
+
+\end{thebibliography}

@@ -1,0 +1,20 @@
+[baseline] compilando a cópia sem mutação...
+[baseline] todas as suítes passam sem mutação
+[H1] aresta ILEGAL na topologia E na ação (InFlight -> Shutdown permitida)
+      -> morto por: spec-tests, sim-tests (N=3), conformance, reach, model (Hedgehog)
+[H2] DESTINO errado em aresta permitida (Grounded+TakeoffSignal -> Shutdown)
+      -> morto por: spec-tests, sim-tests (N=3), conformance, reach, model (Hedgehog)
+[H3] EVENTOS trocados em Grounded (TakeoffSignal <-> SystemCutoff)
+      -> morto por: spec-tests, sim-tests (N=3), conformance, reach, model (Hedgehog)
+[H4] ação ilegal SEM tocar na topologia (InFlight+SystemCutoff -> Shutdown)
+      -> recusado na compilação: src\Avionics\Crem.hs:93:50: error: [GHC-39999]
+[H5] par (estado, evento) OMITIDO (Shutdown+SystemCutoff)
+      -> recusado na compilação: src\Avionics\Crem.hs:86:1: error: [GHC-62161] [-Wincomplete-patterns, Werror=incomplete-patterns]
+[H6] SAÍDA errada (EmergencyLanding+LandedSignal emite MsgIgnored)
+      -> morto por: sim-tests (N=3), conformance, reach, model (Hedgehog)
+[H7] AMBIENTE: CriticalHeld libera LandedSignal em vez de CriticalBattery
+      -> morto por: sim-tests (N=3), reach, model (Hedgehog)
+[H8] ENERGIA: Low+Drain fica em Low (não desce a Critical)
+      -> morto por: sim-tests (N=3), conformance, reach, model (Hedgehog)
+relatório: /c/Users/Peterson/Documents/GitHub/IC/Revisao_v5/08_reprodutibilidade/logs/06_mutation_haskell.md   (vivos: 0 de 8)
+EXIT=0

@@ -1,0 +1,2 @@
+ternos com fila vazia: TLC = 26, Haskell = 26
+conjuntos iguais: True

@@ -1,0 +1,182 @@
+%%% -*-BibTeX-*-
+%%% Do NOT edit. File created by BibTeX with style
+%%% ACM-Reference-Format-Journals [18-Jan-2012].
+
+\begin{thebibliography}{12}
+
+%%% ====================================================================
+%%% NOTE TO THE USER: you can override these defaults by providing
+%%% customized versions of any of these macros before the \bibliography
+%%% command.  Each of them MUST provide its own final punctuation,
+%%% except for \shownote{} and \showURL{}.  The latter does
+%%% not use final punctuation, in order to avoid confusing it with
+%%% the Web address.
+%%%
+%%% To suppress output of a particular field, define its macro to expand
+%%% to an empty string, or better, \unskip, like this:
+%%%
+%%% \newcommand{\showURL}[1]{\unskip}   % LaTeX syntax
+%%%
+%%% \def \showURL #1{\unskip}           % plain TeX syntax
+%%%
+%%% ====================================================================
+
+\ifx \showCODEN    \undefined \def \showCODEN     #1{\unskip}     \fi
+\ifx \showISBNx    \undefined \def \showISBNx     #1{\unskip}     \fi
+\ifx \showISBNxiii \undefined \def \showISBNxiii  #1{\unskip}     \fi
+\ifx \showISSN     \undefined \def \showISSN      #1{\unskip}     \fi
+\ifx \showLCCN     \undefined \def \showLCCN      #1{\unskip}     \fi
+\ifx \shownote     \undefined \def \shownote      #1{#1}          \fi
+\ifx \showarticletitle \undefined \def \showarticletitle #1{#1}   \fi
+\ifx \showURL      \undefined \def \showURL       {\relax}        \fi
+% The following commands are used for tagged output and should be
+% invisible to TeX
+\providecommand\bibfield[2]{#2}
+\providecommand\bibinfo[2]{#2}
+\providecommand\natexlab[1]{#1}
+\providecommand\showeprint[2][]{arXiv:#2}
+\makeatletter
+\@ifundefined{NAT@parse@date}{}{\let\NAT@parse@date@orig\NAT@parse@date}
+\@ifundefined{NAT@parse@date}{}{\def\NAT@parse@date#1#2#3#4#5#6@@{\NAT@parse@date@orig#1#2#3#4#5#6@@\def\NAT@tempyear{0000}\def\NAT@tempexlab{{?}}\ifx\NAT@year\NAT@tempyear\ifx\NAT@exlab\NAT@tempexlab\def\NAT@date{[n.\,d.]}\else\edef\NAT@date{[n.\,d.]\NAT@exlab}\fi\fi}}
+\makeatother
+
+\bibitem[Atkey(2009)]%
+        {atkey2009parameterised}
+\bibfield{author}{\bibinfo{person}{Robert Atkey}.}
+  \bibinfo{year}{2009}\natexlab{}.
+\newblock \showarticletitle{Parameterised notions of computation}.
+\newblock \bibinfo{journal}{\emph{Journal of Functional Programming}}
+  \bibinfo{volume}{19}, \bibinfo{number}{3--4} (\bibinfo{year}{2009}),
+  \bibinfo{pages}{335--376}.
+\newblock
+
+
+\bibitem[Brady(2013)]%
+        {brady2013idris}
+\bibfield{author}{\bibinfo{person}{Edwin Brady}.}
+  \bibinfo{year}{2013}\natexlab{}.
+\newblock \showarticletitle{Idris, a general-purpose dependently typed
+  programming language: design and implementation}.
+\newblock \bibinfo{journal}{\emph{Journal of Functional Programming}}
+  \bibinfo{volume}{23}, \bibinfo{number}{5} (\bibinfo{year}{2013}),
+  \bibinfo{pages}{552--593}.
+\newblock
+
+
+\bibitem[Claessen and Hughes(2000)]%
+        {claessen2000quickcheck}
+\bibfield{author}{\bibinfo{person}{Koen Claessen} {and} \bibinfo{person}{John
+  Hughes}.} \bibinfo{year}{2000}\natexlab{}.
+\newblock \showarticletitle{{QuickCheck}: a lightweight tool for random testing
+  of {Haskell} programs}. In \bibinfo{booktitle}{\emph{Proceedings of the Fifth
+  ACM SIGPLAN International Conference on Functional Programming (ICFP '00)}}.
+  \bibinfo{publisher}{ACM}, \bibinfo{address}{New York, NY, USA},
+  \bibinfo{pages}{268--279}.
+\newblock
+
+
+\bibitem[Eisenberg and Weirich(2012)]%
+        {eisenberg2012singletons}
+\bibfield{author}{\bibinfo{person}{Richard~A. Eisenberg} {and}
+  \bibinfo{person}{Stephanie Weirich}.} \bibinfo{year}{2012}\natexlab{}.
+\newblock \showarticletitle{Dependently typed programming with singletons}. In
+  \bibinfo{booktitle}{\emph{Proceedings of the 2012 Haskell Symposium (Haskell
+  '12)}}. \bibinfo{publisher}{ACM}, \bibinfo{address}{New York, NY, USA},
+  \bibinfo{pages}{117--130}.
+\newblock
+
+
+\bibitem[Hutton(2016)]%
+        {hutton2016haskell}
+\bibfield{author}{\bibinfo{person}{Graham Hutton}.}
+  \bibinfo{year}{2016}\natexlab{}.
+\newblock \bibinfo{booktitle}{\emph{Programming in {Haskell}}
+  (\bibinfo{edition}{2nd} ed.)}.
+\newblock \bibinfo{publisher}{Cambridge University Press},
+  \bibinfo{address}{Cambridge, UK}.
+\newblock
+
+
+\bibitem[Lamport(2002)]%
+        {lamport2002specifying}
+\bibfield{author}{\bibinfo{person}{Leslie Lamport}.}
+  \bibinfo{year}{2002}\natexlab{}.
+\newblock \bibinfo{booktitle}{\emph{Specifying Systems: The {TLA+} Language and
+  Tools for Hardware and Software Engineers}}.
+\newblock \bibinfo{publisher}{Addison-Wesley}, \bibinfo{address}{Boston, MA,
+  USA}.
+\newblock
+
+
+\bibitem[Malakhovski and Shalyto(2009)]%
+        {malakhovski2009fsm}
+\bibfield{author}{\bibinfo{person}{Yuri~M. Malakhovski} {and}
+  \bibinfo{person}{Anatoly~A. Shalyto}.} \bibinfo{year}{2009}\natexlab{}.
+\newblock \showarticletitle{Konechnye avtomaty v chistykh funktsionalnykh
+  yazykakh programmirovaniya [Finite state machines in pure functional
+  programming languages]}.
+\newblock \bibinfo{journal}{\emph{RSDN Magazine}} \bibinfo{number}{1}
+  (\bibinfo{year}{2009}).
+\newblock
+\newblock
+\shownote{In Russian}.
+
+
+\bibitem[Perone and Karachalias(2023)]%
+        {perone2023crem}
+\bibfield{author}{\bibinfo{person}{Marco Perone} {and}
+  \bibinfo{person}{Georgios Karachalias}.} \bibinfo{year}{2023}\natexlab{}.
+\newblock \bibinfo{title}{Cr{\`e}me de la Crem: Composable Representable
+  Executable Machines}.
+\newblock \bibinfo{howpublished}{arXiv:2307.09090}.
+\newblock
+\newblock
+\shownote{Library: \texttt{crem},
+  \url{https://hackage.haskell.org/package/crem}}.
+
+
+\bibitem[Strom and Yemini(1986)]%
+        {strom1986typestate}
+\bibfield{author}{\bibinfo{person}{Robert~E. Strom} {and}
+  \bibinfo{person}{Shaula Yemini}.} \bibinfo{year}{1986}\natexlab{}.
+\newblock \showarticletitle{Typestate: A programming language concept for
+  enhancing software reliability}.
+\newblock \bibinfo{journal}{\emph{IEEE Transactions on Software Engineering}}
+  \bibinfo{volume}{SE-12}, \bibinfo{number}{1} (\bibinfo{year}{1986}),
+  \bibinfo{pages}{157--171}.
+\newblock
+
+
+\bibitem[{The Hedgehog contributors}(0000)]%
+        {hedgehog}
+\bibfield{author}{\bibinfo{person}{{The Hedgehog contributors}}.}
+  \bibinfo{year}{[n.\,d.]}\natexlab{}.
+\newblock \bibinfo{title}{Hedgehog: property-based testing for {Haskell}}.
+\newblock
+  \bibinfo{howpublished}{\url{https://github.com/hedgehogqa/haskell-hedgehog}}.
+\newblock
+\newblock
+\shownote{Version 1.7 used in this work}.
+
+
+\bibitem[{The Motor contributors}(0000)]%
+        {motor}
+\bibfield{author}{\bibinfo{person}{{The Motor contributors}}.}
+  \bibinfo{year}{[n.\,d.]}\natexlab{}.
+\newblock \bibinfo{title}{Motor: typed finite state machines in {Haskell}}.
+\newblock \bibinfo{howpublished}{\url{https://github.com/owickstrom/motor}}.
+\newblock
+
+
+\bibitem[{The TLA+ tools contributors}(0000)]%
+        {tlaplus}
+\bibfield{author}{\bibinfo{person}{{The TLA+ tools contributors}}.}
+  \bibinfo{year}{[n.\,d.]}\natexlab{}.
+\newblock \bibinfo{title}{The {TLA+} tools ({TLC} model checker)}.
+\newblock \bibinfo{howpublished}{\url{https://github.com/tlaplus/tlaplus}}.
+\newblock
+\newblock
+\shownote{Release v1.7.4 (TLC 2.19) used in this work}.
+
+
+\end{thebibliography}

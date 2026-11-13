@@ -1,0 +1,5 @@
+Rejecting forbidden transitions at compile time is not specific to Haskell
+crem and a C++17 type-level topology reject the same 8 of 16 vertex pairs
+Only an exhaustive test caught a wrong destination on an allowed edge
+Omitted cases need warnings as errors; a catch-all clause hides them
+Compiler output for an omitted case ranges from 4 to 236 lines

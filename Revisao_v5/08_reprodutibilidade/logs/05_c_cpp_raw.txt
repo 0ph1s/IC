@@ -1,0 +1,204 @@
+=== c/M0 — baseline (sem defeito)
+--- A
+--- B
+--- W
+--- S
+=== c/M1 — omite o caso InFlight+LandedSignal (sem default)
+--- A
+C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/c/M1.c:22:17: warning: enumeration value 'LANDED_SIGNAL' not handled in switch [-Wswitch]
+        switch (e) {
+                ^
+1 warning generated.
+--- B
+C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/c/M1.c:22:17: warning: enumeration value 'LANDED_SIGNAL' not handled in switch [-Wswitch]
+        switch (e) {
+                ^
+1 warning generated.
+--- W
+C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/c/M1.c:22:17: error: enumeration value 'LANDED_SIGNAL' not handled in switch [-Werror,-Wswitch]
+        switch (e) {
+                ^
+1 error generated.
+--- S
+=== c/M2 — omite o mesmo caso e acrescenta default (curinga)
+--- A
+--- B
+C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/c/M2.c:22:17: warning: enumeration value 'LANDED_SIGNAL' not explicitly handled in switch [-Wswitch-enum]
+        switch (e) {
+                ^
+1 warning generated.
+--- W
+C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/c/M2.c:22:17: error: enumeration value 'LANDED_SIGNAL' not explicitly handled in switch [-Werror,-Wswitch-enum]
+        switch (e) {
+                ^
+1 error generated.
+--- S
+=== c/M3 — transição proibida InFlight+SystemCutoff -> Shutdown
+--- A
+--- B
+--- W
+--- S
+=== c/M4 — aresta permitida, destino errado (Grounded+TakeoffSignal -> Shutdown)
+--- A
+--- B
+--- W
+--- S
+=== c/M5 — compara estado com constante de evento
+--- A
+--- B
+--- W
+--- S
+=== c/M6 — retorna valor fora da enumeração (42)
+--- A
+--- B
+--- W
+--- S
+=== cpp/M0 — baseline (sem defeito)
+--- A
+--- B
+--- W
+--- S
+=== cpp/M1 — omite o caso InFlight+LandedSignal (sem default)
+--- A
+C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/cpp/M1.cpp:22:17: warning: enumeration value 'LANDED_SIGNAL' not handled in switch [-Wswitch]
+        switch (e) {
+                ^
+1 warning generated.
+--- B
+C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/cpp/M1.cpp:22:17: warning: enumeration value 'LANDED_SIGNAL' not handled in switch [-Wswitch]
+        switch (e) {
+                ^
+1 warning generated.
+--- W
+C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/cpp/M1.cpp:22:17: error: enumeration value 'LANDED_SIGNAL' not handled in switch [-Werror,-Wswitch]
+        switch (e) {
+                ^
+1 error generated.
+--- S
+=== cpp/M2 — omite o mesmo caso e acrescenta default (curinga)
+--- A
+--- B
+C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/cpp/M2.cpp:22:17: warning: enumeration value 'LANDED_SIGNAL' not explicitly handled in switch [-Wswitch-enum]
+        switch (e) {
+                ^
+1 warning generated.
+--- W
+C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/cpp/M2.cpp:22:17: error: enumeration value 'LANDED_SIGNAL' not explicitly handled in switch [-Werror,-Wswitch-enum]
+        switch (e) {
+                ^
+1 error generated.
+--- S
+=== cpp/M3 — transição proibida InFlight+SystemCutoff -> Shutdown
+--- A
+--- B
+--- W
+--- S
+=== cpp/M4 — aresta permitida, destino errado (Grounded+TakeoffSignal -> Shutdown)
+--- A
+--- B
+--- W
+--- S
+=== cpp/M5 — compara estado com constante de evento
+--- A
+C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/cpp/M5.cpp:12:11: error: invalid operands to binary expression ('state_t' and 'event_t')
+    if (s == event_t::TAKEOFF_SIGNAL) return state_t::SHUTDOWN;
+        ~ ^  ~~~~~~~~~~~~~~~~~~~~~~~
+1 error generated.
+--- B
+C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/cpp/M5.cpp:12:11: error: invalid operands to binary expression ('state_t' and 'event_t')
+    if (s == event_t::TAKEOFF_SIGNAL) return state_t::SHUTDOWN;
+        ~ ^  ~~~~~~~~~~~~~~~~~~~~~~~
+1 error generated.
+--- W
+C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/cpp/M5.cpp:12:11: error: invalid operands to binary expression ('state_t' and 'event_t')
+    if (s == event_t::TAKEOFF_SIGNAL) return state_t::SHUTDOWN;
+        ~ ^  ~~~~~~~~~~~~~~~~~~~~~~~
+1 error generated.
+--- S
+C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/cpp/M5.cpp:12:11: error: invalid operands to binary expression ('state_t' and 'event_t')
+    if (s == event_t::TAKEOFF_SIGNAL) return state_t::SHUTDOWN;
+        ~ ^  ~~~~~~~~~~~~~~~~~~~~~~~
+1 error generated.
+=== cpp/M6 — retorna valor fora da enumeração (42, via static_cast)
+--- A
+--- B
+--- W
+--- S
+=== typed/T0 — baseline (sem defeito)
+--- A
+--- B
+--- W
+--- S
+=== typed/T1 — omite o par InFlight+LandedSignal (sem curinga)
+--- A
+C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T1.cpp:61:53: error: no matching function for call to 'step'
+    return std::visit([](auto st, auto ev) { return step(st, ev); }, s, e);
+                                                    ^~~~
+C:/ghcup/ghc/9.6.7/mingw/include/c++/v1/type_traits:3639:23: note: in instantiation of function template specialization 'transition(State, Event)::(anonymous class)::operator()<InFlight, LandedSignal>' requested here
+--- B
+C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T1.cpp:61:53: error: no matching function for call to 'step'
+    return std::visit([](auto st, auto ev) { return step(st, ev); }, s, e);
+                                                    ^~~~
+C:/ghcup/ghc/9.6.7/mingw/include/c++/v1/type_traits:3639:23: note: in instantiation of function template specialization 'transition(State, Event)::(anonymous class)::operator()<InFlight, LandedSignal>' requested here
+--- W
+C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T1.cpp:61:53: error: no matching function for call to 'step'
+    return std::visit([](auto st, auto ev) { return step(st, ev); }, s, e);
+                                                    ^~~~
+C:/ghcup/ghc/9.6.7/mingw/include/c++/v1/type_traits:3639:23: note: in instantiation of function template specialization 'transition(State, Event)::(anonymous class)::operator()<InFlight, LandedSignal>' requested here
+--- S
+C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T1.cpp:61:53: error: no matching function for call to 'step'
+    return std::visit([](auto st, auto ev) { return step(st, ev); }, s, e);
+                                                    ^~~~
+C:/ghcup/ghc/9.6.7/mingw/include/c++/v1/type_traits:3639:23: note: in instantiation of function template specialization 'transition(State, Event)::(anonymous class)::operator()<InFlight, LandedSignal>' requested here
+=== typed/T2 — omite o mesmo par e acrescenta um gabarito genérico (curinga)
+--- A
+--- B
+--- W
+--- S
+=== typed/T3 — transição proibida InFlight+SystemCutoff -> Shutdown
+--- A
+C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T3.cpp:38:5: error: static_assert failed due to requirement 'Allowed<InFlight, Shutdown>::value' "transicao fora da topologia"
+    static_assert(Allowed<From, To>::value, "transicao fora da topologia");
+    ^             ~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T3.cpp:49:50: note: in instantiation of function template specialization 'go<Shutdown, InFlight>' requested here
+--- B
+C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T3.cpp:38:5: error: static_assert failed due to requirement 'Allowed<InFlight, Shutdown>::value' "transicao fora da topologia"
+    static_assert(Allowed<From, To>::value, "transicao fora da topologia");
+    ^             ~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T3.cpp:49:50: note: in instantiation of function template specialization 'go<Shutdown, InFlight>' requested here
+--- W
+C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T3.cpp:38:5: error: static_assert failed due to requirement 'Allowed<InFlight, Shutdown>::value' "transicao fora da topologia"
+    static_assert(Allowed<From, To>::value, "transicao fora da topologia");
+    ^             ~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T3.cpp:49:50: note: in instantiation of function template specialization 'go<Shutdown, InFlight>' requested here
+--- S
+C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T3.cpp:38:5: error: static_assert failed due to requirement 'Allowed<InFlight, Shutdown>::value' "transicao fora da topologia"
+    static_assert(Allowed<From, To>::value, "transicao fora da topologia");
+    ^             ~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T3.cpp:49:50: note: in instantiation of function template specialization 'go<Shutdown, InFlight>' requested here
+=== typed/T4 — aresta permitida, destino errado (Grounded+TakeoffSignal -> Shutdown)
+--- A
+--- B
+--- W
+--- S
+=== typed/T5 — usa um evento como destino (estado x evento)
+--- A
+C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T5.cpp:38:5: error: static_assert failed due to requirement 'Allowed<Grounded, TakeoffSignal>::value' "transicao fora da topologia"
+    static_assert(Allowed<From, To>::value, "transicao fora da topologia");
+    ^             ~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T5.cpp:43:50: note: in instantiation of function template specialization 'go<TakeoffSignal, Grounded>' requested here
+--- B
+C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T5.cpp:38:5: error: static_assert failed due to requirement 'Allowed<Grounded, TakeoffSignal>::value' "transicao fora da topologia"
+    static_assert(Allowed<From, To>::value, "transicao fora da topologia");
+    ^             ~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T5.cpp:43:50: note: in instantiation of function template specialization 'go<TakeoffSignal, Grounded>' requested here
+--- W
+C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T5.cpp:38:5: error: static_assert failed due to requirement 'Allowed<Grounded, TakeoffSignal>::value' "transicao fora da topologia"
+    static_assert(Allowed<From, To>::value, "transicao fora da topologia");
+    ^             ~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T5.cpp:43:50: note: in instantiation of function template specialization 'go<TakeoffSignal, Grounded>' requested here
+--- S
+C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T5.cpp:38:5: error: static_assert failed due to requirement 'Allowed<Grounded, TakeoffSignal>::value' "transicao fora da topologia"
+    static_assert(Allowed<From, To>::value, "transicao fora da topologia");
+    ^             ~~~~~~~~~~~~~~~~~~~~~~~~
+C:/Users/Peterson/Documents/GitHub/IC/Revisao_v5/05_c-cpp/work/typed/T5.cpp:43:50: note: in instantiation of function template specialization 'go<TakeoffSignal, Grounded>' requested here

@@ -1,0 +1,6 @@
+# Scripts de shell sempre com LF (com core.autocrlf=true no Windows, um .sh em CRLF quebra no bash).
+*.sh text eol=lf
+
+# O instantaneo congelado de avionics-crem tem MANIFEST.sha256: os bytes nao podem ser normalizados
+# (sem conversao de fim de linha), para que `sha256sum -c ../MANIFEST.sha256` valha em qualquer sistema.
+03_codigo/base/avionics-crem/** -text

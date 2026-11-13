@@ -1,0 +1,23 @@
+c/M0           | A:silêncio   B:silêncio   W:silêncio S:silêncio | passa
+c/M1           | A:aviso(1)    B:aviso(1)    W:recusa    S:silêncio | passa
+c/M2           | A:silêncio   B:aviso(1)    W:recusa    S:silêncio | passa
+c/M3           | A:silêncio   B:silêncio   W:silêncio S:silêncio | detecta (1 par)
+c/M4           | A:silêncio   B:silêncio   W:silêncio S:silêncio | detecta (1 par)
+c/M5           | A:silêncio   B:silêncio   W:silêncio S:silêncio | detecta (3 par)
+c/M6           | A:silêncio   B:silêncio   W:silêncio S:silêncio | detecta (1 par)
+cpp/M0         | A:silêncio   B:silêncio   W:silêncio S:silêncio | passa
+cpp/M1         | A:aviso(1)    B:aviso(1)    W:recusa    S:silêncio | passa
+cpp/M2         | A:silêncio   B:aviso(1)    W:recusa    S:silêncio | passa
+cpp/M3         | A:silêncio   B:silêncio   W:silêncio S:silêncio | detecta (1 par)
+cpp/M4         | A:silêncio   B:silêncio   W:silêncio S:silêncio | detecta (1 par)
+cpp/M5         | A:recusa      B:recusa      W:recusa    S:recusa    | -
+cpp/M6         | A:silêncio   B:silêncio   W:silêncio S:silêncio | detecta (1 par)
+typed/T0        | A:silêncio   B:silêncio   W:silêncio S:silêncio | passa
+typed/T1        | A:recusa      B:recusa      W:recusa    S:recusa    | -
+typed/T2        | A:silêncio   B:silêncio   W:silêncio S:silêncio | passa
+typed/T3        | A:recusa      B:recusa      W:recusa    S:recusa    | -
+typed/T4        | A:silêncio   B:silêncio   W:silêncio S:silêncio | detecta (1 par)
+typed/T5        | A:recusa      B:recusa      W:recusa    S:recusa    | -
+
+matriz: /c/Users/Peterson/Documents/GitHub/IC/Revisao_v5/08_reprodutibilidade/logs/05_c_cpp_matrix.md
+versões sem defeito: sem aviso e iguais à tabela.

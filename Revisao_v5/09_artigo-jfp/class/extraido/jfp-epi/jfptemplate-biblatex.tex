@@ -1,0 +1,79 @@
+%% THIS TEMPLATE SHOWS HOW TO CONFIGURE THE JFP STYLE IF YOU ARE USING
+%% BIBLATEX INSTEAD OF BIBTEX.
+
+%% For draft paper in the JFP style but not under review:
+% \documentclass[natbib=false]{jfp-epi}
+
+%% For draft paper to be reviewed for publication in JFP:
+% \documentclass[natbib=false,review]{jfp-epi}
+
+%% For final paper to be published in JFP:
+\documentclass[natbib=false,final]{jfp-epi}
+
+\usepackage{lipsum} % just to generate some random text
+
+%% Numeric citations are the default.
+\RequirePackage[datamodel=acmdatamodel,
+  style=acmnumeric,
+  natbib=true]{biblatex}
+
+%% If you want author-year, then replace the above with the following:
+% \RequirePackage[datamodel=acmdatamodel,
+%   style=acmauthoryear,
+%   natbib=true]{biblatex}
+
+%% The natbib=true option is selected above in order to provide
+%% compatibility with natbib citation commands like \citet.
+%% If you do not care about that, you can remove it.
+
+\addbibresource{jfptemplate.bib}
+
+%% The CC-BY publishing option is set by default.
+%% If you wish to use a different option for a draft paper,
+%% uncomment the following line:
+%% \setcopyright{none}
+
+%% The following incantations can be omitted for a draft paper:
+\jfpVolume{99}
+\jfpArticle{13}
+\jfpDOI{10.46298/jfp.01234}
+\jfpYear{2089}
+
+\received[Submitted]{October 2087}
+\received[accepted]{April 2089}
+
+\begin{document}
+
+\title{Fun with Rocks}
+
+\author{Fred Flintstone}
+\orcid{1234-5678-9012}
+\affiliation{%
+  \institution{Bedrock University}
+  \city{Bedrock}
+  \country{The Stone Age}
+  \authoremail{fred@flintstone.org}
+}
+
+\begin{abstract}
+\lipsum[1]
+\end{abstract}
+
+\maketitle
+
+\section{Introduction}
+
+This is my paper. I was inspired by \citet{Rubble&Flintstone60}.
+
+\lipsum[2-6]
+
+\section*{Data availability statement}
+
+All my rocks are available at \texttt{rocksrepo.edu}.
+
+\printbibliography
+
+\end{document}
+
+
+

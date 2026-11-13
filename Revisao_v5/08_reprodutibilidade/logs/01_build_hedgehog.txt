@@ -1,0 +1,231 @@
+Build profile: -w ghc-9.6.7 -O1
+In order, the following will be built (use -v for more details):
+ - async-2.2.5 (lib) (requires download & build)
+ - barbies-2.1.1.0 (lib) (requires download & build)
+ - boring-0.2.2 (lib) (requires download & build)
+ - colour-2.3.6 (lib) (requires download & build)
+ - erf-2.0.0.0 (lib:erf) (requires download & build)
+ - happy-lib-2.1.7 (lib:grammar) (requires download & build)
+ - haskell-lexer-1.2.1 (lib) (requires download & build)
+ - hsc2hs-0.68.10 (exe:hsc2hs) (requires download & build)
+ - mmorph-1.2.1 (lib) (requires download & build)
+ - primitive-0.9.1.0 (lib) (requires download & build)
+ - safe-exceptions-0.1.7.4 (lib) (requires download & build)
+ - splitmix-0.1.3.1 (lib) (requires download & build)
+ - transformers-base-0.4.6 (lib) (requires download & build)
+ - unliftio-core-0.2.1.0 (lib) (requires download & build)
+ - wl-pprint-annotated-0.1.0.1 (lib) (requires download & build)
+ - constraints-0.14.2 (lib) (requires download & build)
+ - ansi-terminal-types-1.1.3 (lib) (requires download & build)
+ - happy-lib-2.1.7 (lib:tabular) (requires download & build)
+ - happy-lib-2.1.7 (lib:frontend) (requires download & build)
+ - terminal-size-0.3.4 (lib) (requires download & build)
+ - random-1.3.1 (lib) (requires download & build)
+ - monad-control-1.0.3.1 (lib) (requires download & build)
+ - resourcet-1.3.0 (lib) (requires download & build)
+ - ansi-terminal-1.1.5 (lib) (requires download & build)
+ - happy-lib-2.1.7 (lib:backend-lalr) (requires download & build)
+ - happy-lib-2.1.7 (lib:backend-glr) (requires download & build)
+ - lifted-base-0.2.3.12 (lib) (requires download & build)
+ - concurrent-output-1.10.21 (lib) (requires download & build)
+ - happy-lib-2.1.7 (lib) (requires download & build)
+ - lifted-async-0.11.0 (lib) (requires download & build)
+ - happy-2.1.7 (exe:happy) (requires download & build)
+ - pretty-show-1.10 (lib) (requires download & build)
+ - hedgehog-1.7 (lib) (requires download & build)
+ - avionics-validation-0.1.0.0 (test:validation-model-tests) (first run)
+Downloading  colour-2.3.6
+Downloaded   colour-2.3.6
+Downloading  erf-2.0.0.0
+Starting     colour-2.3.6 (lib)
+Downloaded   erf-2.0.0.0
+Downloading  haskell-lexer-1.2.1
+Starting     erf-2.0.0.0 (all, legacy fallback: cabal-version is less than 1.8)
+Downloaded   haskell-lexer-1.2.1
+Downloading  mmorph-1.2.1
+Starting     haskell-lexer-1.2.1 (lib)
+Downloaded   mmorph-1.2.1
+Downloading  unliftio-core-0.2.1.0
+Starting     mmorph-1.2.1 (lib)
+Downloaded   unliftio-core-0.2.1.0
+Downloading  primitive-0.9.1.0
+Starting     unliftio-core-0.2.1.0 (lib)
+Downloaded   primitive-0.9.1.0
+Downloading  splitmix-0.1.3.1
+Starting     primitive-0.9.1.0 (lib)
+Downloaded   splitmix-0.1.3.1
+Downloading  random-1.3.1
+Starting     splitmix-0.1.3.1 (lib)
+Downloaded   random-1.3.1
+Downloading  boring-0.2.2
+Downloaded   boring-0.2.2
+Downloading  barbies-2.1.1.0
+Building     colour-2.3.6 (lib)
+Starting     boring-0.2.2 (lib)
+Building     erf-2.0.0.0 (all, legacy fallback: cabal-version is less than 1.8)
+Downloaded   barbies-2.1.1.0
+Downloading  happy-lib-2.1.7
+Starting     barbies-2.1.1.0 (lib)
+Downloaded   happy-lib-2.1.7
+Downloading  happy-2.1.7
+Building     haskell-lexer-1.2.1 (lib)
+Starting     happy-lib-2.1.7 (lib:grammar)
+Downloaded   happy-2.1.7
+Downloading  resourcet-1.3.0
+Downloaded   resourcet-1.3.0
+Downloading  safe-exceptions-0.1.7.4
+Building     mmorph-1.2.1 (lib)
+Downloaded   safe-exceptions-0.1.7.4
+Downloading  transformers-base-0.4.6
+Installing   erf-2.0.0.0 (all, legacy fallback: cabal-version is less than 1.8)
+Starting     safe-exceptions-0.1.7.4 (lib)
+Building     unliftio-core-0.2.1.0 (lib)
+Downloaded   transformers-base-0.4.6
+Downloading  monad-control-1.0.3.1
+Starting     transformers-base-0.4.6 (lib)
+Downloaded   monad-control-1.0.3.1
+Downloading  lifted-base-0.2.3.12
+Building     primitive-0.9.1.0 (lib)
+Downloaded   lifted-base-0.2.3.12
+Downloading  async-2.2.5
+Building     splitmix-0.1.3.1 (lib)
+Completed    erf-2.0.0.0 (all, legacy fallback: cabal-version is less than 1.8)
+Downloaded   async-2.2.5
+Downloading  constraints-0.14.2
+Starting     async-2.2.5 (lib)
+Downloaded   constraints-0.14.2
+Downloading  lifted-async-0.11.0
+Installing   unliftio-core-0.2.1.0 (lib)
+Downloaded   lifted-async-0.11.0
+Downloading  pretty-show-1.10
+Building     boring-0.2.2 (lib)
+Installing   mmorph-1.2.1 (lib)
+Downloaded   pretty-show-1.10
+Downloading  wl-pprint-annotated-0.1.0.1
+Building     barbies-2.1.1.0 (lib)
+Downloaded   wl-pprint-annotated-0.1.0.1
+Downloading  ansi-terminal-types-1.1.3
+Completed    unliftio-core-0.2.1.0 (lib)
+Starting     wl-pprint-annotated-0.1.0.1 (lib)
+Downloaded   ansi-terminal-types-1.1.3
+Downloading  ansi-terminal-1.1.5
+Completed    mmorph-1.2.1 (lib)
+Downloaded   ansi-terminal-1.1.5
+Downloading  hsc2hs-0.68.10
+Building     happy-lib-2.1.7 (lib:grammar)
+Downloaded   hsc2hs-0.68.10
+Downloading  terminal-size-0.3.4
+Installing   boring-0.2.2 (lib)
+Starting     hsc2hs-0.68.10 (exe:hsc2hs)
+Downloaded   terminal-size-0.3.4
+Downloading  concurrent-output-1.10.21
+Downloaded   concurrent-output-1.10.21
+Downloading  hedgehog-1.7
+Completed    boring-0.2.2 (lib)
+Building     safe-exceptions-0.1.7.4 (lib)
+Starting     constraints-0.14.2 (lib)
+Downloaded   hedgehog-1.7
+Building     transformers-base-0.4.6 (lib)
+Installing   colour-2.3.6 (lib)
+Installing   splitmix-0.1.3.1 (lib)
+Installing   happy-lib-2.1.7 (lib:grammar)
+Building     async-2.2.5 (lib)
+Completed    colour-2.3.6 (lib)
+Starting     ansi-terminal-types-1.1.3 (lib)
+Installing   transformers-base-0.4.6 (lib)
+Completed    splitmix-0.1.3.1 (lib)
+Starting     random-1.3.1 (lib)
+Completed    happy-lib-2.1.7 (lib:grammar)
+Installing   safe-exceptions-0.1.7.4 (lib)
+Building     wl-pprint-annotated-0.1.0.1 (lib)
+Starting     happy-lib-2.1.7 (lib:frontend)
+Starting     happy-lib-2.1.7 (lib:tabular)
+Completed    transformers-base-0.4.6 (lib)
+Starting     monad-control-1.0.3.1 (lib)
+Completed    safe-exceptions-0.1.7.4 (lib)
+Building     hsc2hs-0.68.10 (exe:hsc2hs)
+Installing   async-2.2.5 (lib)
+Building     constraints-0.14.2 (lib)
+Completed    async-2.2.5 (lib)
+Installing   wl-pprint-annotated-0.1.0.1 (lib)
+Building     ansi-terminal-types-1.1.3 (lib)
+Building     random-1.3.1 (lib)
+Building     happy-lib-2.1.7 (lib:tabular)
+Building     happy-lib-2.1.7 (lib:frontend)
+Completed    wl-pprint-annotated-0.1.0.1 (lib)
+Building     monad-control-1.0.3.1 (lib)
+Installing   barbies-2.1.1.0 (lib)
+Installing   monad-control-1.0.3.1 (lib)
+Completed    barbies-2.1.1.0 (lib)
+Installing   haskell-lexer-1.2.1 (lib)
+Completed    monad-control-1.0.3.1 (lib)
+Starting     lifted-base-0.2.3.12 (lib)
+Installing   ansi-terminal-types-1.1.3 (lib)
+Completed    haskell-lexer-1.2.1 (lib)
+Installing   primitive-0.9.1.0 (lib)
+Completed    ansi-terminal-types-1.1.3 (lib)
+Starting     ansi-terminal-1.1.5 (lib)
+Completed    primitive-0.9.1.0 (lib)
+Installing   constraints-0.14.2 (lib)
+Starting     resourcet-1.3.0 (lib)
+Completed    constraints-0.14.2 (lib)
+Installing   happy-lib-2.1.7 (lib:tabular)
+Building     lifted-base-0.2.3.12 (lib)
+Completed    happy-lib-2.1.7 (lib:tabular)
+Starting     happy-lib-2.1.7 (lib:backend-glr)
+Starting     happy-lib-2.1.7 (lib:backend-lalr)
+Building     ansi-terminal-1.1.5 (lib)
+Building     resourcet-1.3.0 (lib)
+Building     happy-lib-2.1.7 (lib:backend-glr)
+Building     happy-lib-2.1.7 (lib:backend-lalr)
+Installing   happy-lib-2.1.7 (lib:frontend)
+Installing   lifted-base-0.2.3.12 (lib)
+Completed    happy-lib-2.1.7 (lib:frontend)
+Installing   resourcet-1.3.0 (lib)
+Completed    lifted-base-0.2.3.12 (lib)
+Starting     lifted-async-0.11.0 (lib)
+Completed    resourcet-1.3.0 (lib)
+Installing   happy-lib-2.1.7 (lib:backend-glr)
+Installing   hsc2hs-0.68.10 (exe:hsc2hs)
+Completed    hsc2hs-0.68.10 (exe:hsc2hs)
+Starting     terminal-size-0.3.4 (lib)
+Completed    happy-lib-2.1.7 (lib:backend-glr)
+Building     lifted-async-0.11.0 (lib)
+Installing   happy-lib-2.1.7 (lib:backend-lalr)
+Building     terminal-size-0.3.4 (lib)
+Installing   lifted-async-0.11.0 (lib)
+Installing   ansi-terminal-1.1.5 (lib)
+Completed    happy-lib-2.1.7 (lib:backend-lalr)
+Starting     happy-lib-2.1.7 (lib)
+Completed    lifted-async-0.11.0 (lib)
+Completed    ansi-terminal-1.1.5 (lib)
+Installing   terminal-size-0.3.4 (lib)
+Completed    terminal-size-0.3.4 (lib)
+Starting     concurrent-output-1.10.21 (lib)
+Installing   random-1.3.1 (lib)
+Building     happy-lib-2.1.7 (lib)
+Installing   happy-lib-2.1.7 (lib)
+Completed    random-1.3.1 (lib)
+Completed    happy-lib-2.1.7 (lib)
+Starting     happy-2.1.7 (exe:happy)
+Building     concurrent-output-1.10.21 (lib)
+Building     happy-2.1.7 (exe:happy)
+Installing   concurrent-output-1.10.21 (lib)
+Completed    concurrent-output-1.10.21 (lib)
+Installing   happy-2.1.7 (exe:happy)
+Completed    happy-2.1.7 (exe:happy)
+Starting     pretty-show-1.10 (lib)
+Building     pretty-show-1.10 (lib)
+Installing   pretty-show-1.10 (lib)
+Completed    pretty-show-1.10 (lib)
+Starting     hedgehog-1.7 (lib)
+Building     hedgehog-1.7 (lib)
+Installing   hedgehog-1.7 (lib)
+Completed    hedgehog-1.7 (lib)
+Configuring test suite 'validation-model-tests' for avionics-validation-0.1.0.0...
+Preprocessing test suite 'validation-model-tests' for avionics-validation-0.1.0.0...
+Building test suite 'validation-model-tests' for avionics-validation-0.1.0.0...
+[1 of 2] Compiling Gen              ( test\Gen.hs, C:\Users\Peterson\Documents\GitHub\IC\Revisao_v5\03_codigo\dist-newstyle\build\x86_64-windows\ghc-9.6.7\avionics-validation-0.1.0.0\t\validation-model-tests\build\validation-model-tests\validation-model-tests-tmp\Gen.o )
+[2 of 2] Compiling Main             ( test\ModelSpec.hs, C:\Users\Peterson\Documents\GitHub\IC\Revisao_v5\03_codigo\dist-newstyle\build\x86_64-windows\ghc-9.6.7\avionics-validation-0.1.0.0\t\validation-model-tests\build\validation-model-tests\validation-model-tests-tmp\Main.o )
+[3 of 3] Linking C:\\Users\\Peterson\\Documents\\GitHub\\IC\\Revisao_v5\\03_codigo\\dist-newstyle\\build\\x86_64-windows\\ghc-9.6.7\\avionics-validation-0.1.0.0\\t\\validation-model-tests\\build\\validation-model-tests\\validation-model-tests.exe
+EXIT=0
