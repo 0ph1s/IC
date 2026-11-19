@@ -68,11 +68,58 @@ saída completa.
   (`warning_worse_than_at_arming`, `failsafe.cpp`). Na nossa, o `CriticalBattery` seguinte leva a `EmergencyLanding`.
   O script confere que, nesses casos, a bateria estava `Critical` no momento do armamento.
 
+## Atraso `COM_FAIL_ACT_T` e o limite de (SD) (hipótese (b) da T27)
+
+Com `COM_FAIL_ACT_T > 0`, o PX4 não executa a ação na hora: entra em `Hold`, conta o atraso (`_current_delay`) e só então
+age. Isso foi medido de duas formas. O harness lê o estado interno do `Failsafe` (diretiva `VERBOSE 1`) por um truque de
+compilação só no `harness.cpp`; o código do PX4 continua sem modificação.
+
+**1. Os traços da implementação, com atraso** (`logs/px4_diff_act2_T5_100ms.md`, `px4_diff_act2_T5_1000ms.md`).
+Com `COM_FAIL_ACT_T = 5 s`, aparece uma classe nova: o PX4 está em `Hold` esperando o atraso, enquanto a nossa já está em
+`EmergencyLanding` (517 finais de tick) ou ainda em `InFlight` com bateria `Critical` (201). As outras classes não mudam.
+O que isso mostra é só que **o resultado depende de uma escala de tempo que o nosso modelo não tem**: com 1 s por passo,
+o atraso expira dentro de um traço aleatório e a classe "cegueira" volta (1 caso). Não é conformância nem defeito.
+
+**2. Quanto estado escondido o PX4 carrega** (`px4_sd.py`; `logs/px4_sd_atraso_2simbolos.md`, `px4_sd_atraso_3simbolos.md`,
+`px4_sd_rapido.md`). Todas as palavras de bateria (níveis a cada segundo, armado) até um comprimento fixo, para vários
+valores de `COM_FAIL_ACT_T`. Para cada abstração do estado, conta-se os "conflitos": o mesmo par (estado abstrato,
+entrada) levando a resultados diferentes. Conflito zero significa que (SD) vale para aquela abstração.
+
+| Abstração | O que é | Conflitos |
+|---|---|---|
+| α | o que um observador vê: ação selecionada e takeover | **> 0 mesmo com `COM_FAIL_ACT_T = 0`** (1 a 3, conforme T) |
+| α' | α mais o último nível de bateria (o análogo do nosso terno de vértices) | **> 0**, igual a α |
+| β | α mais os atrasos, a lista de ações ativas e o resto do estado privado que o harness lê | **0 em todas as execuções** |
+
+Resultados (alfabeto de dois níveis, 65.536 palavras de 16 passos; classes futuras com histórias de 8 passos e
+continuações de 8):
+
+| `COM_FAIL_ACT_T` (s) | 0 | 1 | 2 | 3 | 5 | 8 |
+|---|---|---|---|---|---|---|
+| estados β alcançados | 5 | 15 | 31 | 55 | 127 | 269 |
+| classes de comportamento futuro | 2 | 3 | 15 | 29 | 38 | 23 |
+
+As classes futuras para T = 5 e 8 são limitadas pelo horizonte (continuações de 8 passos não cobrem um atraso de 8 s), então
+esses dois valores são **cotas inferiores**; de T = 0 a 3 a contagem cresce com o atraso.
+
+**Leitura.**
+
+* O estado visível **não** determina a saída nem sem temporizador. A causa, verificada na enumeração: o PX4 guarda o nível
+  de bateria **na hora de armar** (`_battery_warning_at_arming`). A mesma história visível (`None` e depois bateria
+  `Critical`) dá `RTL` ou só `Warn`, conforme esse bit.
+* Com atraso, o estado escondido cresce com o parâmetro: dois contadores (`_current_delay`, que desce a cada atualização, e
+  `_current_start_delay`, que volta a subir a um quarto da velocidade) mais a lista de ações. Aqui o estado interno que o
+  harness lê **basta** (β sem conflitos), mas não é um terno de vértices.
+* Em termos de (SD): vale para a abstração β (estado interno completo, com temporizadores), e **não** vale para α nem α'.
+  Ou seja, aplicar o mesmo método de exploração ao PX4 exigiria acrescentar à abstração o bit de armamento e os
+  temporizadores, e o número de estados passa a depender de `COM_FAIL_ACT_T`.
+* Isto é uma medida sobre o recorte "bateria → ação" do PX4, não um teorema sobre (SD) em geral.
+
 ## Limites (o que esta pasta **não** mostra)
 
-1. **Só o recorte "nível de bateria → ação".** Sem atraso (`COM_FAIL_ACT_T = 0`), portanto a máquina de atraso do
-   PX4 (Hold antes da ação, retomada do atraso, takeover do piloto) **não** é exercida. O limite de (SD) com
-   temporizadores, hipótese (b) da T27, continua em aberto.
+1. **Só o recorte "nível de bateria → ação".** A máquina de atraso (Hold antes da ação, refil do atraso) é exercida
+   na seção acima; o takeover do piloto (`rc_sticks_takeover_request`, mudança de modo) e as demais causas de failsafe
+   (GNSS, GCS, link, geofence) **não** são.
 2. **A tradução é nossa.** A independência é a das *regras* de decisão, não da tradução de estados.
 3. Parâmetros além de `COM_LOW_BAT_ACT` e `COM_FAIL_ACT_T` têm os valores de `harness.cpp` (`defaults()`), que **não**
    foram conferidos contra os metadados de parâmetros do PX4; só importam para flags que aqui ficam sempre falsas.
@@ -87,6 +134,7 @@ saída completa.
 # Windows: clang++ do GHC no PATH, por exemplo C:/ghcup/ghc/9.6.7/mingw/bin; pasta de trabalho de caminho curto
 bash 11_oraculo-px4/run_px4_oracle.sh C:/mv/px4   # ~1 minuto, precisa de rede (github.com) na primeira execução
 # ou, dentro do run_all: bash 08_reprodutibilidade/run_all.sh --px4
+# FULL=1 acrescenta as enumerações maiores de px4_sd.py (cerca de 3 minutos)
 ```
 
 Pré-requisito: os traços em `08_reprodutibilidade/logs/18_traces/` (gerados pelo `run_all.sh`).
@@ -102,6 +150,7 @@ O script sai com 0 se o autoteste passar (14/14) e toda divergência cair nas tr
 | `harness.cpp` | liga o `Failsafe` real a uma interface de texto (`PARAM`, `NEW`, `STEP`) |
 | `build.sh` | compila o código real e o harness |
 | `selftest.py` | 14 expectativas do teste do PX4 |
-| `px4_diff.py` | passa os traços pelo PX4 e classifica as divergências |
+| `px4_diff.py` | passa os traços pelo PX4 e classifica as divergências (aceita `COM_FAIL_ACT_T` e tempo por passo) |
+| `px4_sd.py` | mede o estado escondido do PX4 com atraso: conflitos de (SD) por abstração e classes de comportamento futuro |
 | `run_px4_oracle.sh` | tudo isso em sequência |
 | `logs/` | resultados |

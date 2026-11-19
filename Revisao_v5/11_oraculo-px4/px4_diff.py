@@ -20,6 +20,8 @@ import sys
 exe, tla, csvp, act = sys.argv[1], sys.argv[2], sys.argv[3], int(sys.argv[4])
 out_md = sys.argv[5] if len(sys.argv) > 5 else None
 assert_cb = int(sys.argv[6]) if len(sys.argv) > 6 else 1
+fail_t = float(sys.argv[7]) if len(sys.argv) > 7 else 0.0     # COM_FAIL_ACT_T em segundos
+step_ms = int(sys.argv[8]) if len(sys.argv) > 8 else 100      # tempo por passo
 AV = ["Grounded", "InFlight", "EmergencyLanding", "Shutdown"]
 PW = ["Charged", "Low", "Critical"]
 ACT = {0: "None", 1: "Warn", 2: "FallbackPos", 3: "FallbackAlt", 4: "FallbackStab", 5: "Hold", 6: "RTL", 7: "Land",
@@ -36,7 +38,7 @@ def dec(code):
     return code // 100, (code // 10) % 10
 
 
-script = ["PARAM COM_LOW_BAT_ACT %d" % act, "PARAM COM_FAIL_ACT_T 0"]
+script = ["PARAM COM_LOW_BAT_ACT %d" % act, "PARAM COM_FAIL_ACT_T %g" % fail_t]
 index = []   # (trace, tick, k, ours_av, ours_pw, is_tick_end)
 for i in use:
     script.append("NEW")
@@ -56,7 +58,7 @@ for i in use:
             prev_armed = armed
             script.append("STEP %d armed=%d mode=3 bat=%d" % (t, armed, bat))
             index.append((i, ti, k, av, pw, k == len(steps) - 1, arm_pw, bat))
-            t += 100
+            t += step_ms
         first = False
 res = subprocess.run([exe], input="\n".join(script) + "\n", capture_output=True, text=True)
 if res.returncode != 0:
@@ -73,7 +75,9 @@ for (i, ti, k, av, pw, end, arm_pw, bat), line in zip(index, lines):
     action = int(line.split()[1])
     ours_land = av == 2
     px_land = action in LAND
-    if ours_land == px_land:
+    if action == 5 and fail_t > 0 and bat == 2:
+        cls = "ATRASO: o PX4 esta em Hold esperando COM_FAIL_ACT_T; a nossa esta em %s" % AV[av]
+    elif ours_land == px_land:
         cls = "concordam"
     elif px_land and av == 1 and pw == 2:
         cls = "PX4 pousa; nossa fica InFlight com bateria Critical (cegueira)"
@@ -88,7 +92,7 @@ for (i, ti, k, av, pw, end, arm_pw, bat), line in zip(index, lines):
     tally[cls] += 1
     examples.setdefault(cls, (kinds[i], i + 1, ti + 1))
 total = sum(tally.values())
-rows = ["Parametro COM_LOW_BAT_ACT = %d; tracos usados: %d (aresta e aleatorios); finais de tick comparados: %d." % (act, len(use), total), ""]
+rows = ["Parametro COM_LOW_BAT_ACT = %d, COM_FAIL_ACT_T = %g s, %d ms por passo; tracos usados: %d (aresta e aleatorios); finais de tick comparados: %d." % (act, fail_t, step_ms, len(use), total), ""]
 rows.append("| Classe | Finais de tick | Exemplo (tipo, traco, tick) |")
 rows.append("|---|---|---|")
 for cls, n in sorted(tally.items(), key=lambda x: -x[1]):
@@ -97,7 +101,7 @@ msg = "\n".join(rows)
 print(msg)
 if out_md:
     open(out_md, "w", encoding="utf8", newline="\n").write(msg + "\n")
-EXPLAINED = ("concordam", "PX4 pousa; nossa fica InFlight", "PX4 so avisa", "trava:")
+EXPLAINED = ("concordam", "ATRASO:", "PX4 pousa; nossa fica InFlight", "PX4 so avisa", "trava:")
 unexpected = [c for c in tally if not c.startswith(EXPLAINED)]
 if unexpected:
     print("\nCLASSES NAO PREVISTAS:", *unexpected, sep="\n  ")

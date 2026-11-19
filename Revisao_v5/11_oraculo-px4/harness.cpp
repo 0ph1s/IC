@@ -5,16 +5,36 @@
 //   PARAM <NOME> <valor>              define um parametro; vale para as instancias criadas depois
 //   NEW                               cria uma instancia nova de Failsafe (estado zerado, parametros atuais)
 //   STEP <t_ms> chave=valor ...       um update(); chaves: armed mode bat rft gnss mc gcs nav unh stick vtype
+//   VERBOSE <0|1>                     com 1, cada STEP imprime tambem o estado interno (ver abaixo)
 // Saida: uma linha por STEP:  <t_ms> <acao> <takeover> <modo_pretendido>
-#include "failsafe.h"
+//   com VERBOSE 1, acrescenta:  <atraso_us> <atraso_inicial_us> <acoes ativas>
+//   onde <acoes ativas> = lista ordenada de "acao/limpeza/falha" das entradas validas de _actions (ou "-").
+// Os cabecalhos da biblioteca padrao entram ANTES do truque abaixo. O truque (private/protected -> public) vale so
+// nesta unidade de traducao e serve para LER, sem alterar o codigo do PX4, o estado interno do Failsafe (atrasos e
+// lista de acoes) na diretiva VERBOSE; o layout das classes nao muda.
+#include <algorithm>
+#include <cfloat>
+#include <climits>
+#include <cmath>
+#include <cstddef>
+#include <cstdint>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
 #include <map>
 #include <memory>
+#include <new>
 #include <sstream>
 #include <string>
+#include <type_traits>
+#include <utility>
+#include <vector>
+#define private public
+#define protected public
+#include "failsafe.h"
+#undef private
+#undef protected
 #include <uORB/topics/battery_status.h>
 #include <uORB/topics/vehicle_status.h>
 
@@ -71,6 +91,7 @@ int main()
 	failsafe_flags_s flags{};
 	std::string line;
 	bool first_step_of_instance = true;
+	bool verbose = false;
 
 	while (std::getline(std::cin, line)) {
 		auto hash = line.find('#');
@@ -89,6 +110,9 @@ int main()
 			if (i < 0) { std::fprintf(stderr, "parametro desconhecido: %s\n", n.c_str()); return 2; }
 
 			g_param[i] = v;
+
+		} else if (cmd == "VERBOSE") {
+			int v; is >> v; verbose = v != 0;
 
 		} else if (cmd == "NEW") {
 			fs.reset(new Failsafe(nullptr));
@@ -126,7 +150,36 @@ int main()
 
 			(void)first_step_of_instance;
 			uint8_t m = fs->update((hrt_abstime)t_ms * 1000ULL, st, false, stick, flags);
-			std::printf("%ld %d %d %d\n", t_ms, (int)fs->selectedAction(), (int)fs->userTakeoverActive(), (int)m);
+			std::printf("%ld %d %d %d", t_ms, (int)fs->selectedAction(), (int)fs->userTakeoverActive(), (int)m);
+
+			if (verbose) {
+				std::vector<std::string> acts;
+
+				for (int a = 0; a < fs->max_num_actions; ++a) {
+					const auto &x = fs->_actions[a];
+
+					if (x.valid()) {
+						acts.push_back(std::to_string((int)x.action) + "/" + std::to_string((int)x.clear_condition) + "/"
+							       + std::to_string((int)x.state_failure));
+					}
+				}
+
+				std::sort(acts.begin(), acts.end());
+				std::string joined;
+
+				for (auto &a : acts) { joined += (joined.empty() ? "" : ",") + a; }
+
+				std::printf(" %llu %llu %s", (unsigned long long)fs->_current_delay,
+					    (unsigned long long)fs->_current_start_delay, joined.empty() ? "-" : joined.c_str());
+				// resto do estado privado que pode influir nas decisoes seguintes (ordem fixa; ver px4_sd.py)
+				std::printf(" %d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d", (int)fs->_last_armed, (int)fs->_user_takeover_active,
+					    (int)fs->_last_user_intended_mode, (int)fs->_last_status_flags.battery_warning,
+					    (int)fs->_last_status_flags.battery_low_remaining_time, (int)fs->_last_state_battery_warning_low,
+					    (int)fs->_last_state_battery_warning_critical, (int)fs->_last_state_battery_warning_emergency,
+					    (int)fs->_battery_warning_at_arming, (int)fs->_was_armed, (int)(fs->_armed_time != 0));
+			}
+
+			std::printf("\n");
 			first_step_of_instance = false;
 
 		} else {

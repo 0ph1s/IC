@@ -1,4 +1,4 @@
-Parametro COM_LOW_BAT_ACT = 3; tracos usados: 1020 (aresta e aleatorios); finais de tick comparados: 16099.
+Parametro COM_LOW_BAT_ACT = 3, COM_FAIL_ACT_T = 0 s, 100 ms por passo; tracos usados: 1020 (aresta e aleatorios); finais de tick comparados: 16099.
 
 | Classe | Finais de tick | Exemplo (tipo, traco, tick) |
 |---|---|---|
