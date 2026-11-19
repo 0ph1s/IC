@@ -1,0 +1,33 @@
+PX4 em 4e44c822c9018120508bce6d8ad349f0775586a1
+expectativas do PX4 reproduzidas: 14 de 14
+
+== traduzindo CriticalBattery como bateria Critical (assert=1), COM_LOW_BAT_ACT=2
+Parametro COM_LOW_BAT_ACT = 2; tracos usados: 1020 (aresta e aleatorios); finais de tick comparados: 16099.
+
+| Classe | Finais de tick | Exemplo (tipo, traco, tick) |
+|---|---|---|
+| concordam | 15849 | ('aresta', 1, 1) |
+| PX4 pousa; nossa fica InFlight com bateria Critical (cegueira) | 201 | ('aresta', 26, 2) |
+| trava: nossa segue em EmergencyLanding com bateria Low; PX4 liberou (acao Warn) | 41 | ('aresta', 143, 3) |
+| PX4 so avisa: a bateria ja estava Critical ao armar (framework.cpp/failsafe.cpp, COM_LOW_BAT_ACT) | 8 | ('aresta', 269, 4) |
+
+== traduzindo CriticalBattery como bateria Critical (assert=1), COM_LOW_BAT_ACT=3
+Parametro COM_LOW_BAT_ACT = 3; tracos usados: 1020 (aresta e aleatorios); finais de tick comparados: 16099.
+
+| Classe | Finais de tick | Exemplo (tipo, traco, tick) |
+|---|---|---|
+| concordam | 15849 | ('aresta', 1, 1) |
+| PX4 pousa; nossa fica InFlight com bateria Critical (cegueira) | 201 | ('aresta', 26, 2) |
+| trava: nossa segue em EmergencyLanding com bateria Low; PX4 liberou (acao Warn) | 41 | ('aresta', 143, 3) |
+| PX4 so avisa: a bateria ja estava Critical ao armar (framework.cpp/failsafe.cpp, COM_LOW_BAT_ACT) | 8 | ('aresta', 269, 4) |
+
+== sem afirmar bateria Critical pelo comando (assert=0), COM_LOW_BAT_ACT=2 (sensibilidade da tradução)
+Parametro COM_LOW_BAT_ACT = 2; tracos usados: 1020 (aresta e aleatorios); finais de tick comparados: 16099.
+
+| Classe | Finais de tick | Exemplo (tipo, traco, tick) |
+|---|---|---|
+| concordam | 15409 | ('aresta', 1, 1) |
+| trava: nossa segue em EmergencyLanding com bateria Charged; PX4 liberou (acao None) | 275 | ('aresta', 49, 2) |
+| trava: nossa segue em EmergencyLanding com bateria Low; PX4 liberou (acao Warn) | 210 | ('aresta', 50, 2) |
+| PX4 pousa; nossa fica InFlight com bateria Critical (cegueira) | 201 | ('aresta', 26, 2) |
+| PX4 so avisa: a bateria ja estava Critical ao armar (framework.cpp/failsafe.cpp, COM_LOW_BAT_ACT) | 4 | ('aresta', 269, 4) |

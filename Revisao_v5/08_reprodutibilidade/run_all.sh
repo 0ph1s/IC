@@ -10,6 +10,8 @@
 #     --destinos   inclui a mutação exaustiva de destinos, 48 mutantes (lenta: cerca de 2 horas; em Windows, defina
 #                  TMPDIR com caminho curto, por exemplo TMPDIR=/c/mv)
 #     --justica    inclui o TLC sob hipóteses de justiça alternativas (cerca de 35 minutos)
+#     --px4        inclui o oráculo PX4 (11_oraculo-px4/): baixa do GitHub só o failsafe do PX4 (precisa de rede),
+#                  compila o código real com clang++ e passa os traços da implementação por ele (cerca de 1 minuto)
 #     As opções se combinam. SCXML_DIR (opcional): pasta onde se fez `npm install scxml@4.3.1 --ignore-scripts`;
 #     se definida, o oráculo SCION também valida os traços (04_tla/scion/).
 #
@@ -25,12 +27,13 @@ HERE="$(cd "$(dirname "$0")" && pwd)"          # 08_reprodutibilidade/
 ROOT="$(cd "$HERE/.." && pwd)"                 # Revisao_v5/
 CODE="$ROOT/03_codigo"
 LOGS="$HERE/logs"
-WITH_MUT=0; WITH_DEST=0; WITH_FAIR=0
+WITH_MUT=0; WITH_DEST=0; WITH_FAIR=0; WITH_PX4=0
 for arg in "$@"; do
   case "$arg" in
     --mutacao) WITH_MUT=1;;
     --destinos) WITH_DEST=1;;
     --justica) WITH_FAIR=1;;
+    --px4) WITH_PX4=1;;
     *) echo "opção desconhecida: $arg"; exit 2;;
   esac
 done
@@ -202,6 +205,13 @@ if [ "$WITH_FAIR" -eq 1 ] && [ -f "$ROOT/04_tla/tools/tla2tools.jar" ]; then
   if [ $? -eq 0 ]; then record "TLC sob hipóteses de justiça: tabela igual à esperada (9 hipóteses x 2 políticas)" ok "20_justica/20_justica.md"; else record "TLC sob hipóteses de justiça" FALHA "20_justica_console.txt"; fi
 else
   echo "| TLC sob hipóteses de justiça | não executado (use --justica) | \`20_justica/20_justica.md\` (execução anterior, se existir) |" >> "$SUM"
+fi
+
+if [ "$WITH_PX4" -eq 1 ]; then
+  bash "$ROOT/11_oraculo-px4/run_px4_oracle.sh" "${TMPDIR:-/tmp}/px4_oraculo" > "$LOGS/21_px4_console.txt" 2>&1
+  if [ $? -eq 0 ]; then record "O4 (PX4): autoteste 14/14 e divergências só nas classes explicadas" ok "21_px4_console.txt"; else record "O4 (PX4): autoteste ou classe inexplicada" FALHA "21_px4_console.txt"; fi
+else
+  echo "| O4 (PX4) | não executado (use --px4) | \`11_oraculo-px4/logs/px4_console.txt\` (execução anterior, se existir) |" >> "$SUM"
 fi
 
 echo
