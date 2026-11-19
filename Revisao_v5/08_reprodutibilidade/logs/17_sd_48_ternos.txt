@@ -1,0 +1,19 @@
+Build profile: -w ghc-9.6.7 -O1
+In order, the following will be built (use -v for more details):
+ - avionics-validation-0.1.0.0 (test:validation-sd-tests) (ephemeral targets)
+Preprocessing test suite 'validation-sd-tests' for avionics-validation-0.1.0.0...
+Building test suite 'validation-sd-tests' for avionics-validation-0.1.0.0...
+Running 1 test suites...
+Test suite validation-sd-tests: RUNNING...
+Semente do Hedgehog (HEDGEHOG_SEED): 2588939111143008120 8826110057919892547
+=== (SD) exaustiva: 48 ternos x 8421 cenários de até 3 ticks = 404208 casos ===
+  casos em que (SD) falha: 0
+  controle negativo 1 (terno fixo)      : a verificação discorda em 381560 casos
+  controle negativo 2 (ambiente esquecido): a verificação discorda em 231269 casos
+  ✓ <interactive> passed 5000 tests.
+
+(SD) VALE nos 48 ternos (exaustivo até 3 ticks; 5000 cenários aleatórios de até 40 ticks); os controles negativos reprovam.
+Test suite validation-sd-tests: PASS
+Test suite logged to:
+C:\Users\Peterson\Documents\GitHub\IC\Revisao_v5\03_codigo\dist-newstyle\build\x86_64-windows\ghc-9.6.7\avionics-validation-0.1.0.0\t\validation-sd-tests\test\avionics-validation-0.1.0.0-validation-sd-tests.log
+1 of 1 test suites (1 of 1 test cases) passed.

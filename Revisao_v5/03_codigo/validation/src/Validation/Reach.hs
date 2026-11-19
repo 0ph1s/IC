@@ -37,6 +37,15 @@ module Validation.Reach
   , cremTS
   , refTS
   , cremNext
+  , summarizeLoop
+  , cremRunFrom
+  , cremIterFrom
+  , avVs
+  , pwVs
+  , msVs
+  , avIdx
+  , pwIdx
+  , msIdx
   , productTS
   , faithful
   , avSeqViolations
@@ -45,11 +54,11 @@ module Validation.Reach
   , maxCascade
   ) where
 
-import Avionics.Crem (AvionicsVertex (..), SAvionicsVertex)
+import Avionics.Crem (AvionicsVertex (..))
 import qualified Avionics.Naive as N
-import Avionics.Power (PowerVertex (..), SPowerVertex)
+import Avionics.Power (PowerVertex (..))
 import Avionics.Sim.Loop (LoopStep (..), closedLoop)
-import Avionics.Sim.Mission (MissionVertex (..), SMissionVertex)
+import Avionics.Sim.Mission (MissionVertex (..))
 import Avionics.Sim.Observe (Observation (..))
 import Avionics.Sim.Scenario (Scenario, Signal, TickInput, allTickInputs, externalSignals)
 import Crem.StateMachine (StateMachineT, run)
@@ -167,19 +176,13 @@ runAll m (s : ss) =
   let (steps, m') = runIdentity (run m s)
    in steps ++ runAll m' ss
 
--- | Um tick da IMPLEMENTAÇÃO a partir de um terno qualquer: constrói o laço fechado do CREM com os
--- três vértices dados e aplica os sinais do tick (`Beat`, comando, energia).
-cremNext :: AbsState -> TickInput -> (AbsState, [StepSum])
-cremNext (AbsState a p q) inp =
-  withSomeSing @AvionicsVertex (avVs !! a) $ \sa ->
-    withSomeSing @PowerVertex (pwVs !! p) $ \sp ->
-      withSomeSing @MissionVertex (msVs !! q) $ \sq ->
-        summarize (machine sa sp sq)
+-- | Resumo de uma lista de passos do laço: o terno ao fim (o do último passo; o próprio terno de
+-- partida se não houve passo) e os passos na forma comum ao oráculo. É o MESMO resumo para `cremNext`
+-- (um tick), `cremRunFrom` (um cenário inteiro numa só máquina) e o simulador.
+summarizeLoop :: AbsState -> [LoopStep] -> (AbsState, [StepSum])
+summarizeLoop (AbsState a p q) steps = (end, map stepSum steps)
   where
-    machine :: SAvionicsVertex x -> SPowerVertex y -> SMissionVertex z -> [LoopStep]
-    machine sa sp sq = runAll (closedLoop sa sp sq) (externalSignals inp)
-    summarize steps = (end steps, map stepSum steps)
-    end steps = case reverse steps of
+    end = case reverse steps of
       ls : _ -> AbsState (avIdx (obsVertex (lsAv ls))) (pwIdx (obsVertex (lsPow ls))) (msIdx (obsVertex (lsMission ls)))
       [] -> AbsState a p q
     stepSum ls =
@@ -192,6 +195,30 @@ cremNext (AbsState a p q) inp =
         , ssPw = pwOfVertex (obsVertex (lsPow ls))
         , ssMission = show (obsVertex (lsMission ls))
         }
+
+-- | Um tick da IMPLEMENTAÇÃO a partir de um terno qualquer: constrói o laço fechado do CREM com os
+-- três vértices dados e aplica os sinais do tick (`Beat`, comando, energia).
+cremNext :: AbsState -> TickInput -> (AbsState, [StepSum])
+cremNext s@(AbsState a p q) inp =
+  withSomeSing @AvionicsVertex (avVs !! a) $ \sa ->
+    withSomeSing @PowerVertex (pwVs !! p) $ \sp ->
+      withSomeSing @MissionVertex (msVs !! q) $ \sq ->
+        summarizeLoop s (runAll (closedLoop sa sp sq) (externalSignals inp))
+
+-- | (SD), lado "uma máquina": constrói o laço UMA vez no terno dado e aplica a ele os sinais de todos
+-- os ticks do cenário, em sequência. O estado que a máquina carrega entre ticks é o que o CREM guarda.
+cremRunFrom :: AbsState -> Scenario -> (AbsState, [StepSum])
+cremRunFrom s@(AbsState a p q) sc =
+  withSomeSing @AvionicsVertex (avVs !! a) $ \sa ->
+    withSomeSing @PowerVertex (pwVs !! p) $ \sp ->
+      withSomeSing @MissionVertex (msVs !! q) $ \sq ->
+        summarizeLoop s (runAll (closedLoop sa sp sq) (concatMap externalSignals sc))
+
+-- | (SD), lado "terno": reconstrói a máquina a cada tick, só a partir do terno de vértices observado ao
+-- fim do tick anterior (é o que a exploração do grafo faz). Se o comportamento futuro depende só do
+-- terno, os dois lados coincidem.
+cremIterFrom :: AbsState -> Scenario -> (AbsState, [StepSum])
+cremIterFrom s0 = foldl' (\(s, acc) inp -> let (s', ss) = cremNext s inp in (s', acc ++ ss)) (s0, [])
 
 -- | O sistema de transições da implementação.
 cremTS :: TS AbsState [StepSum]

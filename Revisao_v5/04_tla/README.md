@@ -73,3 +73,25 @@ Se os resultados divergirem do esperado, o erro pode estar na especificação, n
 * O TLC verifica o **modelo**, não a implementação Haskell (o parecer faz a mesma ressalva).
 * As propriedades temporais dependem das hipóteses de justiça (`WF` de `Step` e de `Tick`): há infinitos
   ticks, mas as entradas de cada tick são livres (inclusive ociosas para sempre).
+
+## Validação de traços, justiça alternativa e SCION (v3 do artigo JFP, 18 a 19/11/2026)
+
+`AvionicsLoop.tla` **não foi alterado**. Três acréscimos o usam:
+
+* **O3, validação de traços** (`TraceCheck.tla`, `run_trace_validation.sh`, `check_trace_dump.py`). O executável
+  `validation-export` (em `03_codigo/validation/app/`) roda as máquinas reais do CREM e escreve, para cada cenário, o terno
+  (aviônica, bateria, ambiente) depois de **cada sinal**. `TraceCheck.tla` faz o TLC seguir esses traços: a cada tick fixa
+  as entradas do traço, e cada passo da especificação tem de reproduzir o terno registrado; a fila tem de esvaziar no fim
+  de cada tick. São 520 traços de aresta (um por transição do grafo), 500 aleatórios de 30 ticks (gerador congruencial de
+  semente fixa) e 100 corrompidos de propósito, que têm de ser recusados. Resultado em `logs/18_*`.
+* **Justiça alternativa** (`AvionicsLoopFairness.tla`, `run_fairness.sh`). A conclusão sobre `OneSlot` depende do que o mundo
+  externo acaba enviando; o módulo acrescenta, sem alterar a especificação, hipóteses de justiça forte sobre ticks com um
+  dado evento ou comando. `run_fairness.sh` (cerca de 35 minutos) escreve `logs/20_justica/20_justica.md`.
+* **SCION** (`scion/`): `avionics_loop.scxml` descreve o mesmo laço em SCXML; `scion_oracle.js` valida os mesmos traços no
+  SCION (`scxml` 4.3.1, instalado com `npm install scxml@4.3.1 --ignore-scripts`; defina `SCXML_DIR`);
+  `compare_oracles.sh` compara, traço a traço, o que o TLC e o SCION aceitam. **O SCXML foi escrito a partir do TLA+ e das
+  tabelas pelo mesmo autor**: a independência é a do motor de execução, não a da leitura das regras. A região `obs` do SCXML
+  é só instrumentação.
+
+Limite: os traços vêm do mesmo autor do modelo. Isto liga o modelo ao código, sinal a sinal, mas não substitui a revisão
+independente das tabelas.

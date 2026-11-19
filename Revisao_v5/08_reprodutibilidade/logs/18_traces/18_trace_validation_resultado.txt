@@ -1,0 +1,4 @@
+aresta       traços:  520  aceitos:  520  recusados:    0
+aleatorio30  traços:  500  aceitos:  500  recusados:    0
+corrompido   traços:  100  aceitos:    0  recusados:  100
+ESPERADO (todos os traços da implementação aceitos; todos os corrompidos recusados): CONFERE

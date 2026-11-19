@@ -35,3 +35,16 @@ bash Revisao_v5/08_reprodutibilidade/run_all.sh --mutacao  # inclui mutação do
 * Os bytes dos diagnósticos incluem o caminho absoluto dos arquivos compilados e mudam com a pasta do repositório; as linhas, não.
 * Os logs desta pasta são todos gerados pelos scripts; nenhum é editado à mão.
 * A mutação roda em cópia temporária e não altera o projeto; ela recompila tudo na primeira vez.
+
+## Passos acrescentados na v3 do artigo JFP (18 a 19/11/2026)
+
+| Passo | Arquivo | O que mostra |
+|---|---|---|
+| `validation-sd-tests` | `17_sd_48_ternos.txt` | determinação do estado (SD), no sentido comportamental, a partir dos 48 ternos (404 208 casos exaustivos e 5 000 testes Hedgehog), com dois controles negativos que reprovam |
+| validação de traços (O3) | `18_trace_validation_console.txt`, `18_traces/` | traços da implementação aceitos pelo TLC contra `AvionicsLoop.tla`; corrompidos recusados; grafo exportado (`grafo_*.csv`) e cegueira por sinal (`cegueira_por_sinal.txt`) |
+| SCION (opcional, `SCXML_DIR`) | `18_scion_console.txt` | os mesmos traços no SCION: aceita o mesmo conjunto que o TLC |
+| amostragem | `19_amostragem.md` | probabilidade exata de um teste aleatório (e de uma enumeração limitada) achar a lacuna da bateria |
+| `--destinos` | `06b_mutation_dest48.md` | os 48 mutantes de destino: 32 recusados pelo compilador, 16 aceitos e mortos pelas suítes |
+| `--justica` | `20_justica/20_justica.md` | `NoPermanentBlindness` sob 9 hipóteses de justiça, para `OneSlot` e `Level` |
+
+O3 contra os 16 mutantes de destino que o compilador aceita (e, com `SCXML_DIR`, o SCION sobre os mesmos traços) roda à parte, em cópia de trabalho: `python 03_codigo/validation/scripts/o3_mutants.py` escreve `logs/18_o3_contra_mutantes.md` (cerca de 40 minutos; em Windows, `TMPDIR` curto). Os logs `T12_O3_contra_mutantes.*` e `T13_comparacao_oraculos.*` desta pasta vêm de uma execução anterior (18 e 19/11/2026) de uma versão desse script e de `04_tla/scion/compare_oracles.sh` em cópias de trabalho.

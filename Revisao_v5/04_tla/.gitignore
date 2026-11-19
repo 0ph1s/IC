@@ -1,2 +1,9 @@
 tools/
 states/
+states_trace/
+states_f/
+states_cmp/
+cfg_fairness/
+saida_traces/
+logs_fairness/
+TraceData.tla

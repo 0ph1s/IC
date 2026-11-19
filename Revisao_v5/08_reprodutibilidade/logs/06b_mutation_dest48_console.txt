@@ -1,0 +1,99 @@
+[baseline] compilando a cópia sem mutação...
+[baseline] todas as suítes passam sem mutação
+[D01] destino trocado: Grounded+TakeoffSignal -> Grounded (original InFlight)
+      -> morto por: spec-tests, sim-tests (N=3), conformance, reach, model (Hedgehog)
+[D02] destino trocado: Grounded+TakeoffSignal -> EmergencyLanding (original InFlight)
+      -> recusado na compilação: src\Avionics\Crem.hs:86:50: error: [GHC-39999]
+[D03] destino trocado: Grounded+TakeoffSignal -> Shutdown (original InFlight)
+      -> morto por: spec-tests, sim-tests (N=3), conformance, reach, model (Hedgehog)
+[D04] destino trocado: Grounded+CriticalBattery -> InFlight (original Grounded)
+      -> morto por: spec-tests, sim-tests (N=3), conformance, reach, model (Hedgehog)
+[D05] destino trocado: Grounded+CriticalBattery -> EmergencyLanding (original Grounded)
+      -> recusado na compilação: src\Avionics\Crem.hs:87:50: error: [GHC-39999]
+[D06] destino trocado: Grounded+CriticalBattery -> Shutdown (original Grounded)
+      -> morto por: spec-tests, sim-tests (N=3), conformance, reach, model (Hedgehog)
+[D07] destino trocado: Grounded+LandedSignal -> InFlight (original Grounded)
+      -> morto por: spec-tests, sim-tests (N=3), conformance, reach, model (Hedgehog)
+[D08] destino trocado: Grounded+LandedSignal -> EmergencyLanding (original Grounded)
+      -> recusado na compilação: src\Avionics\Crem.hs:88:50: error: [GHC-39999]
+[D09] destino trocado: Grounded+LandedSignal -> Shutdown (original Grounded)
+      -> morto por: spec-tests, sim-tests (N=3), conformance, reach, model (Hedgehog)
+[D10] destino trocado: Grounded+SystemCutoff -> Grounded (original Shutdown)
+      -> morto por: spec-tests, sim-tests (N=3), conformance, reach, model (Hedgehog)
+[D11] destino trocado: Grounded+SystemCutoff -> InFlight (original Shutdown)
+      -> morto por: spec-tests, sim-tests (N=3), conformance, reach, model (Hedgehog)
+[D12] destino trocado: Grounded+SystemCutoff -> EmergencyLanding (original Shutdown)
+      -> recusado na compilação: src\Avionics\Crem.hs:89:50: error: [GHC-39999]
+[D13] destino trocado: InFlight+TakeoffSignal -> Grounded (original InFlight)
+      -> recusado na compilação: src\Avionics\Crem.hs:90:50: error: [GHC-39999]
+[D14] destino trocado: InFlight+TakeoffSignal -> EmergencyLanding (original InFlight)
+      -> morto por: spec-tests, sim-tests (N=3), conformance, reach, model (Hedgehog)
+[D15] destino trocado: InFlight+TakeoffSignal -> Shutdown (original InFlight)
+      -> recusado na compilação: src\Avionics\Crem.hs:90:50: error: [GHC-39999]
+[D16] destino trocado: InFlight+CriticalBattery -> Grounded (original EmergencyLanding)
+      -> recusado na compilação: src\Avionics\Crem.hs:91:50: error: [GHC-39999]
+[D17] destino trocado: InFlight+CriticalBattery -> InFlight (original EmergencyLanding)
+      -> morto por: spec-tests, sim-tests (N=3), conformance, reach, model (Hedgehog)
+[D18] destino trocado: InFlight+CriticalBattery -> Shutdown (original EmergencyLanding)
+      -> recusado na compilação: src\Avionics\Crem.hs:91:50: error: [GHC-39999]
+[D19] destino trocado: InFlight+LandedSignal -> Grounded (original InFlight)
+      -> recusado na compilação: src\Avionics\Crem.hs:92:50: error: [GHC-39999]
+[D20] destino trocado: InFlight+LandedSignal -> EmergencyLanding (original InFlight)
+      -> morto por: spec-tests, sim-tests (N=3), conformance, reach, model (Hedgehog)
+[D21] destino trocado: InFlight+LandedSignal -> Shutdown (original InFlight)
+      -> recusado na compilação: src\Avionics\Crem.hs:92:50: error: [GHC-39999]
+[D22] destino trocado: InFlight+SystemCutoff -> Grounded (original InFlight)
+      -> recusado na compilação: src\Avionics\Crem.hs:93:50: error: [GHC-39999]
+[D23] destino trocado: InFlight+SystemCutoff -> EmergencyLanding (original InFlight)
+      -> morto por: spec-tests, sim-tests (N=3), conformance, reach, model (Hedgehog)
+[D24] destino trocado: InFlight+SystemCutoff -> Shutdown (original InFlight)
+      -> recusado na compilação: src\Avionics\Crem.hs:93:50: error: [GHC-39999]
+[D25] destino trocado: EmergencyLanding+TakeoffSignal -> Grounded (original EmergencyLanding)
+      -> morto por: spec-tests, sim-tests (N=3), conformance, reach, model (Hedgehog)
+[D26] destino trocado: EmergencyLanding+TakeoffSignal -> InFlight (original EmergencyLanding)
+      -> recusado na compilação: src\Avionics\Crem.hs:94:52: error: [GHC-39999]
+[D27] destino trocado: EmergencyLanding+TakeoffSignal -> Shutdown (original EmergencyLanding)
+      -> recusado na compilação: src\Avionics\Crem.hs:94:52: error: [GHC-39999]
+[D28] destino trocado: EmergencyLanding+CriticalBattery -> Grounded (original EmergencyLanding)
+      -> morto por: spec-tests, sim-tests (N=3), conformance, reach, model (Hedgehog)
+[D29] destino trocado: EmergencyLanding+CriticalBattery -> InFlight (original EmergencyLanding)
+      -> recusado na compilação: src\Avionics\Crem.hs:95:52: error: [GHC-39999]
+[D30] destino trocado: EmergencyLanding+CriticalBattery -> Shutdown (original EmergencyLanding)
+      -> recusado na compilação: src\Avionics\Crem.hs:95:52: error: [GHC-39999]
+[D31] destino trocado: EmergencyLanding+LandedSignal -> InFlight (original Grounded)
+      -> recusado na compilação: src\Avionics\Crem.hs:96:52: error: [GHC-39999]
+[D32] destino trocado: EmergencyLanding+LandedSignal -> EmergencyLanding (original Grounded)
+      -> morto por: spec-tests, sim-tests (N=3), conformance, reach, model (Hedgehog)
+[D33] destino trocado: EmergencyLanding+LandedSignal -> Shutdown (original Grounded)
+      -> recusado na compilação: src\Avionics\Crem.hs:96:52: error: [GHC-39999]
+[D34] destino trocado: EmergencyLanding+SystemCutoff -> Grounded (original EmergencyLanding)
+      -> morto por: spec-tests, sim-tests (N=3), conformance, reach, model (Hedgehog)
+[D35] destino trocado: EmergencyLanding+SystemCutoff -> InFlight (original EmergencyLanding)
+      -> recusado na compilação: src\Avionics\Crem.hs:97:52: error: [GHC-39999]
+[D36] destino trocado: EmergencyLanding+SystemCutoff -> Shutdown (original EmergencyLanding)
+      -> recusado na compilação: src\Avionics\Crem.hs:97:52: error: [GHC-39999]
+[D37] destino trocado: Shutdown+TakeoffSignal -> Grounded (original Shutdown)
+      -> recusado na compilação: src\Avionics\Crem.hs:98:50: error: [GHC-39999]
+[D38] destino trocado: Shutdown+TakeoffSignal -> InFlight (original Shutdown)
+      -> recusado na compilação: src\Avionics\Crem.hs:98:50: error: [GHC-39999]
+[D39] destino trocado: Shutdown+TakeoffSignal -> EmergencyLanding (original Shutdown)
+      -> recusado na compilação: src\Avionics\Crem.hs:98:50: error: [GHC-39999]
+[D40] destino trocado: Shutdown+CriticalBattery -> Grounded (original Shutdown)
+      -> recusado na compilação: src\Avionics\Crem.hs:99:50: error: [GHC-39999]
+[D41] destino trocado: Shutdown+CriticalBattery -> InFlight (original Shutdown)
+      -> recusado na compilação: src\Avionics\Crem.hs:99:50: error: [GHC-39999]
+[D42] destino trocado: Shutdown+CriticalBattery -> EmergencyLanding (original Shutdown)
+      -> recusado na compilação: src\Avionics\Crem.hs:99:50: error: [GHC-39999]
+[D43] destino trocado: Shutdown+LandedSignal -> Grounded (original Shutdown)
+      -> recusado na compilação: src\Avionics\Crem.hs:100:50: error: [GHC-39999]
+[D44] destino trocado: Shutdown+LandedSignal -> InFlight (original Shutdown)
+      -> recusado na compilação: src\Avionics\Crem.hs:100:50: error: [GHC-39999]
+[D45] destino trocado: Shutdown+LandedSignal -> EmergencyLanding (original Shutdown)
+      -> recusado na compilação: src\Avionics\Crem.hs:100:50: error: [GHC-39999]
+[D46] destino trocado: Shutdown+SystemCutoff -> Grounded (original Shutdown)
+      -> recusado na compilação: src\Avionics\Crem.hs:101:50: error: [GHC-39999]
+[D47] destino trocado: Shutdown+SystemCutoff -> InFlight (original Shutdown)
+      -> recusado na compilação: src\Avionics\Crem.hs:101:50: error: [GHC-39999]
+[D48] destino trocado: Shutdown+SystemCutoff -> EmergencyLanding (original Shutdown)
+      -> recusado na compilação: src\Avionics\Crem.hs:101:50: error: [GHC-39999]
+relatório: /c/Users/Peterson/Documents/GitHub/IC/Revisao_v5/08_reprodutibilidade/logs/06b_mutation_dest48.md   (vivos: 0 de 48)
