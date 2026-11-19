@@ -143,6 +143,11 @@ int main()
 				else if (k == "gcs") { flags.gcs_connection_lost = v; }
 				else if (k == "nav") { flags.navigator_failure = v; }
 				else if (k == "unh") { flags.battery_unhealthy = v; }
+				else if (k == "gf") { flags.geofence_breached = v; }
+				else if (k == "wind") { flags.wind_limit_exceeded = v; }
+				else if (k == "ftl") { flags.flight_time_limit_exceeded = v; }
+				else if (k == "mf") { flags.mission_failure = v; }
+				else if (k == "posl") { flags.position_accuracy_low = v; }
 				else if (k == "stick") { stick = v; }
 				else if (k == "vtype") { st.vehicle_type = (uint8_t)v; }
 				else { std::fprintf(stderr, "chave desconhecida: %s\n", k.c_str()); return 2; }
@@ -177,6 +182,13 @@ int main()
 					    (int)fs->_last_status_flags.battery_low_remaining_time, (int)fs->_last_state_battery_warning_low,
 					    (int)fs->_last_state_battery_warning_critical, (int)fs->_last_state_battery_warning_emergency,
 					    (int)fs->_battery_warning_at_arming, (int)fs->_was_armed, (int)(fs->_armed_time != 0));
+				// outras causas: ultimas flags vistas e bits privados de Failsafe (acrescentados ao fim)
+				const auto &lf = fs->_last_status_flags;
+				std::printf(",%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d", (int)fs->_manual_control_lost_at_arming,
+					    (int)fs->_last_state_mode_fallback, (int)lf.manual_control_signal_lost, (int)lf.gcs_connection_lost,
+					    (int)lf.gnss_lost, (int)lf.geofence_breached, (int)lf.wind_limit_exceeded,
+					    (int)lf.flight_time_limit_exceeded, (int)lf.navigator_failure, (int)lf.mission_failure,
+					    (int)lf.position_accuracy_low);
 			}
 
 			std::printf("\n");

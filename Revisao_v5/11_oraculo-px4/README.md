@@ -111,6 +111,53 @@ pequenas (D25: cegueira 100 → 101, concordam 14.861 → 14.867), mas determin�
 O TLC (O3) e o SCION (O2) recusam os mutantes por regras da própria especificação; este resultado é o complemento de
 um terceiro.
 
+## Outras causas de failsafe (RC, GCS, GNSS, geofence, vento, tempo de voo, missão, navegador)
+
+A nossa implementação só conhece bateria e comandos, então **estas causas não têm correspondente nos nossos traços** e nada aqui é uma
+comparação com o CREM. É a medida, rodando o failsafe real (`px4_causas.py`, `logs/px4_causas.md`, `px4_causas_rapido.md`), de regras que
+uma extensão do modelo teria de decidir. Cada causa é ligada pelo parâmetro que o PX4 usa (`NAV_RCL_ACT`, `NAV_DLL_ACT`,
+`COM_GNSSLOSS_ACT`, `GF_ACTION`, `COM_WIND_MAX_ACT`, `COM_LOW_BAT_ACT`), e todos os valores de cada parâmetro são exercidos.
+
+**1. A ação trava ou libera quando a condição some?** (`COM_FAIL_ACT_T = 0`, armado, AUTO_MISSION; causa ligada por 3 passos e depois
+desligada de forma explícita)
+
+| Causa (ação configurada) | Quando a condição some |
+|---|---|
+| Bateria `Critical` com Return ou Land | **libera** (6 de 7 valores de `COM_LOW_BAT_ACT`; o outro só avisa) |
+| Bateria `Emergency` com Return ou Land | **libera**; com Terminate, nunca |
+| Perda de RC, perda de GCS, perda de GNSS, geofence, vento, com Hold, Return ou Land | **trava** até uma troca de modo ou até desarmar |
+| Falha do navegador (Hold) | **trava** até uma troca de modo ou até desarmar |
+| Perda de RC ou de GCS com Disarm; tempo de voo excedido; falha de missão (Return) | libera |
+| Qualquer causa com Terminate | nunca libera |
+| Qualquer causa com Warn ou sem ação | não age |
+
+Ou seja: a "trava" que a nossa `EmergencyLanding` tem (só sai com `LandedSignal`, isto é, no pouso e desarme) é, no PX4, o
+**comportamento comum** às causas de link, GNSS, geofence, vento e navegador; **a bateria é a exceção que libera**. A diferença "trava" da
+primeira tabela de resultados é, portanto, específica da regra de limpeza da bateria no PX4, e não uma filosofia geral do PX4 contra
+travar.
+
+**2. Com várias causas ao mesmo tempo, vale a mais severa?** Vale. 300 configurações de parâmetros sorteadas (semente fixa) e todos os 502
+subconjuntos de 2 a 9 das 9 causas (as oito acima e bateria `Critical`) ligados ao mesmo tempo: a ação escolhida é igual ao máximo das ações de
+cada causa sozinha em **150.600 de 150.600 casos**, tanto com `COM_FAIL_ACT_T = 0` quanto com 5 s (depois de 8 passos). **A ordem de chegada
+não importa**: para todos os subconjuntos de 2 e 3 causas e todas as suas ordens (36.000 casos por atraso), a ação final é a mesma e igual
+ao máximo. Isso dá uma especificação simples para estender o modelo: a ação é o máximo de uma ordem de severidade (a do enum `Action` do PX4: `None < Warn < Fallback* < Hold <
+RTL < Land < Descend < Disarm < Terminate`), sem dependência da ordem.
+
+**3. Estado escondido com várias causas** (`px4_sd.py` com flags nomeadas; `logs/px4_sd_causas.md`, `px4_sd_causas_ref.md`,
+`px4_sd_causas_rapido.md`; `NAV_RCL_ACT=2`, `COM_GNSSLOSS_ACT=2`, `GF_ACTION=2`, `COM_LOW_BAT_ACT=3`; 7 passos, histórias de 3):
+
+| `COM_FAIL_ACT_T` (s) | 0 | 2 |
+|---|---|---|
+| estados β só com bateria (referência) | 5 | 26 |
+| estados β com 4 causas (bateria, GNSS, RC, geofence), uma de cada vez | 77 | 664 |
+| conflitos de (SD) no estado visível α, só bateria / 4 causas | 1 / 5 | 2 / 9 |
+| conflitos no estado interno β | **0** | **0** |
+| classes de comportamento futuro, só bateria / 4 causas | 2 / 7 | 5 / 19 |
+
+O estado interno lido continua bastando (0 conflitos), mas o número de estados escondidos cresce **15 vezes** sem atraso e **25 vezes**
+com atraso de 2 s. Com mais causas, um terno de vértices não basta nem de longe: cada causa acrescenta flags e entradas na lista de ações
+que o PX4 guarda.
+
 ## Takeover do piloto
 
 No PX4, com um failsafe de bateria ativo, o piloto pode retomar o controle. As regras, lidas em `framework.cpp`
@@ -210,9 +257,10 @@ esses dois valores são **cotas inferiores**; de T = 0 a 3 a contagem cresce com
 
 ## Limites (o que esta pasta **não** mostra)
 
-1. **Só o recorte "nível de bateria → ação".** A máquina de atraso e o takeover do piloto (manche e troca de modo)
-   são exercidos nas seções acima e abaixo; as demais causas de failsafe (GNSS, GCS, link, geofence), o nível
-   `EMERGENCY` em traços do CREM e os modos de voo além de `AUTO_MISSION` e `AUTO_LOITER` **não** são.
+1. **Só o recorte "nível de bateria → ação" é comparado com o CREM.** O atraso, o takeover do piloto e as outras causas de
+   failsafe são medidas sobre o PX4 (e o que elas implicam para uma extensão do modelo), não comparações com traços do CREM, que não
+   tem essas causas. Ficam de fora o nível `EMERGENCY` em traços do CREM, os modos de voo além de `AUTO_MISSION` e `AUTO_LOITER`, as causas de
+   falha de motor, paraquedas, tráfego e Remote ID, e as exceções de link (`COM_RCL_EXCEPT`, `COM_DLL_EXCEPT`).
 2. **A tradução é nossa.** A independência é a das *regras* de decisão, não da tradução de estados.
 3. Parâmetros além de `COM_LOW_BAT_ACT` e `COM_FAIL_ACT_T` têm os valores de `harness.cpp` (`defaults()`), que **não**
    foram conferidos contra os metadados de parâmetros do PX4; só importam para flags que aqui ficam sempre falsas.
@@ -246,6 +294,7 @@ O script sai com 0 se o autoteste passar (14/14) e toda divergência cair nas tr
 | `build.sh` | compila o código real e o harness |
 | `selftest.py` | 14 expectativas do teste do PX4 |
 | `px4_diff.py` | passa os traços pelo PX4 e classifica as divergências (aceita `COM_FAIL_ACT_T` e tempo por passo) |
+| `px4_causas.py` | outras causas de failsafe: trava ou libera, lei de severidade com várias causas e independência da ordem |
 | `px4_takeover.py` | takeover do piloto: cenários roteirizados e sonda nos estados de `EmergencyLanding` dos traços (manche e troca de modo) |
 | `px4_mutants.py` | o PX4 contra os 16 mutantes de destino aceitos pelo compilador, em cópia de trabalho (lento: cerca de 35 minutos; `MUTANTES=1` no `run_px4_oracle.sh`) |
 | `px4_sd.py` | mede o estado escondido do PX4 com atraso: conflitos de (SD) por abstração e classes de comportamento futuro |

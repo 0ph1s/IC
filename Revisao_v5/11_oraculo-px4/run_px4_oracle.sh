@@ -52,7 +52,16 @@ FAIL=0
   echo; echo "== (SD) com manche e troca de modo, enumeração rápida (bateria:manche:modo; N=6, L=3)"
   "$PY" "$HERE/px4_sd.py" "$(W "$EXE")" "$(W "$LOGS/px4_sd_takeover_rapido.md")" 6 3 0,2,5 0:0,2:0,2:1,2:0:4 > "$WORK/sd_takeover.txt" || FAIL=1
   tail -5 "$WORK/sd_takeover.txt"
+  echo; echo "== outras causas de failsafe: trava ou libera, lei de severidade, ordem (px4_causas.py, 40 configurações)"
+  "$PY" "$HERE/px4_causas.py" "$(W "$EXE")" "$(W "$LOGS/px4_causas_rapido.md")" 40 > "$WORK/causas.txt" || FAIL=1
+  grep -E "^T=|^ordem" "$WORK/causas.txt"
+  echo; echo "== (SD) com 4 causas, uma de cada vez (alfabeto 0,bat2,gnss1,mc1,gf1; N=6, L=3)"
+  PX4_PARAMS="NAV_RCL_ACT=2,COM_GNSSLOSS_ACT=2,GF_ACTION=2" "$PY" "$HERE/px4_sd.py" "$(W "$EXE")" "$(W "$LOGS/px4_sd_causas_rapido.md")" 6 3 0,2 0,bat2,gnss1,mc1,gf1 > "$WORK/sd_causas.txt" || FAIL=1
+  tail -4 "$WORK/sd_causas.txt"
   if [ "${FULL:-0}" = 1 ]; then
+    "$PY" "$HERE/px4_causas.py" "$(W "$EXE")" "$(W "$LOGS/px4_causas.md")" 300 > /dev/null || FAIL=1
+    PX4_PARAMS="NAV_RCL_ACT=2,COM_GNSSLOSS_ACT=2,GF_ACTION=2" "$PY" "$HERE/px4_sd.py" "$(W "$EXE")" "$(W "$LOGS/px4_sd_causas.md")" 7 3 0,2 0,bat2,gnss1,mc1,gf1 > /dev/null || FAIL=1
+    PX4_PARAMS="NAV_RCL_ACT=2,COM_GNSSLOSS_ACT=2,GF_ACTION=2" "$PY" "$HERE/px4_sd.py" "$(W "$EXE")" "$(W "$LOGS/px4_sd_causas_ref.md")" 7 3 0,2 0,bat2 > /dev/null || FAIL=1
     "$PY" "$HERE/px4_sd.py" "$(W "$EXE")" "$(W "$LOGS/px4_sd_takeover.md")" 8 4 0,2,5 0:0,2:0,2:1,2:0:4 > /dev/null || FAIL=1
     "$PY" "$HERE/px4_sd.py" "$(W "$EXE")" "$(W "$LOGS/px4_sd_takeover_ref.md")" 8 4 0,2,5 0:0,2:0 > /dev/null || FAIL=1
   fi

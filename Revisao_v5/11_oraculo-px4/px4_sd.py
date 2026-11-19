@@ -17,6 +17,7 @@ na mesma classe se todas as continuacoes de comprimento M dao a mesma sequencia 
 
 Uso: python px4_sd.py <px4_failsafe> [saida.md] [N=10] [L=5] [Ts=0,1,2,3,5] [alfabeto=0,1,2]   (N = L + M)
 """
+import os
 import itertools
 import subprocess
 import sys
@@ -27,10 +28,30 @@ N = int(sys.argv[3]) if len(sys.argv) > 3 else 10
 L = int(sys.argv[4]) if len(sys.argv) > 4 else 5
 M = N - L
 TS = [float(x) for x in (sys.argv[5] if len(sys.argv) > 5 else "0,1,2,3,5").split(",")]
-# simbolo = bateria, ou bateria:manche, ou bateria:manche:modo (modo pretendido; 3 = AUTO_MISSION, 4 = AUTO_LOITER)
+# simbolo = bateria, ou bateria:manche, ou bateria:manche:modo (modo pretendido; 3 = AUTO_MISSION, 4 = AUTO_LOITER),
+# ou flags nomeadas ligadas por '+', por exemplo bat2+gnss1+mc1 (chaves do harness: bat stick mode gnss mc gcs gf wind ftl mf nav).
+# Internamente, um simbolo e uma tupla de pares (chave, valor); toda chave nao citada fica desligada (0; modo 3).
 def sym(tok):
+    if tok[0].isalpha():
+        kv = dict((p.rstrip("0123456789"), int(p[len(p.rstrip("0123456789")):])) for p in tok.split("+"))
+        return tuple(sorted(kv.items()))
     f = [int(x) for x in tok.split(":")]
-    return tuple(f + [0, 3][len(f) - 1:])
+    f = f + [0, 3][len(f) - 1:]
+    return (("bat", f[0]), ("mode", f[2]), ("stick", f[1]))
+
+
+def sym_line(s):
+    d = dict(s)
+    d.setdefault("bat", 0); d.setdefault("stick", 0); d.setdefault("mode", 3)
+    keys = ["bat", "stick", "mode", "gnss", "mc", "gcs", "gf", "wind", "ftl", "mf", "nav"]
+    return " ".join("%s=%d" % (k, d.get(k, 0)) for k in keys)
+
+
+def sym_name(s):
+    d = dict(s)
+    if set(d) <= {"bat", "stick", "mode"}:
+        return "%d:%d:%d" % (d.get("bat", 0), d.get("stick", 0), d.get("mode", 3))
+    return "+".join("%s%d" % kv for kv in s if kv[1])
 
 
 ALPHA = tuple(sym(x) for x in (sys.argv[6] if len(sys.argv) > 6 else "0,1,2").split(","))
@@ -40,11 +61,12 @@ conts = list(itertools.product(ALPHA, repeat=M))
 
 def run(T):
     script = ["VERBOSE 1", "PARAM COM_LOW_BAT_ACT 3", "PARAM COM_FAIL_ACT_T %g" % T]
+    script += ["PARAM %s %s" % tuple(p.split("=")) for p in os.environ.get("PX4_PARAMS", "").split(",") if p]   # parametros extras, ex.: NAV_RCL_ACT=2,COM_GNSSLOSS_ACT=2
     for w in words:
         script.append("NEW")
         t = 5000
         for s in w:
-            script.append("STEP %d armed=1 bat=%d stick=%d mode=%d" % (t, s[0], s[1], s[2]))
+            script.append("STEP %d armed=1 %s" % (t, sym_line(s)))
             t += 1000
     res = subprocess.run([exe], input="\n".join(script) + "\n", capture_output=True, text=True)
     if res.returncode != 0:
@@ -82,7 +104,8 @@ for T in TS:
     print("T=%g s: alfa=%d (conflitos %d), alfa'=%d (conflitos %d), beta=%d (conflitos %d), classes futuras=%d"
           % rows[-1], flush=True)
 
-md = ["PX4 (failsafe real), COM_LOW_BAT_ACT = 3, armado, entrada (bateria:manche:modo) em {%s} a cada segundo." % ",".join(":".join(map(str, a)) for a in ALPHA),
+md = ["PX4 (failsafe real), COM_LOW_BAT_ACT = 3%s, armado, entrada (bateria:manche:modo, ou flags nomeadas) em {%s} a cada segundo."
+      % ((", " + os.environ["PX4_PARAMS"].replace(",", ", ")) if os.environ.get("PX4_PARAMS") else "", ",".join(sym_name(a) for a in ALPHA)),
       "Todas as %d palavras de comprimento %d; classes futuras: historias de comprimento %d, continuacoes de comprimento %d." % (len(words), N, L, M), "",
       "| COM_FAIL_ACT_T (s) | estados alfa | conflitos alfa | estados alfa' | conflitos alfa' | estados beta | conflitos beta | classes futuras |",
       "|---|---|---|---|---|---|---|---|"]

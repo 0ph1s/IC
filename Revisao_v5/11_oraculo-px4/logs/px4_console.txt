@@ -111,6 +111,18 @@ T=5: {'manche': 566, 'modo': 566}
 | 2 | 5 | 8 | 12 | 8 | 57 | 0 | 7 |
 | 5 | 4 | 6 | 10 | 3 | 85 | 0 | 5 |
 
+== outras causas de failsafe: trava ou libera, lei de severidade, ordem (px4_causas.py, 40 configurações)
+T=0: 20080 casos, 0 violacoes
+T=5: 20080 casos, 0 violacoes
+ordem T=0: 4800 casos, 0 dependem da ordem, 0 diferem do maximo
+ordem T=5: 4800 casos, 0 dependem da ordem, 0 diferem do maximo
+
+== (SD) com 4 causas, uma de cada vez (alfabeto 0,bat2,gnss1,mc1,gf1; N=6, L=3)
+| COM_FAIL_ACT_T (s) | estados alfa | conflitos alfa | estados alfa' | conflitos alfa' | estados beta | conflitos beta | classes futuras |
+|---|---|---|---|---|---|---|---|
+| 0 | 5 | 5 | 15 | 5 | 77 | 0 | 7 |
+| 2 | 5 | 9 | 17 | 28 | 540 | 0 | 15 |
+
 == sem afirmar bateria Critical pelo comando (assert=0), COM_LOW_BAT_ACT=2 (sensibilidade da tradução)
 Parametro COM_LOW_BAT_ACT = 2, COM_FAIL_ACT_T = 0 s, 100 ms por passo; tracos usados: 1020 (aresta e aleatorios); finais de tick comparados: 16700.
 
