@@ -4,6 +4,7 @@
 # Uso (de qualquer pasta):  bash 11_oraculo-px4/run_px4_oracle.sh [pasta de trabalho]
 #   pasta de trabalho (padrão: $TMPDIR/px4_oraculo): recebe o checkout do PX4 (px4_src/) e o build (build/).
 #   No Windows use um caminho curto (por exemplo C:/mv) e deixe o clang do GHC no PATH.
+# FULL=1: enumerações maiores de (SD); MUTANTES=1: o PX4 contra os 16 mutantes de destino (lento).
 # Saída: logs/px4_*.md e logs/px4_console.txt aqui; código 0 se o autoteste passa e não há classe inexplicada.
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -27,6 +28,16 @@ FAIL=0
     echo; echo "== traduzindo CriticalBattery como bateria Critical (assert=1), COM_LOW_BAT_ACT=$a"
     "$PY" "$HERE/px4_diff.py" "$(W "$EXE")" "$(W "$TR/TraceData.tla")" "$(W "$TR/tracos.csv")" "$a" "$(W "$LOGS/px4_diff_act$a.md")" 1 || FAIL=1
   done
+  # política do oráculo em Haskell (OneSlot = a implementação; Level existe só no modelo): precisa de cabal
+  if command -v cabal > /dev/null 2>&1; then
+    for pol in oneslot level; do
+      echo; echo "== oráculo em Haskell, política $pol (traços de validation-export $pol), COM_LOW_BAT_ACT=2"
+      ( cd "$ROOT/03_codigo/validation" && cabal run -v0 avionics-validation:exe:validation-export -- "$WORK/tr_$pol" "$pol" ) > /dev/null || FAIL=1
+      "$PY" "$HERE/px4_diff.py" "$(W "$EXE")" "$(W "$WORK/tr_$pol/TraceData.tla")" "$(W "$WORK/tr_$pol/tracos.csv")" 2 "$(W "$LOGS/px4_diff_$pol.md")" 1 || FAIL=1
+    done
+  else
+    echo "cabal ausente: política Level não rodada"
+  fi
   for cfg in "5 100" "5 1000"; do
     set -- $cfg
     echo; echo "== com atraso: COM_FAIL_ACT_T=$1 s, $2 ms por passo, COM_LOW_BAT_ACT=2"
@@ -41,6 +52,11 @@ FAIL=0
     "$PY" "$HERE/px4_sd.py" "$(W "$EXE")" "$(W "$LOGS/px4_sd_atraso_3simbolos.md")" 10 5 0,1,2,3 0,1,2 > /dev/null || FAIL=1
   fi
   echo; echo "== sem afirmar bateria Critical pelo comando (assert=0), COM_LOW_BAT_ACT=2 (sensibilidade da tradução)"
+  if [ "${MUTANTES:-0}" = 1 ]; then
+    echo; echo "== PX4 contra os 16 mutantes de destino (MUTANTES=1; cerca de 40 minutos; TMPDIR curto no Windows)"
+    "$PY" "$HERE/px4_mutants.py" "$(W "$EXE")" > "$WORK/mutantes.txt" 2>&1 || FAIL=1
+    tail -3 "$WORK/mutantes.txt"
+  fi
   # só sensibilidade: as classes mudam de proporção de propósito, então o código de saída não conta
   "$PY" "$HERE/px4_diff.py" "$(W "$EXE")" "$(W "$TR/TraceData.tla")" "$(W "$TR/tracos.csv")" 2 "$(W "$LOGS/px4_diff_act2_assert0.md")" 0 || true
   echo "FAIL=$FAIL" > "$WORK/fail.txt"

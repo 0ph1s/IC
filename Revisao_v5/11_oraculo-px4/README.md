@@ -39,11 +39,11 @@ Por passo `(aviônica, bateria, ambiente)` de um traço:
   cada passo, então ele vê o traço inteiro, com a sua própria história interna;
 * "pouso" no PX4 = ação selecionada `Land` ou `RTL`; na nossa, `EmergencyLanding`.
 
-## Resultado (traços da implementação: 520 de aresta + 500 aleatórios de 30 ticks; 16.099 finais de tick)
+## Resultado (traços da implementação: 520 de aresta + 500 aleatórios de 30 ticks; 16.700 finais de tick)
 
 | Classe | Finais de tick |
 |---|---|
-| Concordam | 15.849 |
+| Concordam | 16.450 |
 | O PX4 pousa e a nossa fica em `InFlight` com bateria `Critical` (a **cegueira**) | 201 |
 | Nossa segue em `EmergencyLanding` com bateria `Low` e o PX4 já liberou (**trava**) | 41 |
 | O PX4 só avisa, porque a bateria já estava `Critical` ao armar | 8 |
@@ -57,9 +57,10 @@ saída completa.
 
 * **Cegueira (201).** O PX4 trata a bateria como um *nível* (condição verificada a cada atualização) e, por isso, nunca
   fica "cego": com bateria `Critical` e armado, escolhe a ação. A nossa implementação (política `OneSlot`) pode terminar
-  um tick em `(InFlight, Critical)` por perder o sinal. É o mesmo defeito que o TLC aponta como violação de
-  `NoPermanentBlindness`, agora visto por uma referência cuja regra não é nossa. Isso **não** prova que a nossa
-  especificação está certa; mostra que uma implementação de terceiros, com semântica de nível, não tem o defeito.
+  um tick em `(InFlight, Critical)` por perder o sinal. Esta classe conta **qualquer** fim de tick assim, inclusive os
+  transitórios; o defeito que o TLC aponta (violação de `NoPermanentBlindness`) é a cegueira que **persiste**, medida
+  na seção seguinte. Isso **não** prova que a nossa especificação está certa; mostra que uma implementação de
+  terceiros, com semântica de nível, não tem o defeito.
 * **Trava (41).** No PX4, a ação de bateria `Critical` usa a condição de limpeza padrão (`WhenConditionClears`,
   `failsafe.cpp`, `fromBatteryWarningActParam`): quando o nível melhora, a ação some. Na nossa máquina,
   `EmergencyLanding` só sai com `LandedSignal`. É uma **diferença de projeto**, não necessariamente um defeito:
@@ -67,6 +68,48 @@ saída completa.
 * **Só avisa (8).** Se a bateria já estava pior que `NONE` ao armar, o PX4 só avisa
   (`warning_worse_than_at_arming`, `failsafe.cpp`). Na nossa, o `CriticalBattery` seguinte leva a `EmergencyLanding`.
   O script confere que, nesses casos, a bateria estava `Critical` no momento do armamento.
+
+## A política `Level` (e a cegueira que persiste)
+
+A implementação em CREM só tem `OneSlot`; `Level` existe apenas no oráculo em Haskell (`refTS`). Por isso os traços de
+`Level` vêm de `validation-export <pasta> level` (a pasta `03_codigo/validation`), e os de `oneslot` do mesmo comando
+servem de controle: **são idênticos aos da implementação (1020 de 1020 traços)**. Cada conjunto ganha 3 traços "ociosos":
+de cada terno que termina cego, 10 ticks sem nenhuma entrada.
+
+| Medida (`COM_LOW_BAT_ACT = 2`, `logs/px4_diff_oneslot.md`, `px4_diff_level.md`) | `OneSlot` | `Level` |
+|---|---|---|
+| Concordam / cegueira / trava / só avisa (finais de tick) | 16.476 / 213 / 41 / 8 | 16.472 / 204 / 48 / 14 |
+| Maior sequência de ticks seguidos terminando em `(InFlight, Critical)` | **11** | **2** |
+| Traços ociosos que terminam ainda cegos | **2 de 3** | **0 de 3** |
+| Traços aleatórios (500 de 30 ticks) que terminam cegos | 0 | 0 |
+
+Leitura: a contagem da classe "cegueira" é quase igual nas duas políticas, porque `Level` também termina alguns ticks em
+`(InFlight, Critical)` antes de reagir no tick seguinte. O que separa as duas é a **persistência**: com `OneSlot` dois
+ternos ficam cegos para sempre sob ticks ociosos (sequência de 11 ticks), com `Level` a cegueira some em no máximo 2
+ticks. O PX4 pousa nos três casos. Bate com o resultado do TLC (`OneSlot` viola `NoPermanentBlindness`, `Level` não),
+mas por outro caminho. Os 500 traços aleatórios **não** distinguem as políticas (nenhum termina cego em nenhuma),
+o que é coerente com a probabilidade pequena de a enumeração aleatória achar a lacuna (`19_amostragem.md`).
+
+## O PX4 contra os mutantes de destino
+
+`px4_mutants.py` pega os 16 mutantes de destino que o compilador aceita (a aresta mutada está dentro da topologia, os
+outros 32 de 48 não compilam), numa cópia de `03_codigo`: compila a implementação mutada, exporta os traços dela, passa
+pelo PX4 e compara com a implementação original. Resultado (`logs/px4_contra_mutantes.md`):
+
+| Veredito | Mutantes |
+|---|---|
+| Morto por **classe nova** (uma divergência que a original não tem) | 1: D17 (`InFlight` + `CriticalBattery` fica em `InFlight`). Aparece "PX4 pousa; nossa (InFlight, Charged ou Low) não": a nossa nunca pousa, e o PX4 pousa |
+| Morto pelas **contagens nos 500 traços aleatórios** (os mesmos cenários de entrada para toda implementação) | 15 |
+| Morto só pelos traços de aresta | 0 |
+| Vivo | 0 |
+
+**Como ler.** Só D17 é pego por uma regra do PX4 sozinha: a nossa fica de fora de um pouso que o PX4 manda fazer. Os outros
+15 são pegos por **comparação com a implementação original**: o "dedo" do PX4 (quantos finais de tick caem em cada classe)
+muda. Isso é um oráculo de regressão, não de correção absoluta: o PX4 não diz que esses 15 estão errados, diz que o
+comportamento mudou em relação ao original, e só o original foi explicado classe a classe. Algumas diferenças são
+pequenas (D25: cegueira 100 → 101, concordam 14.861 → 14.867), mas determinísticas, porque os cenários são idênticos.
+O TLC (O3) e o SCION (O2) recusam os mutantes por regras da própria especificação; este resultado é o complemento de
+um terceiro.
 
 ## Atraso `COM_FAIL_ACT_T` e o limite de (SD) (hipótese (b) da T27)
 
@@ -78,7 +121,7 @@ compilação só no `harness.cpp`; o código do PX4 continua sem modificação.
 Com `COM_FAIL_ACT_T = 5 s`, aparece uma classe nova: o PX4 está em `Hold` esperando o atraso, enquanto a nossa já está em
 `EmergencyLanding` (517 finais de tick) ou ainda em `InFlight` com bateria `Critical` (201). As outras classes não mudam.
 O que isso mostra é só que **o resultado depende de uma escala de tempo que o nosso modelo não tem**: com 1 s por passo,
-o atraso expira dentro de um traço aleatório e a classe "cegueira" volta (1 caso). Não é conformância nem defeito.
+o atraso expira dentro de um traço aleatório e a classe "cegueira" volta (4 casos). Não é conformância nem defeito.
 
 **2. Quanto estado escondido o PX4 carrega** (`px4_sd.py`; `logs/px4_sd_atraso_2simbolos.md`, `px4_sd_atraso_3simbolos.md`,
 `px4_sd_rapido.md`). Todas as palavras de bateria (níveis a cada segundo, armado) até um comprimento fixo, para vários
@@ -125,7 +168,9 @@ esses dois valores são **cotas inferiores**; de T = 0 a 3 a contagem cresce com
    foram conferidos contra os metadados de parâmetros do PX4; só importam para flags que aqui ficam sempre falsas.
 4. A comparação é por final de tick e por classe; não há comparação passo a passo (dentro de um tick a nossa
    máquina entrega os sinais em sequência, e o PX4 reage ao nível).
-5. Só traços da implementação atual (`OneSlot`); **não** foi rodado contra os mutantes nem contra a política `Level`.
+5. Os mutantes cobrem só os 16 de destino aceitos pelo compilador (não os 9 da implementação em `mutation.sh`), e 15 deles
+   são detectados por comparação com o original, não por uma regra do PX4 (ver seção dos mutantes). `Level` só foi
+   testado no oráculo em Haskell, porque não existe na implementação.
 6. Cada traço roda numa instância nova do `Failsafe` (`NEW`), com o tipo de veículo fixo em asa rotativa.
 
 ## Reproduzir
@@ -134,7 +179,7 @@ esses dois valores são **cotas inferiores**; de T = 0 a 3 a contagem cresce com
 # Windows: clang++ do GHC no PATH, por exemplo C:/ghcup/ghc/9.6.7/mingw/bin; pasta de trabalho de caminho curto
 bash 11_oraculo-px4/run_px4_oracle.sh C:/mv/px4   # ~1 minuto, precisa de rede (github.com) na primeira execução
 # ou, dentro do run_all: bash 08_reprodutibilidade/run_all.sh --px4
-# FULL=1 acrescenta as enumerações maiores de px4_sd.py (cerca de 3 minutos)
+# FULL=1 acrescenta as enumerações maiores de px4_sd.py (cerca de 3 minutos); MUTANTES=1, o PX4 contra os mutantes (~35 min)
 ```
 
 Pré-requisito: os traços em `08_reprodutibilidade/logs/18_traces/` (gerados pelo `run_all.sh`).
@@ -151,6 +196,7 @@ O script sai com 0 se o autoteste passar (14/14) e toda divergência cair nas tr
 | `build.sh` | compila o código real e o harness |
 | `selftest.py` | 14 expectativas do teste do PX4 |
 | `px4_diff.py` | passa os traços pelo PX4 e classifica as divergências (aceita `COM_FAIL_ACT_T` e tempo por passo) |
+| `px4_mutants.py` | o PX4 contra os 16 mutantes de destino aceitos pelo compilador, em cópia de trabalho (lento: cerca de 35 minutos; `MUTANTES=1` no `run_px4_oracle.sh`) |
 | `px4_sd.py` | mede o estado escondido do PX4 com atraso: conflitos de (SD) por abstração e classes de comportamento futuro |
 | `run_px4_oracle.sh` | tudo isso em sequência |
 | `logs/` | resultados |

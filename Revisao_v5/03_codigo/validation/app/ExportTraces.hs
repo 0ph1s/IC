@@ -25,9 +25,12 @@ import qualified Data.Set as S
 import Data.Maybe (fromMaybe)
 import System.Directory (createDirectoryIfMissing)
 import System.Environment (getArgs)
+import System.Exit (exitFailure)
 import System.FilePath ((</>))
 import System.IO (IOMode (WriteMode), hPutStrLn, hSetEncoding, stdout, utf8, withFile)
 import Validation.Reach
+import Validation.RefModel ()
+import Validation.Table (loadTables, renderTableError)
 import Validation.Types
 
 stepCode :: StepSum -> Int
@@ -58,10 +61,54 @@ randomScenario seed len = go seed len
 blindStep :: StepSum -> Bool
 blindStep s = fromEnum (ssAv s) == 1 && ssPw s == PwCritical
 
+-- | Sem política: traços da IMPLEMENTAÇÃO (e grafo, cegueira por sinal). Com `oneslot` ou `level`: só os traços
+-- (TraceData.tla, tracos.csv) do ORÁCULO em Haskell (`refTS`) sob a política dada, sem os corrompidos. Só OneSlot existe
+-- na implementação; Level existe apenas no modelo. Roda na pasta validation/ (lê spec/*.csv).
 main :: IO ()
 main = do
   hSetEncoding stdout utf8
-  [out] <- getArgs
+  args <- getArgs
+  case args of
+    [out] -> mainImpl out
+    [out, pol] | Just p <- lookup pol [("oneslot", OneSlot), ("level", Level)] -> mainPolicy out p
+    _ -> putStrLn "uso: validation-export <pasta> [oneslot|level]" >> exitFailure
+
+-- | Um cenário sobre um sistema de transições qualquer: por tick, a entrada codificada e os passos.
+runTicksTS :: TS s [StepSum] -> s -> Scenario -> [((Int, Int), [Int])]
+runTicksTS _ _ [] = []
+runTicksTS ts s (i : is) = let (s', ss) = tsNext ts s i in (tickCode i, map stepCode ss) : runTicksTS ts s' is
+
+mainPolicy :: FilePath -> Policy -> IO ()
+mainPolicy out pol = do
+  createDirectoryIfMissing True out
+  etables <- loadTables "spec/transition_table.csv" "spec/power_table.csv"
+  tables <- either (\e -> putStrLn (renderTableError e) >> exitFailure) pure etables
+  let ts = refTS tables pol
+      g = explore ts
+      ins = tsInputs ts
+      pad k = let s = show k in replicate (3 - length s) '0' ++ s
+      edgeTraces = [("E" ++ pad k, "aresta", runTicksTS ts (tsStart ts) (pathTo ts g s ++ [ins !! i])) | (k, (s, i, _, _)) <- zip [1 :: Int ..] (gEdges g)]
+      randTraces = [("R" ++ pad k, "aleatorio30", runTicksTS ts (tsStart ts) (randomScenario (20261118 + k) 30)) | k <- [1 .. 500]]
+      -- "ocioso": de cada terno alcançável que termina cego (aviônica InFlight, bateria Critical), segue-se por 10 ticks
+      -- sem nenhuma entrada. Mostra se a cegueira persiste (OneSlot tem ternos presos) ou some (Level).
+      blindStates = [s | s <- M.keys (gDepth g), let a = absOfRef s, asAv a == 1, asPw a == 2]
+      idleTraces = [("I" ++ pad k, "ocioso", runTicksTS ts (tsStart ts) (pathTo ts g s ++ replicate 10 (TickInput Nothing Nothing))) | (k, s) <- zip [1 :: Int ..] blindStates]
+      allTraces = edgeTraces ++ randTraces ++ idleTraces
+  withFile (out </> "TraceData.tla") WriteMode $ \h -> do
+    hSetEncoding h utf8
+    hPutStrLn h "---- MODULE TraceData ----"
+    hPutStrLn h "\\* Gerado por validation-export (política do oráculo). Não editar à mão."
+    hPutStrLn h "EXTENDS Naturals, Sequences"
+    hPutStrLn h ("Traces == <<\n  " ++ intercalate ",\n  " (map (\(_, _, t) -> tlaTrace t) allTraces) ++ "\n>>")
+    hPutStrLn h "===="
+  withFile (out </> "tracos.csv") WriteMode $ \h -> do
+    hSetEncoding h utf8
+    hPutStrLn h "indice,nome,tipo,ticks,passos"
+    mapM_ (\(k, (n, ty, t)) -> hPutStrLn h (intercalate "," [show k, n, ty, show (length t), show (sum (map (length . snd) t))])) (zip [1 :: Int ..] allTraces)
+  putStrLn ("política " ++ show pol ++ ": estados " ++ show (length (gDepth g)) ++ ", arestas " ++ show (length (gEdges g)) ++ ", traços " ++ show (length allTraces))
+
+mainImpl :: FilePath -> IO ()
+mainImpl out = do
   createDirectoryIfMissing True out
   let g = explore cremTS
       ins = tsInputs cremTS

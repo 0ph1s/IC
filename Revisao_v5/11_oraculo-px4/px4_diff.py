@@ -8,7 +8,7 @@ Traducao (declarada, nao e propriedade do PX4): por passo (aviônica, bateria, a
   CriticalBattery (codigo 2) AFIRMA bateria Critical durante os passos do seu tick (assert=1; assert=0 desliga isso);
   modo pretendido = AUTO_MISSION; COM_LOW_BAT_ACT e COM_FAIL_ACT_T dados por argumento; 100 ms por passo.
 "Pouso" na PX4 = acao selecionada Land (7) ou RTL (6) (conforme o parametro); na nossa = EmergencyLanding.
-Uso: python px4_diff.py <px4_failsafe> <TraceData.tla> <tracos.csv> <COM_LOW_BAT_ACT> [saida.md] [assert_cb 0|1]
+Uso: python px4_diff.py <px4_failsafe> <TraceData.tla> <tracos.csv> <COM_LOW_BAT_ACT> [saida.md] [assert_cb 0|1] [COM_FAIL_ACT_T] [ms por passo] [tipos: aresta,aleatorio30,ocioso]
 Saida 0 se toda divergencia cair numa das tres classes explicadas abaixo; 1 se houver classe INEXPLICADA
 (ou outra nao prevista).
 """
@@ -22,6 +22,7 @@ out_md = sys.argv[5] if len(sys.argv) > 5 else None
 assert_cb = int(sys.argv[6]) if len(sys.argv) > 6 else 1
 fail_t = float(sys.argv[7]) if len(sys.argv) > 7 else 0.0     # COM_FAIL_ACT_T em segundos
 step_ms = int(sys.argv[8]) if len(sys.argv) > 8 else 100      # tempo por passo
+only_kinds = set(sys.argv[9].split(",")) if len(sys.argv) > 9 else None   # tipos de traco a usar (padrao: todos)
 AV = ["Grounded", "InFlight", "EmergencyLanding", "Shutdown"]
 PW = ["Charged", "Low", "Critical"]
 ACT = {0: "None", 1: "Warn", 2: "FallbackPos", 3: "FallbackAlt", 4: "FallbackStab", 5: "Hold", 6: "RTL", 7: "Land",
@@ -31,7 +32,7 @@ body = text.split("Traces ==", 1)[1].split("====", 1)[0]
 traces = eval(body.replace("<<", "[").replace(">>", "]"))
 kinds = {int(r["indice"]) - 1: r["tipo"] for r in csv.DictReader(open(csvp, encoding="utf8"))}
 assert len(kinds) == len(traces), (len(kinds), len(traces))
-use = [i for i in range(len(traces)) if kinds[i] != "corrompido"]
+use = [i for i in range(len(traces)) if kinds[i] != "corrompido" and (only_kinds is None or kinds[i] in only_kinds)]
 
 
 def dec(code):
@@ -48,8 +49,6 @@ for i in use:
     arm_pw = 0
     for ti, (cmd, pwe, steps) in enumerate(traces[i]):
         for k, code in enumerate(steps):
-            if k == 0 and not first:
-                continue   # o primeiro passo de um tick repete o ultimo do tick anterior
             av, pw = dec(code)
             armed = 1 if av in (1, 2) else 0
             bat = 2 if (assert_cb and cmd == 2 and k >= 1) else pw
@@ -69,9 +68,19 @@ assert len(lines) == len(index), (len(lines), len(index))
 LAND = {6, 7}
 tally = collections.Counter()
 examples = {}
+# persistencia da cegueira do lado nosso: ticks consecutivos terminando em (InFlight, Critical), por traco
+runs = collections.defaultdict(list)   # traco -> comprimentos das sequencias de ticks cegos
+cur = {}
+last_tick = {}
+ended_blind = collections.Counter()    # tipo -> tracos cujo ultimo tick termina cego
 for (i, ti, k, av, pw, end, arm_pw, bat), line in zip(index, lines):
     if not end:
         continue
+    last_tick[i] = ti
+    if av == 1 and pw == 2:
+        cur[i] = cur.get(i, 0) + 1
+    elif cur.get(i, 0):
+        runs[i].append(cur.pop(i))
     action = int(line.split()[1])
     ours_land = av == 2
     px_land = action in LAND
@@ -97,6 +106,14 @@ rows.append("| Classe | Finais de tick | Exemplo (tipo, traco, tick) |")
 rows.append("|---|---|---|")
 for cls, n in sorted(tally.items(), key=lambda x: -x[1]):
     rows.append("| %s | %d | %s |" % (cls, n, examples[cls]))
+for i, n in cur.items():           # sequencias que continuam ate o fim do traco
+    runs[i].append(n)
+    ended_blind[kinds[i]] += 1
+allruns = [n for v in runs.values() for n in v]
+rows += ["", "Persistencia da cegueira (ticks consecutivos terminando em (InFlight, Critical), do lado nosso):",
+         "sequencias: %d; maior sequencia: %d ticks; sequencias com mais de 1 tick: %d." % (len(allruns), max(allruns, default=0), sum(1 for n in allruns if n > 1)),
+         "Tracos que terminam cegos, por tipo (total do tipo): " + "; ".join(
+             "%s: %d de %d" % (t, ended_blind[t], sum(1 for i in use if kinds[i] == t)) for t in sorted({kinds[i] for i in use}))]
 msg = "\n".join(rows)
 print(msg)
 if out_md:
