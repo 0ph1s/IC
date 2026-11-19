@@ -46,6 +46,16 @@ FAIL=0
   echo; echo "== (SD) com atraso, enumeração exaustiva rápida (alfabeto 0,1,2; N=8, L=4)"
   "$PY" "$HERE/px4_sd.py" "$(W "$EXE")" "$(W "$LOGS/px4_sd_rapido.md")" 8 4 0,1,2,3,5 0,1,2 > "$WORK/sd_rapido.txt" || FAIL=1
   tail -9 "$WORK/sd_rapido.txt"
+  echo; echo "== takeover do piloto: cenários e sonda nos estados EmergencyLanding (px4_takeover.py)"
+  "$PY" "$HERE/px4_takeover.py" "$(W "$EXE")" "$(W "$TR/TraceData.tla")" "$(W "$TR/tracos.csv")" "$(W "$LOGS/px4_takeover.md")" > "$WORK/takeover.txt" || FAIL=1
+  grep -E "^T=" "$WORK/takeover.txt"
+  echo; echo "== (SD) com manche e troca de modo, enumeração rápida (bateria:manche:modo; N=6, L=3)"
+  "$PY" "$HERE/px4_sd.py" "$(W "$EXE")" "$(W "$LOGS/px4_sd_takeover_rapido.md")" 6 3 0,2,5 0:0,2:0,2:1,2:0:4 > "$WORK/sd_takeover.txt" || FAIL=1
+  tail -5 "$WORK/sd_takeover.txt"
+  if [ "${FULL:-0}" = 1 ]; then
+    "$PY" "$HERE/px4_sd.py" "$(W "$EXE")" "$(W "$LOGS/px4_sd_takeover.md")" 8 4 0,2,5 0:0,2:0,2:1,2:0:4 > /dev/null || FAIL=1
+    "$PY" "$HERE/px4_sd.py" "$(W "$EXE")" "$(W "$LOGS/px4_sd_takeover_ref.md")" 8 4 0,2,5 0:0,2:0 > /dev/null || FAIL=1
+  fi
   if [ "${FULL:-0}" = 1 ]; then
     echo; echo "== (SD) com atraso, enumerações maiores (FULL=1; cerca de 3 minutos)"
     "$PY" "$HERE/px4_sd.py" "$(W "$EXE")" "$(W "$LOGS/px4_sd_atraso_2simbolos.md")" 16 8 0,1,2,3,5,8 0,2 > /dev/null || FAIL=1

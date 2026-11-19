@@ -111,6 +111,56 @@ pequenas (D25: cegueira 100 → 101, concordam 14.861 → 14.867), mas determin�
 O TLC (O3) e o SCION (O2) recusam os mutantes por regras da própria especificação; este resultado é o complemento de
 um terceiro.
 
+## Takeover do piloto
+
+No PX4, com um failsafe de bateria ativo, o piloto pode retomar o controle. As regras, lidas em `framework.cpp`
+(`checkFailsafe`, `getSelectedAction`) e confirmadas rodando o código: com `COM_FAIL_ACT_T = 0` a ação aceita takeover **só por troca de
+modo** (`AlwaysModeSwitchOnly`: o manche não vale); com `COM_FAIL_ACT_T > 0.1` o manche também vale, **mas não durante o `Hold` do
+atraso** (nele, só a troca de modo vale). Depois do takeover a ação vira `Warn` e fica assim enquanto a condição durar.
+Na nossa máquina **não existe entrada do piloto**: `EmergencyLanding` só sai com `LandedSignal`.
+
+**1. Cenários** (`logs/px4_takeover.md`, um passo por segundo, bateria `Critical` a partir do passo 1, `*` = takeover ativo):
+
+| Cenário (`COM_LOW_BAT_ACT = 2`) | `COM_FAIL_ACT_T = 0` | `COM_FAIL_ACT_T = 5` |
+|---|---|---|
+| sem takeover | `Land` do passo 1 em diante | `Hold` nos passos 1 a 5, depois `Land` |
+| manche no passo 8 | **sem efeito**, segue `Land` | `Land` → `Warn*` e fica |
+| troca de modo no passo 8 | `Land` → `Warn*` e fica | `Land` → `Warn*` e fica |
+| manche no 8, depois bateria `Emergency` no 11 | sem efeito | `Warn*` → `Hold` (novo atraso) → `Land`: o takeover é desfeito pelo novo failsafe |
+| manche no 8, bateria recupera no 10 e cai de novo no 12 | `None` no 10, depois `Land` | `None` no 10, depois `Hold` (atraso de novo) → `Land` |
+
+**2. Sonda nos nossos estados de `EmergencyLanding`** (566 fins de tick nos 1020 traços). Para cada um, repete-se o traço no PX4 e
+acrescenta-se um passo com manche ou com troca de modo para `Loiter`. Dos 566, em 49 o PX4 já tinha liberado (a classe "trava"); nos 517
+restantes ele ainda mandava pousar (ou estava no `Hold` do atraso):
+
+| Configuração | Manche assume | Troca de modo assume |
+|---|---|---|
+| `COM_FAIL_ACT_T = 0` | **0 de 517** | **517 de 517** |
+| `COM_FAIL_ACT_T = 5 s`, 100 ms por passo (tudo ainda no `Hold` do atraso) | 0 de 517 | 517 de 517 |
+| `COM_FAIL_ACT_T = 5 s`, 1 s por passo (o atraso expira em parte dos traços) | 37 de 517 | 517 de 517 |
+
+Ou seja: **em todo estado em que a nossa máquina está em `EmergencyLanding` e o PX4 ainda age, uma troca de modo do piloto abortaria o
+pouso no PX4**, e o manche também, quando há atraso configurado e ele já expirou. A nossa máquina não tem essa transição.
+Isto é uma diferença de projeto, não um defeito mostrado: se um pouso de emergência deve ou não poder ser abortado pelo piloto é uma
+exigência de domínio, a decidir com a orientação. O que o experimento fixa é o que o PX4 faz e que a nossa especificação é, nesse ponto, mais
+restritiva.
+
+**3. O takeover no estado escondido** (`px4_sd.py` com entradas `bateria:manche:modo`; `logs/px4_sd_takeover.md`, `px4_sd_takeover_ref.md`,
+`px4_sd_takeover_rapido.md`). Mesma medida da seção do atraso, agora com entradas de manche e troca de modo (8 passos, histórias de 4):
+
+| `COM_FAIL_ACT_T` (s) | 0 | 2 | 5 |
+|---|---|---|---|
+| estados β sem takeover (referência) | 5 | 28 | 50 |
+| estados β com takeover | 10 | 75 | 180 |
+| conflitos de (SD) no estado visível α, sem takeover | 1 | 2 | 2 |
+| conflitos de (SD) no estado visível α, com takeover | 6 | 8 | 8 |
+| conflitos no estado interno β (os dois casos) | **0** | **0** | **0** |
+
+O estado interno que o harness lê (agora incluindo `_user_takeover_active` e `_last_user_intended_mode`) **continua bastando**: nenhum
+conflito. Mas o número de estados escondidos cresce de 2 a 3,6 vezes, e o estado visível fica ainda pior (6 a 8 conflitos). O takeover
+acrescenta à máquina uma dimensão de histórico que um terno de vértices não tem. Como antes, a contagem para T = 5 é limitada pelo
+horizonte.
+
 ## Atraso `COM_FAIL_ACT_T` e o limite de (SD) (hipótese (b) da T27)
 
 Com `COM_FAIL_ACT_T > 0`, o PX4 não executa a ação na hora: entra em `Hold`, conta o atraso (`_current_delay`) e só então
@@ -160,9 +210,9 @@ esses dois valores são **cotas inferiores**; de T = 0 a 3 a contagem cresce com
 
 ## Limites (o que esta pasta **não** mostra)
 
-1. **Só o recorte "nível de bateria → ação".** A máquina de atraso (Hold antes da ação, refil do atraso) é exercida
-   na seção acima; o takeover do piloto (`rc_sticks_takeover_request`, mudança de modo) e as demais causas de failsafe
-   (GNSS, GCS, link, geofence) **não** são.
+1. **Só o recorte "nível de bateria → ação".** A máquina de atraso e o takeover do piloto (manche e troca de modo)
+   são exercidos nas seções acima e abaixo; as demais causas de failsafe (GNSS, GCS, link, geofence), o nível
+   `EMERGENCY` em traços do CREM e os modos de voo além de `AUTO_MISSION` e `AUTO_LOITER` **não** são.
 2. **A tradução é nossa.** A independência é a das *regras* de decisão, não da tradução de estados.
 3. Parâmetros além de `COM_LOW_BAT_ACT` e `COM_FAIL_ACT_T` têm os valores de `harness.cpp` (`defaults()`), que **não**
    foram conferidos contra os metadados de parâmetros do PX4; só importam para flags que aqui ficam sempre falsas.
@@ -196,6 +246,7 @@ O script sai com 0 se o autoteste passar (14/14) e toda divergência cair nas tr
 | `build.sh` | compila o código real e o harness |
 | `selftest.py` | 14 expectativas do teste do PX4 |
 | `px4_diff.py` | passa os traços pelo PX4 e classifica as divergências (aceita `COM_FAIL_ACT_T` e tempo por passo) |
+| `px4_takeover.py` | takeover do piloto: cenários roteirizados e sonda nos estados de `EmergencyLanding` dos traços (manche e troca de modo) |
 | `px4_mutants.py` | o PX4 contra os 16 mutantes de destino aceitos pelo compilador, em cópia de trabalho (lento: cerca de 35 minutos; `MUTANTES=1` no `run_px4_oracle.sh`) |
 | `px4_sd.py` | mede o estado escondido do PX4 com atraso: conflitos de (SD) por abstração e classes de comportamento futuro |
 | `run_px4_oracle.sh` | tudo isso em sequência |

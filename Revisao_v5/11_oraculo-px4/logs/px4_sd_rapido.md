@@ -1,4 +1,4 @@
-PX4 (failsafe real), COM_LOW_BAT_ACT = 3, armado, entrada = nivel de bateria em {0,1,2} a cada segundo.
+PX4 (failsafe real), COM_LOW_BAT_ACT = 3, armado, entrada (bateria:manche:modo) em {0:0:3,1:0:3,2:0:3} a cada segundo.
 Todas as 6561 palavras de comprimento 8; classes futuras: historias de comprimento 4, continuacoes de comprimento 4.
 
 | COM_FAIL_ACT_T (s) | estados alfa | conflitos alfa | estados alfa' | conflitos alfa' | estados beta | conflitos beta | classes futuras |

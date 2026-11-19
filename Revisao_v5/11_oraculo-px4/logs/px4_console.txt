@@ -99,6 +99,18 @@ Todas as 6561 palavras de comprimento 8; classes futuras: historias de comprimen
 | 3 | 4 | 3 | 5 | 3 | 176 | 0 | 8 |
 | 5 | 4 | 3 | 5 | 3 | 194 | 0 | 4 |
 
+== takeover do piloto: cenários e sonda nos estados EmergencyLanding (px4_takeover.py)
+T=0: {'manche': 566, 'modo': 566}
+T=5: {'manche': 566, 'modo': 566}
+T=5: {'manche': 566, 'modo': 566}
+
+== (SD) com manche e troca de modo, enumeração rápida (bateria:manche:modo; N=6, L=3)
+| COM_FAIL_ACT_T (s) | estados alfa | conflitos alfa | estados alfa' | conflitos alfa' | estados beta | conflitos beta | classes futuras |
+|---|---|---|---|---|---|---|---|
+| 0 | 4 | 6 | 10 | 3 | 10 | 0 | 5 |
+| 2 | 5 | 8 | 12 | 8 | 57 | 0 | 7 |
+| 5 | 4 | 6 | 10 | 3 | 85 | 0 | 5 |
+
 == sem afirmar bateria Critical pelo comando (assert=0), COM_LOW_BAT_ACT=2 (sensibilidade da tradução)
 Parametro COM_LOW_BAT_ACT = 2, COM_FAIL_ACT_T = 0 s, 100 ms por passo; tracos usados: 1020 (aresta e aleatorios); finais de tick comparados: 16700.
 

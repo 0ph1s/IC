@@ -27,7 +27,13 @@ N = int(sys.argv[3]) if len(sys.argv) > 3 else 10
 L = int(sys.argv[4]) if len(sys.argv) > 4 else 5
 M = N - L
 TS = [float(x) for x in (sys.argv[5] if len(sys.argv) > 5 else "0,1,2,3,5").split(",")]
-ALPHA = tuple(int(x) for x in (sys.argv[6] if len(sys.argv) > 6 else "0,1,2").split(","))
+# simbolo = bateria, ou bateria:manche, ou bateria:manche:modo (modo pretendido; 3 = AUTO_MISSION, 4 = AUTO_LOITER)
+def sym(tok):
+    f = [int(x) for x in tok.split(":")]
+    return tuple(f + [0, 3][len(f) - 1:])
+
+
+ALPHA = tuple(sym(x) for x in (sys.argv[6] if len(sys.argv) > 6 else "0,1,2").split(","))
 words = list(itertools.product(ALPHA, repeat=N))
 conts = list(itertools.product(ALPHA, repeat=M))
 
@@ -38,7 +44,7 @@ def run(T):
         script.append("NEW")
         t = 5000
         for s in w:
-            script.append("STEP %d armed=1 bat=%d" % (t, s))
+            script.append("STEP %d armed=1 bat=%d stick=%d mode=%d" % (t, s[0], s[1], s[2]))
             t += 1000
     res = subprocess.run([exe], input="\n".join(script) + "\n", capture_output=True, text=True)
     if res.returncode != 0:
@@ -76,7 +82,7 @@ for T in TS:
     print("T=%g s: alfa=%d (conflitos %d), alfa'=%d (conflitos %d), beta=%d (conflitos %d), classes futuras=%d"
           % rows[-1], flush=True)
 
-md = ["PX4 (failsafe real), COM_LOW_BAT_ACT = 3, armado, entrada = nivel de bateria em {%s} a cada segundo." % ",".join(map(str, ALPHA)),
+md = ["PX4 (failsafe real), COM_LOW_BAT_ACT = 3, armado, entrada (bateria:manche:modo) em {%s} a cada segundo." % ",".join(":".join(map(str, a)) for a in ALPHA),
       "Todas as %d palavras de comprimento %d; classes futuras: historias de comprimento %d, continuacoes de comprimento %d." % (len(words), N, L, M), "",
       "| COM_FAIL_ACT_T (s) | estados alfa | conflitos alfa | estados alfa' | conflitos alfa' | estados beta | conflitos beta | classes futuras |",
       "|---|---|---|---|---|---|---|---|"]
