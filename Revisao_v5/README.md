@@ -2,7 +2,9 @@
 
 Pasta **isolada**: tudo o que foi feito para aplicar os dois documentos está aqui, para não se misturar ao
 progresso atual do projeto (relatório v4, `Code/`, `Obsidian/`, `Projects/` etc., que **não foram alterados**).
-Nada foi commitado. Para voltar ao estado anterior basta apagar esta pasta.
+Esta pasta entrou na `main` pelos PRs 1 a 3. Os oráculos adicionais (validação de traços, SCION, justiça, amostragem,
+(SD) e PX4; pastas `11_` e `12_` e acréscimos em `03_`, `04_` e `08_`) estão, em 19/11/2026, na branch local
+`revisao-v5-oraculos`, ainda **não** enviada nem incorporada à `main`.
 
 | Pasta | Conteúdo | Comece por |
 |---|---|---|
@@ -17,6 +19,8 @@ Nada foi commitado. Para voltar ao estado anterior basta apagar esta pasta.
 | `08_reprodutibilidade/` | `run_all.sh` e todos os logs | `logs/SUMARIO.md` |
 | `10_artigo-scp/` | **manuscrito formatado para o SCP** (classe `elsarticle`), estudo do guia da revista (lido no navegador do app) e checklist, com a sobreposição com o artigo do JFP | `CHECKLIST_SUBMISSAO.md` |
 | `09_artigo-jfp/` | **manuscrito formatado para o JFP** (classe oficial `jfp-epi`), estudo do guia da revista e checklist de submissão | `CHECKLIST_SUBMISSAO.md` |
+| `11_oraculo-px4/` | **oráculo O4**: o failsafe real do PX4 compilado e dirigido pelos traços da implementação; atraso, takeover do piloto e outras causas | `README.md` da pasta |
+| `12_documentacao-oraculos/` | **guia dos oráculos O1 a O4**: o que cada um é, pega e não pega, como rodar, resultados e glossário | `README.md` da pasta |
 
 ## Em uma página: o que se obteve
 
@@ -50,6 +54,9 @@ Nada foi commitado. Para voltar ao estado anterior basta apagar esta pasta.
 bash Revisao_v5/08_reprodutibilidade/run_all.sh            # tudo, sem a mutação
 bash Revisao_v5/08_reprodutibilidade/run_all.sh --mutacao  # inclui a mutação do CREM (lenta)
 ```
+
+Opções de `run_all.sh` para os oráculos (detalhes em `12_documentacao-oraculos/README.md`): `--destinos` (48 mutantes de destino),
+`--justica` (TLC sob hipóteses de justiça), `--px4` (failsafe do PX4); com `SCXML_DIR` definido, o SCION também valida os traços.
 
 A primeira execução compila tudo e baixa do Hackage as dependências do Hedgehog. `cabal build all` e `cabal test` sem alvo
 **falham de propósito** (o teste de invalidez do pacote base não compila); use os alvos explícitos do script.

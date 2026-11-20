@@ -11,6 +11,14 @@ parâmetros (um mapa), tempo (`hrt_abstime`), eventos (desligados, como no build
 usa no simulador de failsafe) e os cabeçalhos uORB, **gerados dos `.msg` reais** por `gen_headers.py`. O `param.h` real
 confere por `static_assert` que cada parâmetro é `int` ou `float` como declarado na nossa tabela de tipos.
 
+**Sumário.** [Procedência](#procedência) · [Autoteste](#verificação-do-harness-autoteste) · [Tradução](#tradução-o-que-é-nosso-e-portanto-não-é-propriedade-do-px4) ·
+[Resultado nos traços](#resultado-traços-da-implementação-520-de-aresta--500-aleatórios-de-30-ticks-16700-finais-de-tick) ·
+[`Level`](#a-política-level-e-a-cegueira-que-persiste) · [Mutantes](#o-px4-contra-os-mutantes-de-destino) ·
+[Outras causas](#outras-causas-de-failsafe-rc-gcs-gnss-geofence-vento-tempo-de-voo-missão-navegador) ·
+[Takeover](#takeover-do-piloto) · [Atraso e (SD)](#atraso-com_fail_act_t-e-o-limite-de-sd-hipótese-b-da-t27) ·
+[Limites](#limites-o-que-esta-pasta-não-mostra) · [Reproduzir](#reproduzir) · [Arquivos](#arquivos).
+Visão de conjunto dos quatro oráculos: `../12_documentacao-oraculos/README.md`.
+
 ## Procedência
 
 | Item | Valor |
