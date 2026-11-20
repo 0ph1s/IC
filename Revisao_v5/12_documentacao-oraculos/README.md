@@ -39,6 +39,7 @@ implementação CREM ───────────────────�
 | Determinação do estado (SD) | vale nos 48 ternos, no sentido comportamental (404.208 casos exaustivos e 5.000 testes Hedgehog); dois controles negativos reprovam | `08_reprodutibilidade/logs/17_sd_48_ternos.txt` |
 | O3 | 520 traços de aresta e 500 aleatórios aceitos; 100 corrompidos recusados | `08_reprodutibilidade/logs/18_trace_validation_*`, `04_tla/` |
 | O2 | o SCION aceita exatamente a mesma lista de traços que o TLC | `08_reprodutibilidade/logs/18_scion_console.txt`, `04_tla/scion/` |
+| O3 e O2 contra mutantes | dos 16 mutantes de destino aceitos pelo compilador, **16 recusados pelo TLC e 16 pelo SCION**, com a mesma lista de traços aceitos nos 16 (executado em 19/11/2026, `python 03_codigo/validation/scripts/o3_mutants.py`, cerca de 1 hora) | `08_reprodutibilidade/logs/18_o3_contra_mutantes.md` |
 | TLC (modelo) | `OneSlot` viola `NoPermanentBlindness`; `Level` satisfaz tudo | `08_reprodutibilidade/logs/14_tlc_*.txt` |
 | Justiça | `OneSlot` viola sob a hipótese base e sob comandos de pouso, corte e decolagem justos; vale sob as demais; `Level` vale em todas (9 hipóteses × 2 políticas) | `08_reprodutibilidade/logs/20_justica/` |
 | Mutação de destinos | dos 48 mutantes, 32 o compilador recusa e 16 as suítes matam; nenhum vivo | `08_reprodutibilidade/logs/06b_mutation_dest48.md` |
@@ -94,8 +95,10 @@ Tudo em `11_oraculo-px4/README.md`, com a metodologia e os limites de cada linha
 ## 6. O que cada oráculo **não** prova
 
 * **O1, O2, O3:** concordam entre si e com a implementação, mas as regras são todas do mesmo autor. Concordância não é correção.
-* **O3 contra mutantes** e **SCION contra mutantes:** o resultado de uma execução anterior (18 e 19/11/2026, em cópias de trabalho) está
-  descrito no README de `08_reprodutibilidade`; o script `o3_mutants.py` **não foi executado neste repositório**.
+* **O3 e SCION contra mutantes:** 16 de 16 mutantes de destino são recusados pelos dois, com os **mesmos conjuntos de traços aceitos** em
+  todos. Como o SCXML foi escrito a partir do mesmo TLA+ e das mesmas tabelas, a coincidência mostra que o **motor** (TLC contra SCION)
+  não muda o veredito, não que as regras estejam certas. Os mutantes são só de **destino**; não há mutante de entrada ausente, evento
+  extra ou política.
 * **O4:** só o recorte "nível de bateria → ação" é comparado traço a traço com o CREM; atraso, takeover e outras causas são medidas sobre
   o PX4, não comparações. A tradução de estados é nossa. 15 dos 16 mutantes são detectados por comparação com a original, não por uma
   regra do PX4. O comando `--px4` do `run_all.sh` foi testado só isoladamente, não numa execução completa.

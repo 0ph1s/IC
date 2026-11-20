@@ -93,5 +93,9 @@ Se os resultados divergirem do esperado, o erro pode estar na especificação, n
   tabelas pelo mesmo autor**: a independência é a do motor de execução, não a da leitura das regras. A região `obs` do SCXML
   é só instrumentação.
 
+**Contra mutantes** (`03_codigo/validation/scripts/o3_mutants.py`, `logs/18_o3_contra_mutantes.md`): os 16 mutantes de destino que o
+compilador aceita são recusados **tanto pelo TLC quanto pelo SCION**, e os dois aceitam o mesmo conjunto de traços em todos os 16
+(executado em 19/11/2026). Só há mutantes de destino; entrada ausente, evento extra e política não foram mutados.
+
 Limite: os traços vêm do mesmo autor do modelo. Isto liga o modelo ao código, sinal a sinal, mas não substitui a revisão
 independente das tabelas.
