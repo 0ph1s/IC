@@ -7,6 +7,13 @@
 # Uso (de qualquer pasta):
 #     bash Revisao_v5/08_reprodutibilidade/run_all.sh              # tudo, sem a mutação (rápida: alguns minutos)
 #     bash Revisao_v5/08_reprodutibilidade/run_all.sh --mutacao    # inclui a mutação da implementação (lenta: dezenas de minutos)
+#     --destinos   inclui a mutação exaustiva de destinos, 48 mutantes (lenta: cerca de 2 horas; em Windows, defina
+#                  TMPDIR com caminho curto, por exemplo TMPDIR=/c/mv)
+#     --justica    inclui o TLC sob hipóteses de justiça alternativas (cerca de 35 minutos)
+#     --px4        inclui o oráculo PX4 (11_oraculo-px4/): baixa do GitHub só o failsafe do PX4 (precisa de rede),
+#                  compila o código real com clang++ e passa os traços da implementação por ele (cerca de 1 minuto)
+#     As opções se combinam. SCXML_DIR (opcional): pasta onde se fez `npm install scxml@4.3.1 --ignore-scripts`;
+#     se definida, o oráculo SCION também valida os traços (04_tla/scion/).
 #
 # Requisitos: GHC 9.6.7, cabal 3.12.1.0, bash (no Windows, o Git Bash), clang/clang++ (os do GHC servem),
 # Java e 04_tla/tools/tla2tools.jar v1.7.4 (ver 04_tla/run_tlc.sh; sem o jar, o passo do TLC é marcado FALHA) e Python.
@@ -20,7 +27,16 @@ HERE="$(cd "$(dirname "$0")" && pwd)"          # 08_reprodutibilidade/
 ROOT="$(cd "$HERE/.." && pwd)"                 # Revisao_v5/
 CODE="$ROOT/03_codigo"
 LOGS="$HERE/logs"
-WITH_MUT=0; [ "${1:-}" = "--mutacao" ] && WITH_MUT=1
+WITH_MUT=0; WITH_DEST=0; WITH_FAIR=0; WITH_PX4=0
+for arg in "$@"; do
+  case "$arg" in
+    --mutacao) WITH_MUT=1;;
+    --destinos) WITH_DEST=1;;
+    --justica) WITH_FAIR=1;;
+    --px4) WITH_PX4=1;;
+    *) echo "opção desconhecida: $arg"; exit 2;;
+  esac
+done
 export LANG=C.UTF-8
 mkdir -p "$LOGS"
 cd "$CODE" || exit 2
@@ -71,7 +87,8 @@ record "versões registradas" ok "00_versions.txt"
 TARGETS=(avionics-crem:lib:avionics-crem avionics-crem:exe:avionics-sim avionics-crem:exe:avionics-crem
   avionics-crem:test:avionics-spec-tests avionics-crem:test:avionics-sim-tests avionics-crem:test:avionics-chain-tests avionics-crem:test:avionics-policy-tests
   avionics-validation:lib:avionics-validation avionics-validation:test:validation-conformance-tests avionics-validation:test:validation-boundary-tests
-  avionics-validation:test:validation-reach-tests avionics-validation:test:validation-model-tests)
+  avionics-validation:test:validation-reach-tests avionics-validation:test:validation-model-tests
+  avionics-validation:test:validation-sd-tests avionics-validation:exe:validation-export avionics-validation:exe:validation-sampling)
 cabal build "${TARGETS[@]}" 2>&1 | grep -v "package list for\|Run 'cabal update'" > "$LOGS/01_build_all.txt"
 if [ "${PIPESTATUS[0]}" -eq 0 ]; then record "compilação de todos os alvos (-Wall -Werror=incomplete-patterns)" ok "01_build_all.txt"
 else record "compilação de todos os alvos" FALHA "01_build_all.txt"; fi
@@ -113,6 +130,7 @@ run_cabal_test "novo: validation-conformance-tests (tabelas x CREM, exaustivo)" 
 run_cabal_test "novo: validation-boundary-tests (fronteira tipada)" avionics-validation:test:validation-boundary-tests 08_boundary.txt
 run_cabal_test "novo: validation-reach-tests (alcançabilidade exaustiva)" avionics-validation:test:validation-reach-tests 04_reach.txt
 run_cabal_test "novo: validation-model-tests (Hedgehog, com mutantes)" avionics-validation:test:validation-model-tests 03_model_hedgehog.txt
+run_cabal_test "novo: validation-sd-tests ((SD) nos 48 ternos, com controles negativos)" avionics-validation:test:validation-sd-tests 17_sd_48_ternos.txt
 
 # ---------------------------------------------------------------------------
 # 5. Matriz de rejeição (16 compilações, causa conferida) e auditoria de C e C++
@@ -140,6 +158,32 @@ else
 fi
 
 # ---------------------------------------------------------------------------
+# 5c. O3: traços da implementação validados no TLC contra AvionicsLoop.tla (T12), grafo exportado (T21) e
+#     cegueira medida a cada sinal (T14). Também precisa do jar do TLC. Opcional: o SCION como segundo motor (T13).
+# ---------------------------------------------------------------------------
+if [ -f "$ROOT/04_tla/tools/tla2tools.jar" ]; then
+  TRACES="$LOGS/18_traces"; rm -rf "$TRACES"
+  bash "$ROOT/04_tla/run_trace_validation.sh" "$TRACES" > "$LOGS/18_trace_validation_console.txt" 2>&1
+  if [ $? -eq 0 ]; then record "O3: traços da implementação aceitos pelo TLC (aresta e aleatórios); corrompidos recusados" ok "18_trace_validation_console.txt"
+  else record "O3: validação de traços no TLC" FALHA "18_trace_validation_console.txt"; fi
+  if [ -n "${SCXML_DIR:-}" ] && [ -d "$SCXML_DIR/node_modules/scxml" ] && command -v node > /dev/null; then
+    SCXML_DIR="$SCXML_DIR" ACCEPT_LIST="$TRACES/aceitos_scion.txt" node --no-deprecation "$ROOT/04_tla/scion/scion_oracle.js" "$ROOT/04_tla/TraceData.tla" "$TRACES/tracos.csv" > "$LOGS/18_scion_console.txt" 2>&1
+    if [ $? -eq 0 ] && cmp -s <(tr -d '\r' < "$TRACES/aceitos_tlc.txt") <(tr -d '\r' < "$TRACES/aceitos_scion.txt"); then record "O2: SCION aceita os mesmos traços que o TLC" ok "18_scion_console.txt"
+    else record "O2: SCION difere do TLC" FALHA "18_scion_console.txt"; fi
+  else
+    echo "| O2 (SCION): não executado (defina SCXML_DIR; ver 04_tla/scion/) | n/a | \`18_scion_console.txt\` |" >> "$SUM"
+  fi
+else
+  record "O3: não executado (falta 04_tla/tools/tla2tools.jar)" FALHA "18_trace_validation_console.txt"
+fi
+
+# ---------------------------------------------------------------------------
+# 5d. Amostragem contra fechamento (T16) e enumeração limitada por profundidade (T17): probabilidades exatas
+# ---------------------------------------------------------------------------
+( cd "$CODE/validation" && cabal run -v0 avionics-validation:exe:validation-sampling ) 2>&1 | grep -v "package list for\|Run 'cabal update'" > "$LOGS/19_amostragem.md"
+if [ "${PIPESTATUS[0]}" -eq 0 ]; then record "amostragem contra fechamento (valores exatos) e enumeração por profundidade" ok "19_amostragem.md"; else record "amostragem contra fechamento" FALHA "19_amostragem.md"; fi
+
+# ---------------------------------------------------------------------------
 # 6. Mutação da implementação em CREM (lenta; só com --mutacao)
 # ---------------------------------------------------------------------------
 if [ "$WITH_MUT" -eq 1 ]; then
@@ -147,6 +191,27 @@ if [ "$WITH_MUT" -eq 1 ]; then
   if [ $? -eq 0 ]; then record "mutação do CREM (H1 a H9): nenhum mutante vivo" ok "06_mutation_haskell.md"; else record "mutação do CREM: há mutante vivo ou erro" FALHA "06_mutation_haskell_console.txt"; fi
 else
   echo "| mutação do CREM | não executada (use --mutacao) | \`06_mutation_haskell.md\` (execução anterior, se existir) |" >> "$SUM"
+fi
+
+if [ "$WITH_DEST" -eq 1 ]; then
+  bash "$CODE/validation/scripts/mutation_dest48.sh" > "$LOGS/06b_mutation_dest48_console.txt" 2>&1
+  if [ $? -eq 0 ]; then record "mutação exaustiva de destinos (48): 32 recusados, 16 aceitos, nenhum vivo" ok "06b_mutation_dest48.md"; else record "mutação de destinos: há mutante vivo ou erro" FALHA "06b_mutation_dest48_console.txt"; fi
+else
+  echo "| mutação de destinos (48) | não executada (use --destinos) | \`06b_mutation_dest48.md\` (execução anterior, se existir) |" >> "$SUM"
+fi
+
+if [ "$WITH_FAIR" -eq 1 ] && [ -f "$ROOT/04_tla/tools/tla2tools.jar" ]; then
+  bash "$ROOT/04_tla/run_fairness.sh" "$LOGS/20_justica" > "$LOGS/20_justica_console.txt" 2>&1
+  if [ $? -eq 0 ]; then record "TLC sob hipóteses de justiça: tabela igual à esperada (9 hipóteses x 2 políticas)" ok "20_justica/20_justica.md"; else record "TLC sob hipóteses de justiça" FALHA "20_justica_console.txt"; fi
+else
+  echo "| TLC sob hipóteses de justiça | não executado (use --justica) | \`20_justica/20_justica.md\` (execução anterior, se existir) |" >> "$SUM"
+fi
+
+if [ "$WITH_PX4" -eq 1 ]; then
+  bash "$ROOT/11_oraculo-px4/run_px4_oracle.sh" "${TMPDIR:-/tmp}/px4_oraculo" > "$LOGS/21_px4_console.txt" 2>&1
+  if [ $? -eq 0 ]; then record "O4 (PX4): autoteste 14/14 e divergências só nas classes explicadas" ok "21_px4_console.txt"; else record "O4 (PX4): autoteste ou classe inexplicada" FALHA "21_px4_console.txt"; fi
+else
+  echo "| O4 (PX4) | não executado (use --px4) | \`11_oraculo-px4/logs/px4_console.txt\` (execução anterior, se existir) |" >> "$SUM"
 fi
 
 echo

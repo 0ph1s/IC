@@ -1,0 +1,139 @@
+PX4 em 4e44c822c9018120508bce6d8ad349f0775586a1
+expectativas do PX4 reproduzidas: 14 de 14
+
+== traduzindo CriticalBattery como bateria Critical (assert=1), COM_LOW_BAT_ACT=2
+Parametro COM_LOW_BAT_ACT = 2, COM_FAIL_ACT_T = 0 s, 100 ms por passo; tracos usados: 1020 (aresta e aleatorios); finais de tick comparados: 16700.
+
+| Classe | Finais de tick | Exemplo (tipo, traco, tick) |
+|---|---|---|
+| concordam | 16450 | ('aresta', 1, 1) |
+| PX4 pousa; nossa fica InFlight com bateria Critical (cegueira) | 201 | ('aresta', 26, 2) |
+| trava: nossa segue em EmergencyLanding com bateria Low; PX4 liberou (acao Warn) | 41 | ('aresta', 143, 3) |
+| PX4 so avisa: a bateria ja estava Critical ao armar (framework.cpp/failsafe.cpp, COM_LOW_BAT_ACT) | 8 | ('aresta', 269, 4) |
+
+Persistencia da cegueira (ticks consecutivos terminando em (InFlight, Critical), do lado nosso):
+sequencias: 223; maior sequencia: 2 ticks; sequencias com mais de 1 tick: 18.
+Tracos que terminam cegos, por tipo (total do tipo): aleatorio30: 0 de 500; aresta: 33 de 520
+
+== traduzindo CriticalBattery como bateria Critical (assert=1), COM_LOW_BAT_ACT=3
+Parametro COM_LOW_BAT_ACT = 3, COM_FAIL_ACT_T = 0 s, 100 ms por passo; tracos usados: 1020 (aresta e aleatorios); finais de tick comparados: 16700.
+
+| Classe | Finais de tick | Exemplo (tipo, traco, tick) |
+|---|---|---|
+| concordam | 16450 | ('aresta', 1, 1) |
+| PX4 pousa; nossa fica InFlight com bateria Critical (cegueira) | 201 | ('aresta', 26, 2) |
+| trava: nossa segue em EmergencyLanding com bateria Low; PX4 liberou (acao Warn) | 41 | ('aresta', 143, 3) |
+| PX4 so avisa: a bateria ja estava Critical ao armar (framework.cpp/failsafe.cpp, COM_LOW_BAT_ACT) | 8 | ('aresta', 269, 4) |
+
+Persistencia da cegueira (ticks consecutivos terminando em (InFlight, Critical), do lado nosso):
+sequencias: 223; maior sequencia: 2 ticks; sequencias com mais de 1 tick: 18.
+Tracos que terminam cegos, por tipo (total do tipo): aleatorio30: 0 de 500; aresta: 33 de 520
+
+== oráculo em Haskell, política oneslot (traços de validation-export oneslot), COM_LOW_BAT_ACT=2
+Parametro COM_LOW_BAT_ACT = 2, COM_FAIL_ACT_T = 0 s, 100 ms por passo; tracos usados: 1023 (aresta e aleatorios); finais de tick comparados: 16738.
+
+| Classe | Finais de tick | Exemplo (tipo, traco, tick) |
+|---|---|---|
+| concordam | 16476 | ('aresta', 1, 1) |
+| PX4 pousa; nossa fica InFlight com bateria Critical (cegueira) | 213 | ('aresta', 26, 2) |
+| trava: nossa segue em EmergencyLanding com bateria Low; PX4 liberou (acao Warn) | 41 | ('aresta', 143, 3) |
+| PX4 so avisa: a bateria ja estava Critical ao armar (framework.cpp/failsafe.cpp, COM_LOW_BAT_ACT) | 8 | ('aresta', 269, 4) |
+
+Persistencia da cegueira (ticks consecutivos terminando em (InFlight, Critical), do lado nosso):
+sequencias: 226; maior sequencia: 11 ticks; sequencias com mais de 1 tick: 20.
+Tracos que terminam cegos, por tipo (total do tipo): aleatorio30: 0 de 500; aresta: 33 de 520; ocioso: 2 de 3
+
+== oráculo em Haskell, política level (traços de validation-export level), COM_LOW_BAT_ACT=2
+Parametro COM_LOW_BAT_ACT = 2, COM_FAIL_ACT_T = 0 s, 100 ms por passo; tracos usados: 1023 (aresta e aleatorios); finais de tick comparados: 16738.
+
+| Classe | Finais de tick | Exemplo (tipo, traco, tick) |
+|---|---|---|
+| concordam | 16472 | ('aresta', 1, 1) |
+| PX4 pousa; nossa fica InFlight com bateria Critical (cegueira) | 204 | ('aresta', 26, 2) |
+| trava: nossa segue em EmergencyLanding com bateria Low; PX4 liberou (acao Warn) | 48 | ('aresta', 143, 3) |
+| PX4 so avisa: a bateria ja estava Critical ao armar (framework.cpp/failsafe.cpp, COM_LOW_BAT_ACT) | 14 | ('aresta', 261, 4) |
+
+Persistencia da cegueira (ticks consecutivos terminando em (InFlight, Critical), do lado nosso):
+sequencias: 225; maior sequencia: 2 ticks; sequencias com mais de 1 tick: 10.
+Tracos que terminam cegos, por tipo (total do tipo): aleatorio30: 0 de 500; aresta: 25 de 520; ocioso: 0 de 3
+
+== com atraso: COM_FAIL_ACT_T=5 s, 100 ms por passo, COM_LOW_BAT_ACT=2
+Parametro COM_LOW_BAT_ACT = 2, COM_FAIL_ACT_T = 5 s, 100 ms por passo; tracos usados: 1020 (aresta e aleatorios); finais de tick comparados: 16700.
+
+| Classe | Finais de tick | Exemplo (tipo, traco, tick) |
+|---|---|---|
+| concordam | 15933 | ('aresta', 1, 1) |
+| ATRASO: o PX4 esta em Hold esperando COM_FAIL_ACT_T; a nossa esta em EmergencyLanding | 517 | ('aresta', 49, 2) |
+| ATRASO: o PX4 esta em Hold esperando COM_FAIL_ACT_T; a nossa esta em InFlight | 201 | ('aresta', 26, 2) |
+| trava: nossa segue em EmergencyLanding com bateria Low; PX4 liberou (acao Warn) | 41 | ('aresta', 143, 3) |
+| PX4 so avisa: a bateria ja estava Critical ao armar (framework.cpp/failsafe.cpp, COM_LOW_BAT_ACT) | 8 | ('aresta', 269, 4) |
+
+Persistencia da cegueira (ticks consecutivos terminando em (InFlight, Critical), do lado nosso):
+sequencias: 223; maior sequencia: 2 ticks; sequencias com mais de 1 tick: 18.
+Tracos que terminam cegos, por tipo (total do tipo): aleatorio30: 0 de 500; aresta: 33 de 520
+
+== com atraso: COM_FAIL_ACT_T=5 s, 1000 ms por passo, COM_LOW_BAT_ACT=2
+Parametro COM_LOW_BAT_ACT = 2, COM_FAIL_ACT_T = 5 s, 1000 ms por passo; tracos usados: 1020 (aresta e aleatorios); finais de tick comparados: 16700.
+
+| Classe | Finais de tick | Exemplo (tipo, traco, tick) |
+|---|---|---|
+| concordam | 15941 | ('aresta', 1, 1) |
+| ATRASO: o PX4 esta em Hold esperando COM_FAIL_ACT_T; a nossa esta em EmergencyLanding | 509 | ('aresta', 49, 2) |
+| ATRASO: o PX4 esta em Hold esperando COM_FAIL_ACT_T; a nossa esta em InFlight | 197 | ('aresta', 26, 2) |
+| trava: nossa segue em EmergencyLanding com bateria Low; PX4 liberou (acao Warn) | 41 | ('aresta', 143, 3) |
+| PX4 so avisa: a bateria ja estava Critical ao armar (framework.cpp/failsafe.cpp, COM_LOW_BAT_ACT) | 8 | ('aresta', 269, 4) |
+| PX4 pousa; nossa fica InFlight com bateria Critical (cegueira) | 4 | ('aresta', 486, 4) |
+
+Persistencia da cegueira (ticks consecutivos terminando em (InFlight, Critical), do lado nosso):
+sequencias: 223; maior sequencia: 2 ticks; sequencias com mais de 1 tick: 18.
+Tracos que terminam cegos, por tipo (total do tipo): aleatorio30: 0 de 500; aresta: 33 de 520
+
+== (SD) com atraso, enumeração exaustiva rápida (alfabeto 0,1,2; N=8, L=4)
+Todas as 6561 palavras de comprimento 8; classes futuras: historias de comprimento 4, continuacoes de comprimento 4.
+
+| COM_FAIL_ACT_T (s) | estados alfa | conflitos alfa | estados alfa' | conflitos alfa' | estados beta | conflitos beta | classes futuras |
+|---|---|---|---|---|---|---|---|
+| 0 | 3 | 2 | 4 | 2 | 18 | 0 | 2 |
+| 1 | 4 | 2 | 5 | 2 | 54 | 0 | 3 |
+| 2 | 4 | 3 | 5 | 3 | 108 | 0 | 6 |
+| 3 | 4 | 3 | 5 | 3 | 176 | 0 | 8 |
+| 5 | 4 | 3 | 5 | 3 | 194 | 0 | 4 |
+
+== takeover do piloto: cenários e sonda nos estados EmergencyLanding (px4_takeover.py)
+T=0: {'manche': 566, 'modo': 566}
+T=5: {'manche': 566, 'modo': 566}
+T=5: {'manche': 566, 'modo': 566}
+
+== (SD) com manche e troca de modo, enumeração rápida (bateria:manche:modo; N=6, L=3)
+| COM_FAIL_ACT_T (s) | estados alfa | conflitos alfa | estados alfa' | conflitos alfa' | estados beta | conflitos beta | classes futuras |
+|---|---|---|---|---|---|---|---|
+| 0 | 4 | 6 | 10 | 3 | 10 | 0 | 5 |
+| 2 | 5 | 8 | 12 | 8 | 57 | 0 | 7 |
+| 5 | 4 | 6 | 10 | 3 | 85 | 0 | 5 |
+
+== outras causas de failsafe: trava ou libera, lei de severidade, ordem (px4_causas.py, 40 configurações)
+T=0: 20080 casos, 0 violacoes
+T=5: 20080 casos, 0 violacoes
+ordem T=0: 4800 casos, 0 dependem da ordem, 0 diferem do maximo
+ordem T=5: 4800 casos, 0 dependem da ordem, 0 diferem do maximo
+
+== (SD) com 4 causas, uma de cada vez (alfabeto 0,bat2,gnss1,mc1,gf1; N=6, L=3)
+| COM_FAIL_ACT_T (s) | estados alfa | conflitos alfa | estados alfa' | conflitos alfa' | estados beta | conflitos beta | classes futuras |
+|---|---|---|---|---|---|---|---|
+| 0 | 5 | 5 | 15 | 5 | 77 | 0 | 7 |
+| 2 | 5 | 9 | 17 | 28 | 540 | 0 | 15 |
+
+== sem afirmar bateria Critical pelo comando (assert=0), COM_LOW_BAT_ACT=2 (sensibilidade da tradução)
+Parametro COM_LOW_BAT_ACT = 2, COM_FAIL_ACT_T = 0 s, 100 ms por passo; tracos usados: 1020 (aresta e aleatorios); finais de tick comparados: 16700.
+
+| Classe | Finais de tick | Exemplo (tipo, traco, tick) |
+|---|---|---|
+| concordam | 16010 | ('aresta', 1, 1) |
+| trava: nossa segue em EmergencyLanding com bateria Charged; PX4 liberou (acao None) | 275 | ('aresta', 49, 2) |
+| trava: nossa segue em EmergencyLanding com bateria Low; PX4 liberou (acao Warn) | 210 | ('aresta', 50, 2) |
+| PX4 pousa; nossa fica InFlight com bateria Critical (cegueira) | 201 | ('aresta', 26, 2) |
+| PX4 so avisa: a bateria ja estava Critical ao armar (framework.cpp/failsafe.cpp, COM_LOW_BAT_ACT) | 4 | ('aresta', 269, 4) |
+
+Persistencia da cegueira (ticks consecutivos terminando em (InFlight, Critical), do lado nosso):
+sequencias: 223; maior sequencia: 2 ticks; sequencias com mais de 1 tick: 18.
+Tracos que terminam cegos, por tipo (total do tipo): aleatorio30: 0 de 500; aresta: 33 de 520

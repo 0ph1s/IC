@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  O2 (plano v2, T13): o laço fechado aviônica || energia -> ambiente em SCXML, para ser executado pelo SCION
+  (scxml 4.3.1). ESCRITO A PARTIR DE AvionicsLoop.tla E DAS TABELAS (transition_table.csv, power_table.csv,
+  POLITICAS.md), NÃO do código Haskell. AUTORIA: este arquivo foi escrito pela mesma edição que escreveu o TLA+
+  de apoio; a independência do oráculo está no MOTOR DE EXECUÇÃO (terceiros, padrão W3C), não na leitura das
+  regras. Para ganhar independência de leitura, outra pessoa deve reescrever este arquivo só a partir do texto.
+
+  Mapeamento de semântica (hipótese a verificar na comparação, não resultado):
+    * fila de sinais de um tick da implementação  <->  eventos EXTERNOS do SCXML (Beat, comando, energia), um por vez;
+    * o que o ambiente libera num Beat (reinjetado à frente da fila, em profundidade, pelo Feedback do crem)
+      <->  eventos INTERNOS (raise), que o SCXML processa, em ordem, antes do próximo evento externo;
+    * telemetria da aviônica e da bateria para o ambiente  <->  eventos internos cue_* (um passo extra interno, que
+      NÃO corresponde a um sinal da implementação; por isso o observador só registra um passo por sinal).
+  Política do ambiente: OneSlot (um slot; com o slot ocupado a telemetria nova é descartada: não há transição).
+-->
+<scxml xmlns="http://www.w3.org/2005/07/scxml" version="1.0" initial="loop">
+  <parallel id="loop">
+
+    <!-- aviônica: transition_table.csv; pares sem regra deixam o estado e não emitem (MsgIgnored) -->
+    <state id="av" initial="Grounded">
+      <state id="Grounded">
+        <transition event="TakeoffSignal" target="InFlight"/>
+        <transition event="SystemCutoff" target="Shutdown"/>
+      </state>
+      <state id="InFlight">
+        <transition event="CriticalBattery" target="EmergencyLanding">
+          <raise event="cue_emergency"/>
+        </transition>
+      </state>
+      <state id="EmergencyLanding">
+        <transition event="LandedSignal" target="Grounded">
+          <raise event="cue_landed"/>
+        </transition>
+      </state>
+      <state id="Shutdown"/>
+    </state>
+
+    <!-- bateria: power_table.csv; o relato crítico sai sempre que o nível resultante é Critical -->
+    <state id="pw" initial="Charged">
+      <state id="Charged">
+        <transition event="Drain" target="Low"/>
+      </state>
+      <state id="Low">
+        <transition event="Drain" target="Critical">
+          <raise event="cue_crit"/>
+        </transition>
+        <transition event="Recharge" target="Charged"/>
+      </state>
+      <state id="Critical">
+        <transition event="Drain">
+          <raise event="cue_crit"/>
+        </transition>
+        <transition event="Recharge" target="Low"/>
+        <transition event="ShedLoad" target="Low"/>
+      </state>
+    </state>
+
+    <!-- ambiente (OneSlot): retém uma telemetria e a libera no Beat seguinte, na ordem de POLITICAS.md -->
+    <state id="ms" initial="Standby">
+      <state id="Standby">
+        <transition event="cue_crit" target="CriticalHeld"/>
+        <transition event="cue_emergency" target="TouchdownHeld"/>
+        <transition event="cue_landed" target="CutoffHeld"/>
+      </state>
+      <state id="CriticalHeld">
+        <transition event="Beat" target="Standby">
+          <raise event="CriticalBattery"/>
+        </transition>
+      </state>
+      <state id="TouchdownHeld">
+        <transition event="Beat" target="Standby">
+          <raise event="ShedLoad"/>
+          <raise event="LandedSignal"/>
+        </transition>
+      </state>
+      <state id="CutoffHeld">
+        <transition event="Beat" target="Standby">
+          <raise event="SystemCutoff"/>
+        </transition>
+      </state>
+    </state>
+
+    <!-- Observador (só instrumentação, não é modelo): uma região que aceita QUALQUER evento sem mudar nada, para que
+         o SCION faça um passo pequeno (e dispare onSmallStepBegin) para todo sinal, mesmo quando nenhuma
+         transição das três máquinas o consome (por exemplo, um Beat com o ambiente em Standby). -->
+    <state id="obs" initial="Watch">
+      <state id="Watch">
+        <transition event="*"/>
+      </state>
+    </state>
+
+  </parallel>
+</scxml>

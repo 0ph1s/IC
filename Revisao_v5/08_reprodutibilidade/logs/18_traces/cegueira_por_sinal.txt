@@ -1,0 +1,9 @@
+ternos alcançáveis: 26; arestas: 520
+ternos cegos no FIM do tick (aviônica InFlight e bateria Critical): 3
+arestas com pelo menos um passo cego: 81
+arestas com TODOS os passos cegos: 16
+arestas com passo cego e destino NÃO cego no fim do tick (cegueira só no meio do tick): 48
+cego para sempre, definição por fim de tick (foreverBad)   : 2 ["(InFlight, Critical, Standby)","(InFlight, Critical, CutoffHeld)"]
+cego para sempre, definição por sinal (TLA+: toda a cauda)  : 2 ["(InFlight, Critical, Standby)","(InFlight, Critical, CutoffHeld)"]
+as duas definições coincidem: True
+presos sob ticks ociosos (fim de tick): 2 ["(InFlight, Critical, Standby)","(InFlight, Critical, CutoffHeld)"]

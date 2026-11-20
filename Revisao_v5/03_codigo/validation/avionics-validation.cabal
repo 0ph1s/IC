@@ -81,3 +81,42 @@ test-suite validation-reach-tests
     avionics-crem,
     avionics-validation,
     containers
+
+-- T02 (plano v2): determinacao do estado (SD) a partir dos 48 ternos.   cabal test validation-sd-tests
+test-suite validation-sd-tests
+  import: warnings
+  type: exitcode-stdio-1.0
+  main-is: SDSpec.hs
+  hs-source-dirs: test
+  other-modules: Gen
+  build-depends:
+    base,
+    avionics-crem,
+    avionics-validation,
+    hedgehog
+
+-- T21, T14 e T12 (plano v2): exporta grafo, cegueira por sinal e tracos para o TLC.
+--   cabal run validation-export -- <pasta de saida>
+executable validation-export
+  import: warnings
+  main-is: ExportTraces.hs
+  hs-source-dirs: app
+  build-depends:
+    base,
+    avionics-crem,
+    avionics-validation,
+    containers,
+    directory,
+    filepath
+
+-- T16 e T17 (plano v2): probabilidade exata de achar a lacuna por teste aleatorio e por enumeracao limitada.
+--   (na pasta validation/)  cabal run validation-sampling
+executable validation-sampling
+  import: warnings
+  main-is: Sampling.hs
+  hs-source-dirs: app
+  build-depends:
+    base,
+    avionics-crem,
+    avionics-validation,
+    containers

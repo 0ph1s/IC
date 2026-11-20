@@ -1,6 +1,6 @@
 # Defeitos na FSM em Haskell: `Avionics.Naive` (sem CREM) e a ação do CREM
 
-Gerado por `05_c-cpp/scripts/haskell_defects.sh` em 2026-11-13, GHC 9.6.7.
+Gerado por `05_c-cpp/scripts/haskell_defects.sh` em 2026-11-19, GHC 9.6.7.
 
 ## Haskell sem CREM (`Avionics.Naive`)
 

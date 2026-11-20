@@ -1,6 +1,6 @@
 # Auditoria da comparação com C e C++ (matriz reproduzível)
 
-Gerado por `05_c-cpp/scripts/audit.sh` em 2026-11-13. Sistema: MINGW64_NT-10.0-26300 (x86_64).
+Gerado por `05_c-cpp/scripts/audit.sh` em 2026-11-19. Sistema: MINGW64_NT-10.0-26300 (x86_64).
 Compilador C: clang version 14.0.6. Compilador C++: clang version 14.0.6.
 Esperado: os 16 triplos de `03_codigo/validation/spec/transition_table.csv` (coluna `origem` não usada aqui).
 

@@ -1,6 +1,6 @@
 # Matriz de rejeição da topologia em C++17 tipado (16 pares), com a causa conferida
 
-Gerado por `05_c-cpp/scripts/typed_matrix.sh` em 2026-11-13. Compilador: clang version 14.0.6, `-std=c++17 -Wall -Wextra`.
+Gerado por `05_c-cpp/scripts/typed_matrix.sh` em 2026-11-19. Compilador: clang version 14.0.6, `-std=c++17 -Wall -Wextra`.
 Esperado: derivado de `03_codigo/validation/spec/transition_table.csv`. Rejeitado = exatamente um erro, `static_assert` nomeando o par.
 
 | De | Para | Esperado | Obtido | Confere |
